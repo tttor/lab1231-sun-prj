@@ -14,8 +14,7 @@ void LearGistWrapper::extract(const std::string& img_path, const std::string& ou
   
   const size_t dot_pos = img_path_parts.back().find('.');
   const string ext = img_path_parts.back().substr(dot_pos+1, img_path_parts.back().size());
-  
-  const string img_filename = img_path_parts.back().substr(0, img_path_parts.back().size()-dot_pos+1);
+  const string img_filename = img_path_parts.back().substr(0, img_path_parts.back().size()-(ext.size()+1));// +1 for the dot
   
   string ppm_img_path;
   if (ext != "ppm") {
