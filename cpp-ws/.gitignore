@@ -1,0 +1,7 @@
+# tmp files
+*~
+
+# ignored dir
+test
+build
+out
