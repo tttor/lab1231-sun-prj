@@ -3,7 +3,7 @@ project (LAB1231_SUN_PRJ)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")# Activate C++11
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}) # used to determine the root of the install destination; you may change it to, e.g.: /usr/local/lab1231-ecg-prj
 
-find_package(Boost COMPONENTS system filesystem REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 find_package(OpenCV REQUIRED )
 
 add_subdirectory (src)
