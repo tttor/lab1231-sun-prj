@@ -7,13 +7,15 @@ from sklearn.cross_validation import train_test_split
 
 def main():
     #
-    data = scene_clf.load_oliv8()
+    #data = scene_clf.load_oliv8()
+    #data = scene_clf.load_quat8()
+    data = scene_clf.load_fei8()
     X = [datum[0]for datum in data]
     y = [datum[1] for datum in data]
     
     n_clone = 1# a single clone is represented as a list of [X_tr, X_te, y_tr, y_te]
     dataset = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
-
+    
     # Preprocessing
     # TODO
     
@@ -33,8 +35,8 @@ def main():
     perf_metrics = perf_metrics.reshape(len(clfs), len(dataset))
     
     # Plot
-    plotter.plot_1(perf_metrics, clfs)
-    plotter.plot_2(perf_metrics, clfs)
+    #plotter.plot_1(perf_metrics, clfs)
+    #plotter.plot_2(perf_metrics, clfs)
     plotter.plot_cm(perf_metrics, clfs)
     
 if __name__ == "__main__":
