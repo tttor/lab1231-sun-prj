@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import csv
 from os import listdir
 from os.path import isfile, join
@@ -11,14 +13,83 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 from lab1231_sun_prj.util import evaluator
 
+def get_n_sample_per_class(D):
+    y = [datum[1] for datum in D]
+    print 'n_instance_total=', len(y)
+    
+    uniq_y = set(y)
+    for i in uniq_y:
+        print 'label=', i, 'has', y.count(i)
+
+def load_fei8():
+    '''This loads sport scenes'''
+    print 'load_fei8(): BEGIN'
+    
+    str2num_label_dict = {'badminton': 1, 'bocce': 2, 'croquet': 3, 'polo': 4, 'rockclimbing': 5, 'rowing': 6, 'sailing': 7, 'snowboarding': 8}
+
+    dir_path = '/home/tor/sun/ws/lab1231-sun-prj/cpp-ws/out/gist/fei-8/'
+    dirs = [d for d in listdir(dir_path)]
+    
+    D = []  
+    for d in dirs:
+        local_dir_path = join(dir_path,d)
+        #print 'local_dir_path=', local_dir_path
+        
+        files = [ f for f in listdir(local_dir_path) if isfile(join(local_dir_path,f)) ]
+        assert len(files)!=0, "len(files)==0"
+        
+        for i, f in enumerate(files):
+            #print "load ith=", i+1, " of ", len(files), "==>", join(local_dir_path,f)
+            X = None
+            with open(join(local_dir_path,f), 'rb') as csvfile:
+                content = csv.reader(csvfile)
+                x = [row[0] for row in content]
+                y = str2num_label_dict[d]
+            D.append( (x,y) );
+    
+    #get_n_sample_per_class(D)
+    print 'load_fei8(): END'    
+    return D
+    
+def load_quat8():
+    '''This loads indoor scene images'''
+    print 'load_quat8(): BEGIN'
+    
+    str2num_label_dict = {'bathroom': 1, 'bedroom': 2, 'classroom': 3, 'dining_room': 4, 'garage': 5, 'kitchen': 6, 'livingroom': 7, 'office': 8}
+
+    dir_path = '/home/tor/sun/ws/lab1231-sun-prj/cpp-ws/out/gist/quat-8/'
+    dirs = [d for d in listdir(dir_path)]
+    
+    D = []  
+    for d in dirs:
+        local_dir_path = join(dir_path,d)
+        #print 'local_dir_path=', local_dir_path
+        
+        files = [ f for f in listdir(local_dir_path) if isfile(join(local_dir_path,f)) ]
+        assert len(files)!=0, "len(files)==0"
+        
+        for i, f in enumerate(files):
+            #print "load ith=", i+1, " of ", len(files), "==>", join(local_dir_path,f)
+            X = None
+            with open(join(local_dir_path,f), 'rb') as csvfile:
+                content = csv.reader(csvfile)
+                x = [row[0] for row in content]
+                y = str2num_label_dict[d]
+            D.append( (x,y) );
+    
+    get_n_sample_per_class(D)
+    print 'load_quat8(): END'    
+    return D
+    
 def load_oliv8():
     ''' This load the data D={(x,y)}, where x and y are the gist and the label, respectively.'''
     print 'load_oliv8(): BEGIN'
     
     str2num_label_dict = {'coast':1, 'forest':2, 'highway':3, 'insidecity':4, 'mountain':5, 'opencountry':6, 'street':7, 'tallbuilding':8}
     
-    dir_path = '/home/tor/sun/ws/lab1231-sun-prj/cpp-ws/out/gist/'
+    dir_path = '/home/tor/sun/ws/lab1231-sun-prj/cpp-ws/out/gist/oliv-8/'
     files = [ f for f in listdir(dir_path) if isfile(join(dir_path,f)) ]
+    assert len(files)!=0, "len(files)==0"
     
     D = []
     for i, f in enumerate(files):
@@ -29,12 +100,6 @@ def load_oliv8():
             x = [row[0] for row in content]
             y = str2num_label_dict[ f[0:f.index('_')] ]
         D.append( (x,y) );
-    
-    #y = [datum[1] for datum in D]
-    #print 'n_instance=', len(y)
-    #uniq_y = set(y)
-    #for i in uniq_y:
-        #print 'label=', i, 'has', y.count(i)
     
     print 'load_oliv8(): END'    
     return D
@@ -47,7 +112,7 @@ def evaluate(clf_type, data):
     y_tr = data[2]
     y_te = data[3]
     
-    meta_clf = tune(clf_type, X_tr, y_tr)
+    meta_clf = NuSVC(nu=0.5)#tune(clf_type, X_tr, y_tr)
     clf_star = train(meta_clf, X_tr, y_tr)
     perf = test(clf_star, X_te, y_te)
     
@@ -89,18 +154,12 @@ def test(clf, X_te, y_te):
 def tune_nuSVC(X_tr, y_tr):
     clf = NuSVC()
     
-    #param_space = {
-                    ##'nu': [0.3, 0.5, 0.8], \
-                    #'kernel': ['rbf'], \ 
-                    #'degree': [3, 5], \
-                    ##'gamma': [0.0, 0.5],
-                  #}
+    param_space = { 'nu': [0.3, 0.5, 0.8], 'kernel': ['rbf'], 'degree': [3, 5], 'gamma': [0.0, 0.5] }
     
-    #grid_search = GridSearchCV(clf, param_grid=param_space, cv=10)
-    #grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
+    grid_search = GridSearchCV(clf, param_grid=param_space, cv=10)
+    grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
     
-    #return grid_search.get_params()['estimator']
-    return clf
+    return grid_search.get_params()['estimator']
     
 #def tune_SGD(X_tr, y_tr):
     #print 'tune_SGD(X_tr, y_tr):'
@@ -153,3 +212,6 @@ def tune_nuSVC(X_tr, y_tr):
     #grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
     
     #return grid_search.get_params()['estimator']
+
+if __name__ == '__main__':
+    load_quat8()

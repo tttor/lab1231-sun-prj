@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-out_dir_path = '/home/tor/sun2/wrt/draft/fig/'
+out_dir_path = '/home/tor/sun2/wrt/rpt-jun14/fig/'
 
 def plot_cm(perf_metrics, clfs):
     n_clf = perf_metrics.shape[0]
