@@ -11,16 +11,15 @@
 
 namespace lab1231_sun_prj {
 
-class LearGistWrapper {
- public:
-  //! Extract GIST features
-  static void extract(const std::string& img_path, const std::string& out_dir_path);
-  
-  //! Copied from compute_gist.c of Lear GIST implementation
-  static color_image_t *load_ppm(const char *fname);
-  
- private:
-};
+namespace LearGistWrapper {
+
+//! Extract GIST features
+void extract(const std::string& img_path, const std::string& out_dir_path);
+
+//! Copied from compute_gist.c of Lear GIST implementation
+color_image_t *load_ppm(const char *fname);
+
+}// namespace LearGistWrapper
 
 }// namespace lab1231_sun_prj
 
