@@ -18,6 +18,11 @@ void LearGistWrapper::extract(const std::string& img_path, const std::string& ou
   
   string ppm_img_path;
   if (ext != "ppm") {
+    if (ext != "jpg") {
+      cout << "ERROR: Unsupported image format => RETURN\n";
+      return;
+    }
+    
     cv::Mat not_ppm_img= cv::imread(img_path);
     
     const string ppm_img_out_dir = img_path.substr(0, img_path.size()-img_path_parts.back().size());
