@@ -1,4 +1,8 @@
 ##
+add_executable (create_ground_truth_image_of_stanford_background_dataset create_ground_truth_image_of_stanford_background_dataset.cc) 
+target_link_libraries( create_ground_truth_image_of_stanford_background_dataset ${OpenCV_LIBS} )
+
+##
 add_executable (extract_gist extract_gist.cc) 
 
 set (LIBS lab1231_sun_prj_gist boost_filesystem boost_program_options boost_system)
