@@ -1,2 +1,0 @@
-/home/jogie/ws/vlfeat-slic-example-master/CMakeFiles/vlfeat_slic.dir
-/home/jogie/ws/vlfeat-slic-example-master/vlfeat_slic_cli/CMakeFiles/vlfeat_slic_example.dir
