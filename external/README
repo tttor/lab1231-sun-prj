@@ -1,0 +1,21 @@
+List of external source code:
+
+===
+vlfeat-0.9.19
+http://www.vlfeat.org/download/vlfeat-0.9.19.tar.gz
+
+===
+pff-segment
+http://cs.brown.edu/~pff/segment/segment.tgz
+
+===
+robustpn
+http://www.inf.ethz.ch/personal/ladickyl/robustpn.zip
+
+===
+prob-image
+http://graphics.stanford.edu/projects/densecrf/unary/probimage.zip
+
+===
+textonboost
+http://graphics.stanford.edu/projects/densecrf/textonboost/classification.zip

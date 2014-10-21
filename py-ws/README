@@ -1,8 +1,0 @@
-===
-Coding style:
-http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
-
-===
-Dependencies (to be completed list):
-1) Python 2.7.x
-2) sklearn.__version__ = '0.15.0b1'

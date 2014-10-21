@@ -1,0 +1,6 @@
+# ignore external src dirs
+pff-segment
+prob-image
+robustpn
+textonboost
+vlfeat-0.9.19
