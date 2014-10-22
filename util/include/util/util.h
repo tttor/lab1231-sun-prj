@@ -31,6 +31,33 @@ Superpixel;
 /*!
  * @brief
  */
+template<typename MatType>
+void csv_write(const MatType& m, const std::string& csv_path) {
+  using namespace std;
+  using namespace boost;
+  
+  ofstream csv;
+  csv.open(csv_path.c_str());
+  BOOST_ASSERT_MSG(csv.is_open(), string("ERROR: Cannot open: " + csv_path).c_str());
+  
+  for(uint64_t  i=0; i<m.rows(); i++){
+    for(uint64_t j=0; j<m.cols(); j++){
+       string str = lexical_cast<std::string>(m(i,j));
+       if(j+1 == m.cols()){
+           csv << str;
+       }else{
+           csv << str << ",";
+       }
+    }
+    csv << "\n";
+  }
+  
+  csv.close();  
+}
+
+/*!
+ * @brief
+ */
 size_t n_pairwise(const size_t& n_row, const size_t& n_col, const std::string& type);
 
 /*!
@@ -57,33 +84,6 @@ double l1_norm(cv::Vec3b p1, cv::Vec3b p2);
  * @brief
  */
 double l1_norm_squared(cv::Vec3b p1, cv::Vec3b p2);
-
-/*!
- * @brief
- */
-template<typename MatType>
-void csv_write(const MatType& m, const std::string& csv_path) {
-  using namespace std;
-  using namespace boost;
-  
-  ofstream csv;
-  csv.open(csv_path.c_str());
-  BOOST_ASSERT_MSG(csv.is_open(), string("ERROR: Cannot open: " + csv_path).c_str());
-  
-  for(uint64_t  i=0; i<m.rows(); i++){
-    for(uint64_t j=0; j<m.cols(); j++){
-       string str = lexical_cast<std::string>(m(i,j));
-       if(j+1 == m.cols()){
-           csv << str;
-       }else{
-           csv << str << ",";
-       }
-    }
-    csv << "\n";
-  }
-  
-  csv.close();  
-}
 
 /*!
  * @brief read list containing one entity per line
