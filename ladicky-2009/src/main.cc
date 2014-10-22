@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
   sun::util::DataParam data_param;
   sun::util::EnergyParam energy_param;
 
-  if (argc > 1) {
+  if (argc == 10) {
     //
     data_param["dataset_name"] = argv[1];
     data_param["n_label"] = argv[2];
