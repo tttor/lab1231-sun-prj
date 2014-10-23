@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/lexical_cast.hpp>
 #include <util/util.h>
 #include <ladicky/ladicky.h>
 
@@ -6,20 +7,26 @@ int main(int argc, char* argv[]) {
   using namespace std;
   namespace sun = lab1231_sun_prj;
 
-  //
   sun::util::DataParam data_param;
-  data_param["dataset_name"] = string("msrc");
-  data_param["n_label"] = string("21");
-  data_param["ori_img_dir"] = string("/home/tor/sun3/dataset/msrc/spt/Images/");
-  data_param["test_img_list_filepath"] = string("/home/tor/sun4/exp/ladicky-2009-mrsc/meta/test_img.list");
-  data_param["ann_result_dir"] = string("/home/tor/sun4/exp/ladicky-2009-mrsc/ann-result/");
-  data_param["unary_philipp_dir"] = string("/home/tor/sun3/dataset/msrc/unary_philipp/msrc_compressed/");
-
-  // Train
   sun::util::EnergyParam energy_param;
-  energy_param["SLIC_region"] = 20;
-  energy_param["SLIC_regularization"] = 1000;
-  energy_param["SLIC_min_region"] = 10;
+
+  if (argc == 10) {
+    //
+    data_param["dataset_name"] = argv[1];
+    data_param["n_label"] = argv[2];
+    data_param["ori_img_dir"] = argv[3];
+    data_param["test_img_list_filepath"] = argv[4];
+    data_param["result_dir"] = argv[5];
+    data_param["unary_philipp_dir"] = argv[6];
+
+    // Train
+    energy_param["SLIC_region"] = boost::lexical_cast<double>(argv[7]);
+    energy_param["SLIC_regularization"] = boost::lexical_cast<double>(argv[8]);
+    energy_param["SLIC_min_region"] = boost::lexical_cast<double>(argv[9]);
+  }
+  else {
+    assert(false && "UNSUFFICIENT ARGUMENTS!");
+  }
 
   // Test: Annotate
   vector<string> test_img_filenames;
@@ -32,8 +39,8 @@ int main(int argc, char* argv[]) {
     Eigen::MatrixXi ann;
     ann = sun::ladicky::annotate(img_filename, data_param, energy_param);
 
-    const string ann_filepath = string(data_param["ann_result_dir"]+img_filename.substr(0,img_filename.size()-4)+".ann");
-    const string ann_img_filepath = string(data_param["ann_result_dir"]+img_filename.substr(0,img_filename.size()-4)+".bmp");
+    const string ann_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".ann");
+    const string ann_img_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".bmp");
     sun::util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
     cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
   }
