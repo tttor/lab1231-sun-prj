@@ -4,7 +4,9 @@ namespace sun = lab1231_sun_prj;
 
 Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, sun::util::DataParam data_param, sun::util::EnergyParam energy_param) {
   using namespace std;
+  #ifdef DEBUG_LEVEL_1
   cout << "annotate(): BEGIN\n";
+  #endif
 
   //
   const string img_path = string(data_param["ori_img_dir"]+img_filename);
@@ -37,7 +39,9 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, sun::uti
   const string method = "AlphaExpansion";
   sun::ladicky::infer(method, energy, &ann);
 
+  #ifdef DEBUG_LEVEL_1
   cout << "annotate(): END\n";
+  #endif
   return ann;
 }
 
@@ -63,14 +67,9 @@ void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Sup
   using namespace std;
 
   //initialize number of elements in each segment
-  int maxi = 0;
   for (int i = 0; i < superpixels.size(); i++) {
     energy->higherElements[i] = superpixels[i].size();
-
-    if (maxi < superpixels[i].size())
-      maxi = superpixels[i].size();
   }
-  cout << "maxi " << maxi << endl;
 
   //allocate energy for higher order indexes
   energy->AllocateHigherIndexes();

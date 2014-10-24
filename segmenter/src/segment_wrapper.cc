@@ -122,7 +122,9 @@ std::vector<sun::util::Superpixel> sun::slic_segment_wrapper::segment(cv::Mat ma
       }
   }
 
+  #ifdef DEBUG_LEVEL_2
   cv::imwrite("slic.bmp", mat);
+  #endif
 
   return list_spixel;  
 }
