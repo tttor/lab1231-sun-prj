@@ -2,9 +2,7 @@ import cv2
 import numpy
 
 class Evaluator:
-	def __init__(self, list_pred_img, dir_gt, param):
-		self.list_pred_img = list_pred_img
-		self.dir_gt = dir_gt
+	def __init__(self, param):
 		self.param = param
 		self.list_acc_class = []
 		self.conf_mat = self.init_conf_mat()
@@ -52,13 +50,13 @@ class Evaluator:
 
 	def evaluate_all(self):
 		self.conf_mat = self.init_conf_mat()
-		for x in xrange(len(self.list_pred_img)): 
-			list_ann_label = self.make_list_from_ann_file(self.list_pred_img[x])
-			gt_file_name = self.dir_gt + self.list_pred_img[x].split('\\')[-1].replace('ann','bmp')
+		for x in xrange(len(self.param["ann_filepaths"])): 
+			list_ann_label = self.make_list_from_ann_file(self.param["ann_filepaths"][x])
+			gt_file_name = self.param["gt_img_dir"] + self.param["ann_filepaths"][x].split('/')[-1].replace('ann','bmp')
 			list_gt_label = self.make_list_from_img_file(gt_file_name)
 			res_conf_mat, res_list_acc = self.evaluate(list_ann_label, list_gt_label)
 			average_acc = self.get_avg_acc(res_list_acc)
-			file_output = self.param["dir_output"] + self.list_pred_img[x].split('\\')[-1].replace('ann','out')			
+			file_output = self.param["dir_output"] + self.param["ann_filepaths"][x].split('/')[-1].replace('ann','out')			
 			self.write_to_file(file_output, res_list_acc, res_conf_mat, average_acc)
 			print "image " + str(x) + " done"
 		file_output = self.param["dir_output"] + 'global.out'
