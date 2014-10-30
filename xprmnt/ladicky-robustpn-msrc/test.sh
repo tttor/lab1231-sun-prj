@@ -2,15 +2,15 @@
 
 #
 num=$1
-result_dir=/home/jogie/sun4/xprmnt/ladicky-robustpn-msrc/result/test-$num/
-test_img_list_filepath=/home/jogie/sun4/xprmnt/ladicky-robustpn-msrc/meta/test$num.list
+result_dir=/home/jogie/sun4/exp/ladicky-2009-mrsc/ann-result/test-$num/
+test_img_list_filepath=/home/jogie/sun4/exp/ladicky-2009-mrsc/meta/test$num.list
 
 # Constant params across num
 exe=../../ladicky-2009/build/main 
 
-SLIC_region=20
-SLIC_regularization=1000
-SLIC_min_region=10
+SLIC_region=25
+SLIC_regularization=70
+SLIC_min_region=15
 dataset_name=msrc
 n_label=21
 ori_img_dir=/home/jogie/sun3/dataset/msrc/unmix/Images/
