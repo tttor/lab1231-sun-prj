@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <sstream>
 // #include <cstdint>
 #include <iostream> 
 #include <opencv2/core/core.hpp>
@@ -145,6 +146,11 @@ double l1_norm_squared(cv::Vec3b p1, cv::Vec3b p2);
  * @brief read list containing one entity per line
  */
 std::vector<std::string> read_list(const std::string& list_path);
+
+/*!
+ * @brief
+ */
+std::vector<Superpixel> loadSuperpixel(const std::string& list_path);
 
 /*!
  * @brief

@@ -53,6 +53,30 @@ std::vector<std::string> read_list(const std::string& list_path) {
   return test_img_filenames;
 }
 
+std::vector<Superpixel> loadSuperpixel(const std::string& list_path){
+  using namespace std;
+
+  vector<Superpixel> vec_sup;
+  ifstream superpixel_file(list_path.c_str());
+
+  if (superpixel_file.is_open()) {
+    string line;
+    while ( getline(superpixel_file,line) ) {
+      stringstream ss(line);
+      size_t tmp;
+      Superpixel v_temp; 
+      while (ss >> tmp)
+      {
+          v_temp.push_back(tmp);
+          if (ss.peek() == ',') ss.ignore();
+      }
+      vec_sup.push_back(v_temp);
+    }
+    superpixel_file.close();
+  }
+  return vec_sup;
+}
+
 Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col) {
   Eigen::MatrixXi mat(n_row, n_col);
 
