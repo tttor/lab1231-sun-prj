@@ -43,8 +43,9 @@ class Evaluator:
 	def evaluate(self, list_ann_label, list_gt_label):
 		conf_mat = self.init_conf_mat()
 		for ann_label, gt_label in zip (list_ann_label, list_gt_label):
-			self.conf_mat[gt_label][ann_label] += 1
-			conf_mat[gt_label][ann_label] += 1
+			if gt_label!=-1:
+				self.conf_mat[gt_label][ann_label] += 1
+				conf_mat[gt_label][ann_label] += 1
 		list_acc_class = self.calc_acc_each_class(conf_mat)
 		return conf_mat, list_acc_class
 
