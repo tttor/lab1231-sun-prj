@@ -39,4 +39,13 @@ add_library (
 
 target_link_libraries ( util color_map  )
 
+#SaliencyFilters library
+set(SALIENCY_DIR /home/rizkivmaster/EXPERIMENT/saliencyfilters)
+include_directories(${SALIENCY_DIR}/src)
+
+set(saliency_libs 
+${SALIENCY_DIR}/build/src/saliency/libsaliency.a
+${SALIENCY_DIR}/build/src/filter/libfilter.a
+${SALIENCY_DIR}/build/src/superpixel/libsuperpixel.a)
+
 add_subdirectory( src )

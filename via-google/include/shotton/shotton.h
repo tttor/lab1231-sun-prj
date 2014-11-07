@@ -70,17 +70,20 @@ void train(const string datasets_name, EnergyParam* energy_param);
 /*!
  * @brief Annotate an image with given data_param, energy_param
  */
+Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const string unary_dir,EnergyParam energy_param,const size_t object_label);
 Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const string unary_dir,EnergyParam energy_param);
 
 /*!
  * @brief we use Shotton's unary based on Phillipp's implementation
  */
 void set_1st_order(const cv::Mat img,ProbImage unary_mat, const size_t n_label, GraphicalModel& gm);
+void set_1st_order(const cv::Mat img,const cv::Mat_<double> saliency_mat,ProbImage unary_mat, const size_t n_label,const size_t object_label, GraphicalModel& gm);
 
 /*!
  * @brief Use the edge potential of [Shotton, 2009], which follows the Pott model
  */
 void set_2nd_order(const cv::Mat img, const size_t n_label, EnergyParam energy_param, GraphicalModel& gm);
+void set_2nd_order(const cv::Mat img, const size_t n_label,const size_t object_label, EnergyParam energy_param, GraphicalModel& gm);
 
 /*!
  * @brief Accomodated method: AlphaExpansion, ICM, ...
