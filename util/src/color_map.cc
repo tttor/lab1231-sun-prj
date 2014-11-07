@@ -2,12 +2,6 @@
 
 namespace sun = lab1231_sun_prj;
 
-sun::util::color_map::ClassColorMap sun::util::color_map::class_color_map(const std::string dataset) {
-  if (dataset=="msrc")
-    return sun::util::color_map::msrc();
-  else
-    assert(false && "color_map(): UNKNOWN DATASET!");
-}
 
 sun::util::color_map::ClassColorMap sun::util::color_map::msrc() {
   sun::util::color_map::ClassColorMap map;
@@ -96,4 +90,11 @@ sun::util::color_map::ClassColorMap sun::util::color_map::msrc() {
   map[20] = color;
 
   return map;
+}
+
+sun::util::color_map::ClassColorMap sun::util::color_map::class_color_map(const std::string& dataset) {
+  if (dataset=="msrc")
+    return sun::util::color_map::msrc();
+  else
+    assert(false && "color_map(): UNKNOWN DATASET!");
 }

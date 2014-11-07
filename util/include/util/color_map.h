@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <opencv2/core/core.hpp>
+#include <util/util.h>
 
 namespace lab1231_sun_prj {
 namespace util {
@@ -21,7 +22,7 @@ ClassColorMap msrc();
 /*!
  * @brief ...
  */
-ClassColorMap class_color_map(const std::string dataset);
+ClassColorMap class_color_map(const std::string& dataset);
 
 }// color_map
 }// namespace util

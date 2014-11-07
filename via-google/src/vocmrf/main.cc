@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 
 #include <shotton/shotton.h>
 #include <util/util.h>
@@ -8,22 +9,32 @@ int main(int argc, char* argv[]) {
   using namespace std;
   using namespace lab1231_sun_prj;
 
-  assert(argc==6 && "argc!=6");
+  // assert(argc==6 && "argc!=6");
 
   // Set the dataset param
-  shotton::DataParam data_param;
-  data_param["name"] = argv[1];//string("MSRC");
-  data_param["n_label"] = argv[2];//string("21");// inc. the background
-  // data_param["gt_img_dir"] = "/home/tor/sun3/dataset/msrc/spt/GroundTruth/";
-  data_param["ori_img_dir"] = argv[3];//"/home/tor/sun3/dataset/msrc/spt/Images/";  
-  data_param["test_img_list_filepath"] = argv[4];// "/home/tor/sun3/dataset/msrc/meta/test.list";
+  const string datasets_name = argv[1];
+  const size_t n_label = atoi(argv[2]);
+  const string img_dir = argv[3];
+  const string unary_dir = argv[4];
+  const string ann_dir = argv[5];
+  const string ann_img_dir = argv[6];
 
   // Train
   shotton::EnergyParam energy_param;
-  shotton::train(data_param, &energy_param);
+  shotton::train(datasets_name, &energy_param);
+  Eigen::MatrixXi ann = shotton::annotate(n_label, img_dir, unary_dir, energy_param);
+  /*for (size_t i=0; i<ann.rows(); ++i) {
+    for (size_t j=0; j<ann.cols(); ++j) {
+      printf("%d",ann(i,j));
+    }
+  }*/
+  util::csv_write(ann, ann_dir);
+  cv::Mat output = util::ann2img(ann,"msrc");
+  imwrite(ann_img_dir,output);
+
 
   // Annotate
-  vector<string> test_img_filenames;
+  /*vector<string> test_img_filenames;
   
   ifstream test_img_list_file(data_param["test_img_list_filepath"].c_str());
   if (test_img_list_file.is_open()) {
@@ -32,24 +43,20 @@ int main(int argc, char* argv[]) {
       test_img_filenames.push_back(line);
     }
     test_img_list_file.close();
-  }
+  }*/
 
-  const string ann_results_dir = argv[5];//"/home/tor/sun4/exp/rep-shotton-msrc/ann-csv/";
-  std::vector<Eigen::MatrixXi> ann_results;
+  // const string ann_results_dir = argv[5];//"/home/tor/sun4/exp/rep-shotton-msrc/ann-csv/";
+  // std::vector<Eigen::MatrixXi> ann_results;
 
-  for (size_t i=0; i<test_img_filenames.size(); ++i) {
+/*  for (size_t i=0; i<test_img_filenames.size(); ++i) {
     const string img_filename = test_img_filenames.at(i);
     cout << "ANNOTATING img_filename" << img_filename << endl;
-
-    Eigen::MatrixXi ann;
-    ann = shotton::annotate(img_filename, data_param, energy_param);
-
-    const string ann_filepath = string(ann_results_dir+img_filename.substr(0,img_filename.size()-4)+".ann");
-    util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
+*/
+    
     
     // ann_results.push_back(ann);
-    break;
-  }
+    /*break;
+  }*/
 
   return 0;
 }

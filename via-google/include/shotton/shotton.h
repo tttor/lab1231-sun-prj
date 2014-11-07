@@ -20,7 +20,7 @@
 #include <opengm/inference/graphcut.hxx>
 #include <opengm/inference/auxiliary/minstcutkolmogorov.hxx>
 #include <opengm/inference/alphaexpansion.hxx>
-#include <opengm/inference/alphaexpansionfusion.hxx>
+//#include <opengm/inference/alphaexpansionfusion.hxx>
 #include <opengm/opengm.hxx>
 #include <opengm/datastructures/marray/marray.hxx>
 #include <opengm/graphicalmodel/space/simplediscretespace.hxx>
@@ -36,8 +36,11 @@
 #include <Eigen/Dense>
 
 #include <util/util.h>
+#include <math.h>
 
 #include <shotton/edge_potential.h>
+
+using namespace std;
 
 namespace lab1231_sun_prj {
 
@@ -52,37 +55,40 @@ opengm::GraphicalModel<
 GraphicalModel;
 
 typedef 
-std::map<std::string, double> 
+map<string, double> 
 EnergyParam;
 
 typedef 
-std::map<std::string, std::string> 
+map<string, string> 
 DataParam;
 
 /*!
  * @brief a dummy training: merely hardcode some given params in [Shotton, 2009] and/or [Kohli, 2009]
  */
-void train(DataParam data_param, EnergyParam* energy_param);
+void train(const string datasets_name, EnergyParam* energy_param);
 
 /*!
  * @brief Annotate an image with given data_param, energy_param
  */
-Eigen::MatrixXi annotate(const std::string& img_filename, DataParam data_param, EnergyParam energy_param);
+Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const string unary_dir,EnergyParam energy_param,const size_t object_label);
+Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const string unary_dir,EnergyParam energy_param);
 
 /*!
  * @brief we use Shotton's unary based on Phillipp's implementation
  */
-void set_1st_order(const cv::Mat& img, const std::string& img_filename, const size_t& n_label, GraphicalModel* gm);
+void set_1st_order(const cv::Mat img,ProbImage unary_mat, const size_t n_label, GraphicalModel& gm);
+void set_1st_order(const cv::Mat img,const cv::Mat_<double> saliency_mat,ProbImage unary_mat, const size_t n_label,const size_t object_label, GraphicalModel& gm);
 
 /*!
  * @brief Use the edge potential of [Shotton, 2009], which follows the Pott model
  */
-void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy_param, GraphicalModel* gm);
+void set_2nd_order(const cv::Mat img, const size_t n_label, EnergyParam energy_param, GraphicalModel& gm);
+void set_2nd_order(const cv::Mat img, const size_t n_label,const size_t object_label, EnergyParam energy_param, GraphicalModel& gm);
 
 /*!
  * @brief Accomodated method: AlphaExpansion, ICM, ...
  */
-void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_var, Eigen::MatrixXi* ann);
+void infer(const string method, GraphicalModel gm, const size_t n_var, Eigen::MatrixXi& ann);
 
 }// namespace shotton
 

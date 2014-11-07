@@ -14,9 +14,10 @@ target_link_libraries (
   main 
   shotton
   probimage
+  color_map
   util
   ${OpenCV_LIBS} 
-  ${OpenGMDir}/b2/src/external/libexternal-library-maxflow.a
-  ${OpenGMDir}/b2/src/external/libexternal-library-qpbo.a
+  ${OpenGMDir}/build/src/external/libexternal-library-maxflow.a 
+  ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
 )
 
