@@ -59,6 +59,30 @@ std::vector<std::string> sun::util::read_list(const std::string& list_path) {
   return test_img_filenames;
 }
 
+std::vector<Superpixel> sun::util::load_superpixel(const std::string& list_path){
+  using namespace std;
+
+  vector<Superpixel> vec_sup;
+  ifstream superpixel_file(list_path.c_str());
+
+  if (superpixel_file.is_open()) {
+    string line;
+    while ( getline(superpixel_file,line) ) {
+      stringstream ss(line);
+      size_t tmp;
+      Superpixel v_temp; 
+      while (ss >> tmp)
+      {
+          v_temp.push_back(tmp);
+          if (ss.peek() == ',') ss.ignore();
+      }
+      vec_sup.push_back(v_temp);
+    }
+    superpixel_file.close();
+  }
+  return vec_sup;
+}
+
 Eigen::MatrixXi sun::util::arr2mat(int* arr, const size_t& n_row, const size_t& n_col) {
   Eigen::MatrixXi mat(n_row, n_col);
 
@@ -83,29 +107,4 @@ cv::Mat sun::util::ann2img(const Eigen::MatrixXi& ann, const std::string& datase
       img.at<cv::Vec3b>(cv::Point(x,y)) = map[ann(y,x)];
   
   return img;
-}
-
-void sun::util::csv_write(Eigen::MatrixXi m, const std::string csv_path){
-  using namespace std;
-  using namespace boost;
-  
-  ofstream csv;
-  csv.open(csv_path.c_str());
-  BOOST_ASSERT_MSG(csv.is_open(), string("ERROR: Cannot open: " + csv_path).c_str());
-  
-  for(size_t  i=0; i<m.rows(); i++){
-    for(size_t j=0; j<m.cols(); j++){
-      
-      printf("%d",m(i,j));
-     if(j+1 == m.cols()){
-       csv << m(i,j);
-     }else{
-       csv << m(i,j)<< ",";
-     }
-   }
-   // printf("\n");
-   csv << "\n";
- }
- 
- csv.close();  
 }

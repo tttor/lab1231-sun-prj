@@ -3,9 +3,8 @@
 
 #include <string>
 #include <fstream>
-
-
 #include <stdlib.h>
+#include <sstream>
 // #include <cstdint>
 #include <iostream> 
 #include <opencv2/core/core.hpp>
@@ -33,7 +32,7 @@ namespace lab1231_sun_prj {
 /*!
  * @brief
  */
-/*template<typename MatType>
+template<typename MatType>
  void csv_write(const MatType m, const std::string csv_path) {
   using namespace std;
   using namespace boost;
@@ -57,10 +56,8 @@ namespace lab1231_sun_prj {
  }
  
  csv.close();  
-}*/
+}
 
-void csv_write(Eigen::MatrixXi m, const std::string csv_path);
-  
 /*!
  * @brief
  */
@@ -117,6 +114,7 @@ MatType csv_read(const std::string& csv_path) {
   
   return xmat;
 }
+
 /*!
  * @brief
  */
@@ -156,6 +154,16 @@ MatType csv_read(const std::string& csv_path) {
  * @brief
  */
  Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
+
+/*!
+ * @brief
+ */
+std::vector<Superpixel> load_superpixel(const std::string& list_path);
+
+/*!
+ * @brief
+ */
+Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
 
 /*!
  * @brief
