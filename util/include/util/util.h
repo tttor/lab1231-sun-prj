@@ -65,7 +65,7 @@ void csv_write(Eigen::MatrixXi m, const std::string csv_path);
  * @brief
  */
 template<typename MatType>
- MatType csv_read(const std::string& csv_path) {
+MatType csv_read(const std::string& csv_path) {
   // Adopted from: https://gist.github.com/stephenjbarr/2266900
   using namespace std;
   using namespace boost;

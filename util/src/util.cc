@@ -52,6 +52,9 @@ std::vector<std::string> sun::util::read_list(const std::string& list_path) {
     }
     test_img_list_file.close();
   }
+  else {
+    cerr << "test_img_list_file.is_open(): FALSE\n";
+  }
 
   return test_img_filenames;
 }

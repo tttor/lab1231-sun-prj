@@ -4,6 +4,9 @@
 #include <map>
 #include <string>
 #include <opencv2/core/core.hpp>
+#include <rapidxml-1.13/rapidxml.hpp>
+#include <rapidxml-1.13/rapidxml_utils.hpp>
+#include <boost/lexical_cast.hpp>
 #include <util/util.h>
 
 namespace lab1231_sun_prj {
@@ -18,6 +21,11 @@ ClassColorMap;
  * @brief The coloring scheme follows http://drwn.anu.edu.au/drwnProjMultiSeg.html
  */
 ClassColorMap msrc();
+
+/*!
+ * @brief The coloring scheme follows color map
+ */
+ClassColorMap voc();
 
 /*!
  * @brief ...

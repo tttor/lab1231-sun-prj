@@ -2,8 +2,8 @@
 clear all;
 clc;
 
-gt_img_dir_path = '/media/tor/423AF0113AF003A7/tor/robotics/prj/011/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass/';
-gt_csv_dir_path = '/media/tor/423AF0113AF003A7/tor/robotics/prj/011/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass-csv/';
+gt_img_dir_path = '/media/tor/423AF0113AF003A7/tor/robotics/prj/011/dataset/pascal/VOC2010/VOCdevkit/VOC2012/SegmentationClass/';
+gt_csv_dir_path = '/media/tor/423AF0113AF003A7/tor/robotics/prj/011/dataset/pascal/VOC2010/VOCdevkit/VOC2012/SegmentationClass-csv/';
 listing = dir(gt_img_dir_path);
 
 for i=1:size(listing,1)
