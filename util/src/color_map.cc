@@ -135,3 +135,10 @@ sun::util::color_map::ClassColorMap sun::util::color_map::msrc() {
 
   return map;
 }
+
+sun::util::color_map::ClassColorMap sun::util::color_map::class_color_map(const std::string& dataset) {
+  if (dataset=="msrc")
+    return sun::util::color_map::msrc();
+  else
+    assert(false && "color_map(): UNKNOWN DATASET!");
+}
