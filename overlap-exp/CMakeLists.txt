@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
-project (ladicky2009)
+project (overlappingsup)
 
 #
 find_package(OpenCV REQUIRED)
@@ -10,6 +10,7 @@ set (PROBIMAGE_DIR ../external/prob-image)
 set (EIGEN_DIR /usr/include/eigen3)
 #
 include_directories (../external)
+include_directories (../overlap-exp/include/)
 include_directories (../util/include)
 include_directories (../segmenter/include)
 include_directories (../ladicky-2009/include)
@@ -37,6 +38,8 @@ add_library(segmenter
   ${VLFEAT_DIR}/vl/slic.c
 )
 
+add_library(majority ../overlap-exp/src/majority.cc)
+
 # 
 add_definitions(-DDEBUG_OFF)
 add_executable(main src/main.cc )
@@ -46,6 +49,7 @@ target_link_libraries( main
   util
   ladicky
   segmenter
+  majority
 )
 
 

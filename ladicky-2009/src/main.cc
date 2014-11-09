@@ -2,6 +2,7 @@
 #include <boost/lexical_cast.hpp>
 #include <util/util.h>
 #include <ladicky/ladicky.h>
+#include <opencv2/opencv.hpp>
 
 int main(int argc, char* argv[]) {
   using namespace std;
