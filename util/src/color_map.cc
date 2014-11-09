@@ -5,8 +5,46 @@ namespace sun = lab1231_sun_prj;
 sun::util::color_map::ClassColorMap sun::util::color_map::class_color_map(const std::string dataset) {
   if (dataset=="msrc")
     return sun::util::color_map::msrc();
+  if (dataset=="voc2010" or dataset=="voc2012")
+    return sun::util::color_map::voc();
   else
     assert(false && "color_map(): UNKNOWN DATASET!");
+}
+
+sun::util::color_map::ClassColorMap sun::util::color_map::voc() {
+  using namespace std;
+  using namespace rapidxml;
+
+  sun::util::color_map::ClassColorMap map;
+  cv::Vec3b color;
+
+  rapidxml::file<> xmlFile("/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/class-color/class_color_map.xml");
+  rapidxml::xml_document<> doc;
+  doc.parse<0>(xmlFile.data());
+
+  xml_node<>* root = doc.first_node();
+  for(xml_node<>* sub=root->first_node("class"); sub; sub=sub->next_sibling()) {
+    xml_attribute<>* sub_att_1 = sub->first_attribute("num");
+    size_t num = boost::lexical_cast<size_t>(sub_att_1->value());
+
+    for(xml_node<>* subsub=sub->first_node("color"); subsub; subsub=subsub->next_sibling()) {
+      xml_attribute<>* subsub_att_r = subsub->first_attribute("r");
+      size_t r = boost::lexical_cast<size_t>(subsub_att_r->value());
+
+      xml_attribute<>* subsub_att_g = subsub->first_attribute("g");
+      size_t g = boost::lexical_cast<size_t>(subsub_att_g->value());
+
+      xml_attribute<>* subsub_att_b = subsub->first_attribute("b");
+      size_t b = boost::lexical_cast<size_t>(subsub_att_b->value());
+
+      cv::Vec3b color;
+      color[0] = b; color[1] = g; color[2] = r;
+
+      map[num] = color;
+    }
+  }
+
+  return map;
 }
 
 sun::util::color_map::ClassColorMap sun::util::color_map::msrc() {
