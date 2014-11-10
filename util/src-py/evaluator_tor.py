@@ -105,7 +105,11 @@ def get_average_acc_over_clasess_from_file(filepaths):
         tree = etree.parse(filepath)
         parent = tree.getroot()
 
-        acc_list = [float(child.attrib['acc']) for child in parent]
+        acc_list = []
+        for child in parent:
+            for grandchild in child:
+                acc_list.append(float(grandchild.attrib['acc']))
+
         avg_acc_list.append( sum(acc_list)/len(acc_list) )
 
     return avg_acc_list
