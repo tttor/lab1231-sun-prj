@@ -27,3 +27,7 @@ class_name_map = {
 	20 : 'tvmonitor',
 	255: 'void'
 }
+
+def translate(numeric_classes):
+	string_classes = [class_name_map[i] for i in numeric_classes]
+	return string_classes
