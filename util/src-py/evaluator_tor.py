@@ -1,7 +1,11 @@
 #!/usr/bin/python
 
+import sys
 import numpy as np
 from sklearn.metrics import confusion_matrix
+from lxml import etree
+from pascal_voc_2012 import translate
+from pascal_voc_2012 import class_name_map
 
 def get_acc_voc(n_tp, n_fp, n_fn):
     return float(n_tp)/(n_tp+n_fp+n_fn)
@@ -25,11 +29,25 @@ def get_perf(cm, i):
 
     return perf
 
-def write_single_eval():
+def write_eval(class_perf_map, out_dir, filename):
     '''
-    TODO @tttor
     @brief: write the results of eval on a single prediction.
     '''
+    root = etree.Element("evaluation")
+    root.set('target', filename[0:len(filename)-4])
+
+    for key, val in class_perf_map.iteritems():
+        sub = etree.SubElement(root, 'class')
+        sub.set('num', str(key))
+        sub.set('name', class_name_map[key])
+
+        subsub = etree.SubElement(sub, 'metric')
+        for subkey, subval in val.iteritems():
+            subsub.set(subkey, str(subval))
+
+    xml_filepath = out_dir+'/'+filename 
+    writer = etree.ElementTree(root)
+    writer.write(xml_filepath, pretty_print=True)
 
 def single_eval(pred_filepath, true_filepath):
     '''
@@ -60,12 +78,14 @@ def single_eval(pred_filepath, true_filepath):
 
     return class_perf_map 
 
-def eval(data):             
-    class_perf_map = {}
+def eval(target_list, pred_dir, gt_dir):             
+    data = [ {'pred': pred_dir+'/'+target+'.csv', 'true': gt_dir+'/'+target+'.csv'} for target in target_list ]
 
+    class_perf_map = {}
     for i, datum in enumerate(data):
-        print "single_eval " + str(i+1) +"/" + str(len(data))
+        print "single_eval on", str(i+1),"of", str(len(data))
         single_class_perf_map = single_eval(datum['pred'], datum['true'])
+        write_eval(single_class_perf_map, out_dir=pred_dir, filename=(target_list[i]+'.evl'))
 
         for key, val in single_class_perf_map.iteritems():
             if key in class_perf_map:
@@ -79,21 +99,29 @@ def get_average_acc_over_classes(class_perf_map):
     accuracies = [ val['acc'] for val in class_perf_map.itervalues() ]
     return sum(accuracies)/len(accuracies)
 
+def get_average_acc_over_clasess_from_file(filepaths):
+    avg_acc_list = []
+    for filepath in filepaths:
+        tree = etree.parse(filepath)
+        parent = tree.getroot()
+
+        acc_list = [float(child.attrib['acc']) for child in parent]
+        avg_acc_list.append( sum(acc_list)/len(acc_list) )
+
+    return avg_acc_list
+
 def main():
-    pred_dir = '/media/tor/46DAF35ADAF344A9/tor/robotics/prj/011/xprmnt/philipp-unary-voc2010/result/test-all'
-    gt_dir = '/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass-csv'
-    test_img_listpath = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/meta/split_voc2010_philipp/Test.txt'
+    assert len(sys.argv)==4, 'INSUFFICIENT NUMBER OF ARGUMENTS'
 
-    with open(test_img_listpath) as f:
-        test_img_list = f.readlines()
-    test_img_list = [x.strip('\n') for x in test_img_list]
-    # print test_img_list
+    target_listpath = sys.argv[1]
+    pred_dir = sys.argv[2]
+    gt_dir = sys.argv[3]
 
-    D_te = [ {'pred': pred_dir+'/'+test_img+'.csv', 'true': gt_dir+'/'+test_img+'.csv'} for test_img in test_img_list ]
-    # print data
+    with open(target_listpath) as f:
+        target_list = f.readlines()
+    target_list = [x.strip('\n') for x in target_list]
 
-    class_perf_map = eval(D_te)
-    # print class_perf_map
+    class_perf_map = eval(target_list, pred_dir, gt_dir)
 
     average_acc_over_classes = get_average_acc_over_classes(class_perf_map)
     print average_acc_over_classes
