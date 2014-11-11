@@ -1,18 +1,18 @@
 
 add_executable ( 
-  main 
-  main.cc 
+  vocmain 
+  ./main.cc 
 )
 
 add_library( 
-  shotton 
+  shotton1 
   shotton.cc
   edge_potential.cc
 )
 
 target_link_libraries ( 
-  main 
-  shotton
+  vocmain 
+  shotton1
   probimage
   color_map
   util

@@ -1,0 +1,1 @@
+./gatherers.sh /home/rizkivmaster/ws/googleimages/list-compilator/classlist /home/rizkivmaster/ws/googleimages/list-compilator/models /home/rizkivmaster/ws/googleimages/datasets /home/rizkivmaster/ws/googleimages/cropped /home/rizkivmaster/ws/googleimages/xml /home/rizkivmaster/ws/googleimages/annotated

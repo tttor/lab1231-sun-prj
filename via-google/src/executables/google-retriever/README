@@ -1,0 +1,2 @@
+run this command from your computer:
+ssh rizkivmaster@152.118.24.105 "nohup autodownload.sh"
