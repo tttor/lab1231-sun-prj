@@ -21,17 +21,15 @@ def annotate(filename, param):
 
     # randomized
     n_rnd_idx = int( round(param['ratio']*ann.size) )
-    rnd_idxes = np.random.random_integers(low=0, high=ann.shape[0]-1, size=(n_rnd_idx,2))# 2 is for 2D idx
+    randomized_row_idxes = list(np.random.random_integers(low=0, high=ann.shape[0]-1, size=n_rnd_idx))
+    randomized_col_idxes = list(np.random.random_integers(low=0, high=ann.shape[1]-1, size=n_rnd_idx))
     class_list = param['class_list']
 
-    for i in range(rnd_idxes.shape[0]):
-        row = rnd_idxes[i,:][0]
-        col = rnd_idxes[i,:][1]
-
+    for i, row in enumerate(randomized_row_idxes):
+        col = randomized_col_idxes[i]
         ann[row][col] = np.random.random_integers(low=min(class_list), high=max(class_list))
 
     return ann
-
 
 def main():
     assert len(sys.argv)==6, 'INSUFFICENT NUMBER OF ARGUMENTS'
