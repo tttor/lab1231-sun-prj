@@ -35,8 +35,7 @@ IFS=$'\n' read -d '' -r -a classes < $1
 `rm $4/Test.txt`
 c=0
 limit=60
-#max=`wc -l < $1`
-max=1
+max=`wc -l < $1`
 echo $max
 while [ $c -lt $max ]
 do
