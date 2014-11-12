@@ -24,13 +24,19 @@ def load_spatial_knowledge(filepath):
 
     tree = etree.parse(filepath)
     root = tree.getroot()
-    
+
+    #
     for sub in root:
         local_knowledge = {}
         for sub_2 in sub:
                 local_knowledge[sub_2.tag] = float(sub_2.attrib['norm_freq'])
 
         knowledge[sub.tag] = local_knowledge
+
+    #
+    uniform_ratio = float(1)/3# TODO should be read from the knowledge xml file
+    param = {'ratio_top': uniform_ratio, 'ratio_center': uniform_ratio, 'ratio_bottom': uniform_ratio}
+    knowledge['param'] = param
 
     return knowledge
 
