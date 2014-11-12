@@ -24,7 +24,7 @@ def main():
     # Extract regression outputs
     print('Extract regression outputs ...')
     evl_filepaths = [ann_dir+'/'+target+'.evl' for target in target_list]
-    out_list = get_average_acc_over_clasess_from_file(evl_filepaths)
+    out_list = [get_average_acc_over_clasess_from_file(filepath) for filepath in evl_filepaths]
 
     # Write the D = {(X,y)}
     assert len(out_list)==len(fea_list), 'len(out_list)!=len(fea_list)'
@@ -32,8 +32,8 @@ def main():
     data = [ fea_list[i]+[out_list[i]] for i in range(len(out_list)) ]
     data = np.asarray(data)
 
-    out_dir = sys.argv[4]
-    np.savetxt(out_dir+'/regression_data.csv', data, delimiter=",")
+    out_filepath = sys.argv[4]
+    np.savetxt(out_filepath, data, delimiter=",")
 
 if __name__ == '__main__':
     main()

@@ -3,6 +3,21 @@
 import numpy as np 
 from knowledge_loader import load_knowledge
 from pascal_voc_2012 import translate
+from pascal_voc_2012 import class_name_map
+
+def get_spatial(i, height, param):
+    top_height = int( round(param['ratio_top']*height) )
+    center_height = int( round(param['ratio_center']*height) )
+ 
+    top_center_th = top_height
+    center_bottom_th = top_height + center_height
+
+    if i < top_center_th:
+        return 'top'
+    elif i < center_bottom_th:
+        return 'center'
+    else:
+        return 'bottom'
 
 def extract_fea_c(ann, knowledge):
     numeric_classes = list( set(ann.flatten()) )
@@ -11,15 +26,37 @@ def extract_fea_c(ann, knowledge):
 
     probs = [knowledge[classes[i]][classes[j]] for i in range(len(classes)-1) for j in range(i+1,len(classes))]
 
+    c = 0.0
     if len(probs) != 0:
         c = sum(probs)/len(probs)
-    else:
-        c = 0.0
 
     return c
 
 def extract_fea_s(ann, knowledge):
-    return 0.0
+    '''
+    @brief extract spatial compatibility score
+    For each annotated pixel (excluding 'void' and 'background', get the probability of such annotation given pixel spatial location.
+
+    \return the average probility of p_s from all annotated pixel.
+    '''
+    n_row = ann.shape[0]
+    n_col = ann.shape[1]
+
+    probs = []
+    for i in range(n_row):
+        for j in range(n_col):
+            ann_ij = class_name_map[ ann[i][j] ]
+            spatial = get_spatial(i, n_row, knowledge['param'])
+
+            if ann_ij!='background':
+                prob = knowledge[ann_ij][spatial]
+                probs.append(prob)
+
+    s = 0.0
+    if len(probs) != 0:
+        s = sum(probs)/len(probs)
+
+    return s
 
 def extract_fea_r(ann, knowledge):
     return 0.0
