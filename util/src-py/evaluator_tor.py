@@ -99,20 +99,16 @@ def get_average_acc_over_classes(class_perf_map):
     accuracies = [ val['acc'] for val in class_perf_map.itervalues() ]
     return sum(accuracies)/len(accuracies)
 
-def get_average_acc_over_clasess_from_file(filepaths):
-    avg_acc_list = []
-    for filepath in filepaths:
-        tree = etree.parse(filepath)
-        parent = tree.getroot()
+def get_average_acc_over_clasess_from_file(filepath):
+    tree = etree.parse(filepath)
+    parent = tree.getroot()
 
-        acc_list = []
-        for child in parent:
-            for grandchild in child:
-                acc_list.append(float(grandchild.attrib['acc']))
+    acc_list = []
+    for child in parent:
+        for grandchild in child:
+            acc_list.append(float(grandchild.attrib['acc']))
 
-        avg_acc_list.append( sum(acc_list)/len(acc_list) )
-
-    return avg_acc_list
+    return sum(acc_list)/len(acc_list)
 
 def main():
     assert len(sys.argv)==4, 'INSUFFICIENT NUMBER OF ARGUMENTS'
