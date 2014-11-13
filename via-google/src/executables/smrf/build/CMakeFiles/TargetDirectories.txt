@@ -1,3 +1,0 @@
-/home/rizkivmaster/ws/googleimages/executables/smrf/build/CMakeFiles/graph.dir
-/home/rizkivmaster/ws/googleimages/executables/smrf/build/CMakeFiles/maxflow.dir
-/home/rizkivmaster/ws/googleimages/executables/smrf/build/CMakeFiles/smrf.dir

@@ -1,2 +1,0 @@
-/usr/bin/ar cr libmaxflow.a  CMakeFiles/maxflow.dir/home/rizkivmaster/ws/opengm/src/external/MaxFlow-v3.02.src-patched/maxflow.cpp.o
-/usr/bin/ranlib libmaxflow.a

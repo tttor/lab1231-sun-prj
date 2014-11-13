@@ -1,1 +1,1 @@
-./gatherer.sh /home/rizkivmaster/EXPERIMENT/codebase/googleimages/classlist /home/rizkivmaster/EXPERIMENT/grabber/cropped /home/rizkivmaster/EXPERIMENT/grabber/JPEGImages /home/rizkivmaster/EXPERIMENT/codebase/train-sampling
+./gatherer.sh /home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/classlist /home/rizkivmaster/ws/googleimages/cropped /home/rizkivmaster/ws/TextonBoost/voc/datasets/JPEGImages /home/rizkivmaster/ws/TextonBoost/voc/split
