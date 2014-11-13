@@ -89,11 +89,11 @@ def extract_fea_p(ann, knowledge, filename):
     raw_present_objects = translate(numeric_present_objects)
     present_objects = [i for i in raw_present_objects if i!='background' and i!='void']
 
-    probs = [knowledge[scene_class][obj] for obj in present_objects]
-
     p = 0.0
-    if len(probs) != 0:
-        p = sum(probs)/len(probs)
+    if scene_class in knowledge:# p= 0.0 for any unknown scene class
+        probs = [knowledge[scene_class][obj] for obj in present_objects]
+        if len(probs) != 0:
+            p = sum(probs)/len(probs)
 
     return p
 
