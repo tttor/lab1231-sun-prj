@@ -78,7 +78,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     return fig
 
-def tune_NuSVR(X_tr, y_tr, out_dir=None):
+def tune_NuSVR(X_tr, y_tr):
     print 'tune_nuSVR(X_tr, y_tr):'
 
     regressor = NuSVR()
@@ -91,15 +91,6 @@ def tune_NuSVR(X_tr, y_tr, out_dir=None):
     #
     grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
     grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
-
-    #  
-    print 'plot_learning_curve()'
-    title = 'Learning curve'
-    ylim = (0.0, 0.50)
-    fig = plot_learning_curve(regressor, title, X_tr, y_tr, ylim, cv=kf_cv, n_jobs=4)
-    if out_dir!=None:
-        with PdfPages(out_dir+'/learning_curve.pdf') as pdf:
-            pdf.savefig(fig)
 
     return grid_search.get_params()['estimator']
 
@@ -146,10 +137,20 @@ def main():
     for dataset in datasets:
         X_tr, X_te, y_tr, y_te = dataset
 
-        meta_regressor = tune_NuSVR(X_tr, y_tr, out_dir)
-        star_regressor = train(meta_regressor, X_tr, y_tr)
-        perf = test(star_regressor, X_te, y_te)
+        meta_regressor = tune_NuSVR(X_tr, y_tr)
+        regressor = train(meta_regressor, X_tr, y_tr)
 
+        #  
+        print 'plot_learning_curve()'
+        title = 'Learning curve'
+        ylim = (0.0, 0.50)
+        fig = plot_learning_curve(regressor, title, X_tr, y_tr, ylim, cv=10, n_jobs=4)
+        if out_dir!=None:
+            with PdfPages(out_dir+'/learning_curve.pdf') as pdf:
+                pdf.savefig(fig)
+
+        #
+        perf = test(regressor, X_te, y_te)
         perf_of_datasets.append(perf)
 
     #
