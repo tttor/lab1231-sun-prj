@@ -123,9 +123,14 @@ def main():
     X = data[:,0:2]# TODO include all but the last column
     y = data[:,-1] # target is at the last column
 
-    # plt.scatter(range(len(y)), y)
-    # plt.grid(True)
-    # plt.show()
+    fig = plt.figure()
+    plt.scatter(range(len(y)), y)
+    plt.grid(True)
+    plt.xlabel('i-th sample')
+    plt.ylabel('$y_{true}$')
+    if out_dir!=None:
+        with PdfPages(out_dir+'/target_scatter_plot.pdf') as pdf:
+            pdf.savefig(fig)
 
     # Shuffle n_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
