@@ -1,0 +1,1 @@
+./gatherer.sh /home/rizkivmaster/EXPERIMENT/codebase/googleimages/classlist /home/rizkivmaster/EXPERIMENT/grabber/cropped /home/rizkivmaster/EXPERIMENT/grabber/JPEGImages /home/rizkivmaster/EXPERIMENT/codebase/train-sampling
