@@ -1,8 +1,8 @@
-wget --no-proxy http://www.vlfeat.org/download/vlfeat-0.9.19.tar.gz
-wget --no-proxy http://cs.brown.edu/~pff/segment/segment.tgz
-wget --no-proxy http://www.inf.ethz.ch/personal/ladickyl/robustpn.zip
-wget --no-proxy http://graphics.stanford.edu/projects/densecrf/unary/probimage.zip
-wget --no-proxy http://graphics.stanford.edu/projects/densecrf/textonboost/classification.zip
+wget http://www.vlfeat.org/download/vlfeat-0.9.19.tar.gz
+wget http://cs.brown.edu/~pff/segment/segment.tgz
+wget http://www.inf.ethz.ch/personal/ladickyl/robustpn.zip
+wget http://graphics.stanford.edu/projects/densecrf/unary/probimage.zip
+wget http://graphics.stanford.edu/projects/densecrf/textonboost/classification.zip
 
 tar -zxvf vlfeat-0.9.19.tar.gz
 tar -zxvf segment.tgz
