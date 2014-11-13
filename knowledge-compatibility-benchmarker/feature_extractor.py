@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np 
+from lxml import etree
 from knowledge_loader import load_knowledge
 from pascal_voc_2012 import translate
 from pascal_voc_2012 import class_name_map
@@ -18,6 +19,22 @@ def get_spatial(i, height, param):
         return 'center'
     else:
         return 'bottom'
+
+def get_scene_class(filename):
+    '''
+    This acts as an oracle that returns an absolutely correct scene class of a given image.
+    \param filename 
+    \return scene class
+    '''
+    annotation_dir = '/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/ScenePropertyAnnotations/cikupastar-20141111/ScenePropertyAnnotations'
+    filepath = annotation_dir + '/' + filename + '.xml'
+
+    tree = etree.parse(filepath)
+    root = tree.getroot()
+    sub = root[0]
+    scene_class = sub.attrib['name']
+
+    return scene_class
 
 def extract_fea_c(ann, knowledge):
     numeric_classes = list( set(ann.flatten()) )
@@ -61,8 +78,24 @@ def extract_fea_s(ann, knowledge):
 def extract_fea_r(ann, knowledge):
     return 0.0
 
-def extract_fea_p(ann, knowledge):
-    return 0.0
+def extract_fea_p(ann, knowledge, filename):
+    '''
+    Calculate the probabibility of each present object given the scene class.
+
+    For now, the scene class is given by an Oracle
+    '''
+    scene_class = get_scene_class(filename).lower()
+    numeric_present_objects = list( set(ann.flatten()) )
+    raw_present_objects = translate(numeric_present_objects)
+    present_objects = [i for i in raw_present_objects if i!='background' and i!='void']
+
+    p = 0.0
+    if scene_class in knowledge:# p= 0.0 for any unknown scene class
+        probs = [knowledge[scene_class][obj] for obj in present_objects]
+        if len(probs) != 0:
+            p = sum(probs)/len(probs)
+
+    return p
 
 def extract_fea(ann_filepaths, knowledge_dir):
     '''
@@ -86,7 +119,7 @@ def extract_fea(ann_filepaths, knowledge_dir):
         c = extract_fea_c(ann, knowledge['c'])
         s = extract_fea_s(ann, knowledge['s'])
         r = extract_fea_r(ann, knowledge['r'])
-        p = extract_fea_p(ann, knowledge['p'])
+        p = extract_fea_p(ann, knowledge['p'], ann_filepath.split('/')[-1][0:-4])
 
         fea = [c, s, r, p]
         fea_list.append(fea)

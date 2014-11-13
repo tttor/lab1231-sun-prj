@@ -46,6 +46,18 @@ def load_relativeposition_knowledge(filepath):
 
 def load_sceneproperty_knowledge(filepath):
     knowledge = {}
+
+    tree = etree.parse(filepath)
+    root = tree.getroot()
+
+    for sub in root:
+        scene_class = sub.attrib['name']
+        obj_freq_map = {}
+        for sub_2 in sub:
+            for sub_3 in sub_2:
+                obj_freq_map[sub_3.tag] = float(sub_3.attrib['norm_freq'])
+        knowledge[scene_class] = obj_freq_map
+
     return knowledge
 
 def load_knowledge(knowledge_dir):
