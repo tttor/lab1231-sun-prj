@@ -119,7 +119,7 @@ int main( int argc, char * argv[]){
 		int nTextons = argc-3;
 		QVector< Image<short> > textons;
 		for( int i=2; i<argc-1; i++ ){
-			QVector< Image<short> > tmp = loadTextons( argv[i], cur_names );
+			QVector< Image<short> > tmp = loadTextons( strcat(argv[i],"TRAIN"), cur_names );
 			for( int j=0; j<tmp.size(); j++ ){
 				if (j >= textons.count())
 					textons.append( Image<short>(tmp[j].width(), tmp[j].height(), nTextons) );
@@ -141,4 +141,47 @@ int main( int argc, char * argv[]){
 		// Do the hard work
 		evaluate_all( booster, textons, cur_names, save_dir );
 	}
+
+  
+  //FOR TEST DATA
+  int blockSize = BLOCK_SIZE;
+  qDebug("(test) Loading the database of TEST DATA");
+  loadImages( images, labels, names, TEST );
+  images.clear();
+  labels.clear();
+  
+  // Saving memory [not having vwrender crash]
+  int blockIndex = 0;
+  for( int n=0; n<names.count(); n+=blockSize ){
+    QVector< QString > cur_names;
+    for( int i=n; i<n+blockSize && i<names.count(); i++ )
+      cur_names.append( names[i] );
+    
+    qDebug(std::string("(test) Loading textons of TEST "+std::to_string(blockIndex)).c_str());
+    int nTextons = argc-3;
+    QVector< Image<short> > textons;
+    for( int i=2; i<argc-1; i++ ){
+      QVector< Image<short> > tmp = loadTextons( (std::string(argv[i])+"TEST"+std::to_string(blockIndex)).c_str(), cur_names );
+      for( int j=0; j<tmp.size(); j++ ){
+        if (j >= textons.count())
+          textons.append( Image<short>(tmp[j].width(), tmp[j].height(), nTextons) );
+        for( int k=0; k<tmp[j].width()*tmp[j].height(); k++ )
+          textons[j][k*nTextons+i-2] = tmp[j][k];
+      }
+    }
+    
+    // Training
+    qDebug("(test) Evaluating");
+    TextonBoost booster;
+    booster.load( boost_file );
+    
+    // Create the output directory
+    QDir dir( save_dir );
+    if (!dir.exists())
+      dir.mkpath( dir.absolutePath() );
+    
+    // Do the hard work
+    evaluate_all( booster, textons, cur_names, save_dir );
+    ++blockIndex;
+  }
 }

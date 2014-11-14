@@ -24,7 +24,7 @@
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+static const int BLOCK_SIZE = 200;
 #pragma once
 // TODO: Make sure to adjust the parameters in this file
 #define USE_MSRC

@@ -74,7 +74,7 @@ void loadMSRC(QVector< ColorImage >& images, QVector< LabelImage >& annotations,
 	}
 }
 
-static QVector< QString > listVOC2010( int type ){
+QVector< QString > listVOC2010( int type ){
 	QString base_dir = VOC2010_DIRECTORY;
 	QVector< QString > names;
 	int types[] = {TRAIN, VALID, TEST};
@@ -116,6 +116,26 @@ void loadVOC2010(QVector< ColorImage >& images, QVector< LabelImage >& annotatio
 		annotations.append( gt );
 		names.append( QFileInfo( name ).baseName() );
 	}
+}
+
+void loadVOC2010byNames(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type,QVector< QString >& filenames) {
+  images.clear();
+  annotations.clear();
+  names.clear();
+  foreach (QString name, filenames ){
+    QString pngname = name;
+    QString gtname = name;
+    pngname+=".png";
+    gtname.replace("/PNGImages/", "/SegmentationClass/");
+    gtname+=".png";
+    ColorImage im;
+    LabelImage gt;
+    im.load( pngname );
+    gt.load( gtname, VOC2010 );
+    images.append( im );
+    annotations.append( gt );
+    names.append( QFileInfo( name ).baseName() );
+  }
 }
 
 void loadImages(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type) {

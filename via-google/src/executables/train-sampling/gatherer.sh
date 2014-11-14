@@ -1,16 +1,28 @@
+classListPath="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/classlist"
+srcDir="/home/rizkivmaster/ws/datasets/googleimages/cropped"
+tgtDir="/home/rizkivmaster/ws/TextonBoost/voc/datasets/JPEGImages"
+splitDir="/home/rizkivmaster/ws/TextonBoost/voc/split"
+quota=60
+blockSize=10
 echo "Target class list file:"
-echo "$1"
+echo "$classListPath"
 echo "Source images folders per class directory:"
-echo "$2"
+echo "$srcDir"
 echo "Target training images folders:"
-echo "$3"
+echo "$tgtDir"
 echo "Target Test.txt folder directory:"
-echo "$4"
+echo "$splitDir"
+echo "Size of Quota:"
+echo "$quota"
+echo "Size of Block Size:"
+echo "$blockSize"
 echo "######################"
 
-classlist=`cat $1`
 
-imgfolddirs=`ls -d $2/*`
+
+classlist=`cat $classListPath`
+
+imgfolddirs=`ls -d $srcDir/*`
 
 
 # for class in $classlist
@@ -26,18 +38,19 @@ do
 done
 
 IFS=$'\n' read -d '' -r -a imgfolds < imgfolddir
-IFS=$'\n' read -d '' -r -a classes < $1
+IFS=$'\n' read -d '' -r -a classes < $classListPath
 
 
 
 
-#`rm compilation`
-`rm $4/Test.txt`
+`rm $splitDir/Test.txt`
+`rm tempList`
 c=0
+trainIndex=1
 limit=60
 half=10
 #`expr $limit / 2`
-max=`wc -l < $1`
+max=`wc -l < $classListPath`
 echo $max
 while [ $c -lt $max ]
 do
@@ -45,18 +58,13 @@ do
 	imgnames=`ls -d ${imgfolds[$c]}/*`
 	for imgname in $imgnames
 	do
-		if [ $counter -lt $limit ]
+		if [ $counter -lt $quota ]
 		then
 			filename=$(basename "$imgname")
 			extension="${filename##*.}"
 			singlename="${filename%.*}"
-			`cp $imgname $3/${classes[$c]}$filename`
-			if [ $counter -lt $half ]
-			then
-				echo "${classes[$c]}$singlename" >> $4/Validation.txt
-			else
-				echo "${classes[$c]}$singlename" >> $4/Test.txt
-			fi
+			`cp $imgname $tgtDir/${classes[$c]}$filename`
+			echo "${classes[$c]}$singlename" >> tempList
 		else
 			break
 		fi
@@ -64,4 +72,22 @@ do
 	done
 	(( c++ ))
 done
+
+
+listFile=`cat tempList`
+blockIndex=1
+counter=0
+for file in listFile
+do
+	if [ $counter -lt $blockSize ]
+		then
+		echo "$file" >> $splitDir/Test$blockIndex.txt
+		(( counter++ ))
+	else
+		counter=0
+		(( blockSize++ ))
+	fi
+done
+
 `rm imgfolddir`
+`rm tempList`
