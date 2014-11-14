@@ -139,19 +139,10 @@ def main():
     n_sample = data.shape[0]
 
     #
-    c_col = 0
-    s_col = 1
-    r_col = 2
-    p_col = 3
     target_col = -1
+    X = data[:,0:target_col]
+    y = data[:,target_col]
 
-    used_fea_list = [c_col, s_col, p_col]
-
-    X = np.zeros((n_sample,len(used_fea_list)))
-    for i, fea in enumerate(used_fea_list):
-        X[:,i] = data[:,fea]
-
-    y = data[:,target_col] # target is at the last column
 
     fig = plt.figure()
     plt.scatter(range(len(y)), y)
@@ -180,7 +171,7 @@ def main():
         #  
         print 'plot_learning_curve()'
         title = 'Learning curve'
-        ylim = (0.0, 0.50)
+        ylim = (0.0, 1.0)
         fig = plot_learning_curve(regressor, title, X_tr, y_tr, ylim, cv=10, n_jobs=4)
         if out_dir!=None:
             with PdfPages(out_dir+'/learning_curve.pdf') as pdf:
@@ -200,9 +191,19 @@ def main():
         #
         fig, ax = plt.subplots()
         scatter_plot = ax.scatter(perf['y_true'], perf['y_pred'])
+        ax.plot([0.0, 1.0], [0.0, 1.0], '-', linewidth=2, color='red')
+
         ax.set_ylabel('$y_{pred}$')
         ax.set_xlabel('$y_{true}$')
         ax.set_title( 'Testing NuSVR: ' + scoring + ' =' + str(perf[scoring]))
+        
+        xlim = (-0.2, 1.2)
+        ylim = xlim
+        plt.xlim(xlim)
+        plt.ylim(ylim)
+        ax.grid(True)
+
+
 
         with PdfPages(out_dir + '/best_ypred_vs_ytrue_based_on_'+scoring+'.pdf') as pdf:
             pdf.savefig(fig)
