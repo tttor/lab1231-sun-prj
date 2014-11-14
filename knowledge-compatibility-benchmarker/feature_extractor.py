@@ -45,7 +45,7 @@ def extract_fea_c(ann, knowledge):
 
     c = 0.0
     if len(probs) != 0:
-        c = sum(probs)/len(probs)
+        c = np.mean(probs)
 
     return c
 
@@ -71,7 +71,7 @@ def extract_fea_s(ann, knowledge):
 
     s = 0.0
     if len(probs) != 0:
-        s = sum(probs)/len(probs)
+        s = np.mean(probs)
 
     return s
 
@@ -93,7 +93,7 @@ def extract_fea_p(ann, knowledge, filename):
     if scene_class in knowledge:# p= 0.0 for any unknown scene class
         probs = [knowledge[scene_class][obj] for obj in present_objects]
         if len(probs) != 0:
-            p = sum(probs)/len(probs)
+            p = np.mean(probs)
 
     return p
 
