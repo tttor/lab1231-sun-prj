@@ -42,10 +42,16 @@ def extract_fea_c(ann, knowledge):
     classes = [i for i in raw_classes if i!='background' and i!='void']
 
     probs = [knowledge[classes[i]][classes[j]] for i in range(len(classes)-1) for j in range(i+1,len(classes))]
+    probs = np.asarray(probs)
 
-    c = 0.0
+    c = []
     if len(probs) != 0:
-        c = sum(probs)/len(probs)
+        c = [np.mean(probs), 
+             np.percentile(probs, 25), 
+             np.percentile(probs, 50), 
+             np.percentile(probs, 75)]
+    else:
+        c = [0.0] * 4
 
     return c
 
@@ -69,14 +75,20 @@ def extract_fea_s(ann, knowledge):
                 prob = knowledge[ann_ij][spatial]
                 probs.append(prob)
 
-    s = 0.0
+    s = []
     if len(probs) != 0:
-        s = sum(probs)/len(probs)
-
+        s = [np.mean(probs), 
+             np.percentile(probs, 25), 
+             np.percentile(probs, 50), 
+             np.percentile(probs, 75)]
+    else:
+        s = [0.0] * 4
+    
     return s
 
 def extract_fea_r(ann, knowledge):
-    return 0.0
+    r = [0.0]
+    return r
 
 def extract_fea_p(ann, knowledge, filename):
     '''
@@ -89,11 +101,16 @@ def extract_fea_p(ann, knowledge, filename):
     raw_present_objects = translate(numeric_present_objects)
     present_objects = [i for i in raw_present_objects if i!='background' and i!='void']
 
-    p = 0.0
-    if scene_class in knowledge:# p= 0.0 for any unknown scene class
-        probs = [knowledge[scene_class][obj] for obj in present_objects]
-        if len(probs) != 0:
-            p = sum(probs)/len(probs)
+    probs = [knowledge[scene_class][obj] for obj in present_objects if scene_class in knowledge]
+    
+    p = []
+    if len(probs) != 0:
+        p = [np.mean(probs), 
+             np.percentile(probs, 25), 
+             np.percentile(probs, 50), 
+             np.percentile(probs, 75)]
+    else:
+        p = [0.0] * 4
 
     return p
 
@@ -121,7 +138,7 @@ def extract_fea(ann_filepaths, knowledge_dir):
         r = extract_fea_r(ann, knowledge['r'])
         p = extract_fea_p(ann, knowledge['p'], ann_filepath.split('/')[-1][0:-4])
 
-        fea = [c, s, r, p]
+        fea = c + s + p #TODO include r
         fea_list.append(fea)
 
     return fea_list
