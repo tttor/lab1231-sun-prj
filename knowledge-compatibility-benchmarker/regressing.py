@@ -89,7 +89,7 @@ def tune_NuSVR(X_tr, y_tr):
                    'nu': [0.5], 
                    'kernel': ['rbf'], 
                    'degree': [3], 
-                   'gamma': [0.0]}
+                   'gamma': [0.7]}
 
     #
     kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
