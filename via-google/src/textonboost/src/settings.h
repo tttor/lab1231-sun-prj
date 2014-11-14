@@ -51,11 +51,11 @@ static const char VOC2010_TEST_FILE  [] = "../data/voc/VOC2010/Test.txt";
 static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
 
 // Texton parameters
-static const int N_TEXTONS = 400;
+static const int N_TEXTONS = 100;
 static const float FILTER_BANK_SIZE = 1.0;
 
 // Boosting parameters
-static const int N_BOOSTING_ROUNDS  = 10000; // Number of boosting rounds
+static const int N_BOOSTING_ROUNDS  = 2500; // Number of boosting rounds
 static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]
 static const int N_THRESHOLDS       = 100; // Number of thresholds to test [per round]
 // static const int N_BOOSTING_ROUNDS  = 10000; // Number of boosting rounds
