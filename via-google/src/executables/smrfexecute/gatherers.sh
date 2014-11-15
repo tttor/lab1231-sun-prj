@@ -27,6 +27,7 @@ imgfolddirs=`ls -d $googleimgfolder/*`
 #  	echo $class
 #  done
 `rm imgfolddir`
+`rm pnglist`
 echo "Retrieving folder list"
 for dir in $imgfolddirs
 do
@@ -60,6 +61,8 @@ do
 				then
 				`$googlevocbinpath $datasettype $imgname $unaryfolder/$singlename.unary $anncsvfolder/$singlename.ann $segclassfolder/$singlename.png`
 			fi
+			echo "$segclassfolder/$singlename.png" >> pnglist
+
 		else
 			break
 		fi
@@ -69,3 +72,6 @@ do
 	(( c++ ))
 done
 `rm imgfolddir`
+
+matlab -nodesktop -nosplash -r "paletting;quit;"
+`rm pnglist`

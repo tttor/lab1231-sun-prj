@@ -22,7 +22,12 @@ classSize=10
 
 #MRF
 anntype="googlevoc"
-vocannbinpath="~/main"
 googlevocannbinpath="~/main"
 googleannbinpath="~/main"
 anncsvfolder="~/ann"
+
+
+#Baseline VOC
+testlistfile="~/list"
+#as baseline annotator
+vocannbinpath="~/main"
