@@ -40,5 +40,3 @@ add_subdirectory( algorithm )
 add_subdirectory( feature )
 add_subdirectory( util )
 add_subdirectory( classifier )
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")

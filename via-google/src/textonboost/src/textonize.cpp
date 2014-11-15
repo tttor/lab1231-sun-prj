@@ -40,130 +40,85 @@
 #include "feature/bboxfeature.h"
 
 
-    int main( int argc, char * argv[]){
+int main( int argc, char * argv[]){
 	/**** Read the IO ****/
-     if (argc<3){
-      qWarning( "Usage: %s texton_file type [params ..]", argv[0] );
-      qWarning( "     type :");
-      qWarning( "           FilterBank [nTextons filterbank_size]" );
-      qWarning( "           Color [nTextons]" );
-      qWarning( "           HoG [nTextons L/A/B]" );
-      qWarning( "           Location [nTextons]" );
+	if (argc<3){
+		qWarning( "Usage: %s texton_file type [params ..]", argv[0] );
+		qWarning( "     type :");
+		qWarning( "           FilterBank [nTextons filterbank_size]" );
+		qWarning( "           Color [nTextons]" );
+		qWarning( "           HoG [nTextons L/A/B]" );
+		qWarning( "           Location [nTextons]" );
 // 		qWarning( "           BBox [nTextons]" );
-      return 1;
-    }
-    QString save_filename = argv[1];
-    QString type = argv[2];
-    type = type.toLower();
-
-    int n_textons = N_TEXTONS;
-    if (argc>3)
-      n_textons = QString( argv[3] ).toInt();
-
-    QSharedPointer<Feature> filter;
-    if (type == "filterbank"){
-      float filterbank_size = FILTER_BANK_SIZE;
-
-      if (argc>4)
-       filterbank_size = QString( argv[4] ).toFloat();
-
-     filter = QSharedPointer<Feature>( new FilterBank( filterbank_size ) );
-   }
-   else if (type == "color"){
-    filter = QSharedPointer<Feature>( new ColorFeature() );
-  }
-  else if (type == "location"){
-    filter = QSharedPointer<Feature>( new LocationFeature() );
-  }
-  else if (type == "hog"){
-    HogFeature::HogFeatureType type = HogFeature::L;
-    if (argc>4){
-     QString t = QString( argv[4] ).toLower();
-     if (t=="a") type = HogFeature::A;
-     if (t=="b") type = HogFeature::B;
-   }
-   filter = QSharedPointer<Feature>( new HogFeature(type) );
- }
- else if (type == "bbox"){
-  filter = QSharedPointer<Feature>( new BBoxFeature() );
-}
-else
-  qFatal( "Unknown feature %s", qPrintable( type ) );
+		return 1;
+	}
+	QString save_filename = argv[1];
+	QString type = argv[2];
+	type = type.toLower();
+	
+	int n_textons = N_TEXTONS;
+	if (argc>3)
+		n_textons = QString( argv[3] ).toInt();
+	
+	QSharedPointer<Feature> filter;
+	if (type == "filterbank"){
+		float filterbank_size = FILTER_BANK_SIZE;
+		
+		if (argc>4)
+			filterbank_size = QString( argv[4] ).toFloat();
+		
+		filter = QSharedPointer<Feature>( new FilterBank( filterbank_size ) );
+	}
+	else if (type == "color"){
+		filter = QSharedPointer<Feature>( new ColorFeature() );
+	}
+	else if (type == "location"){
+		filter = QSharedPointer<Feature>( new LocationFeature() );
+	}
+	else if (type == "hog"){
+		HogFeature::HogFeatureType type = HogFeature::L;
+		if (argc>4){
+			QString t = QString( argv[4] ).toLower();
+			if (t=="a") type = HogFeature::A;
+			if (t=="b") type = HogFeature::B;
+		}
+		filter = QSharedPointer<Feature>( new HogFeature(type) );
+	}
+	else if (type == "bbox"){
+		filter = QSharedPointer<Feature>( new BBoxFeature() );
+	}
+	else
+		qFatal( "Unknown feature %s", qPrintable( type ) );
 	// Declare all variables we need for both training and evaluation
-QVector< ColorImage > images;
-QVector< Image<float> > lab_images;
-QVector< LabelImage > labels;
-QVector< QString > names;
-
+	QVector< ColorImage > images;
+	QVector< Image<float> > lab_images;
+	QVector< LabelImage > labels;
+	QVector< QString > names;
+	
 	/**** Training ****/
-qDebug("(train) Loading the database");
-loadImages( images, labels, names, TRAIN );
-
+	qDebug("(train) Loading the database");
+	loadImages( images, labels, names, TRAIN );
+	
 	// Color Conversion
-qDebug("(train) Converting to Lab");
-lab_images = RGBtoLab( images );
-
+	qDebug("(train) Converting to Lab");
+	lab_images = RGBtoLab( images );
+	
 	// Training
-qDebug("(train) Training Textons");
-Texton texton( filter, n_textons );
-texton.train( lab_images, names );
-
-
+	qDebug("(train) Training Textons");
+	Texton texton( filter, n_textons );
+	texton.train( lab_images, names );
+	
+	
 	/**** Evaluation ****/
-	//PROCESS TRAINING DATA FIRST
-int blockSize = BLOCK_SIZE;
-qDebug("(test)  Loading the database for training");
-loadImages( images, labels, names, TRAIN );
-  // Color Conversion
-qDebug("(test)  Converting to Lab");
-lab_images = RGBtoLab( images );
-  // Evalutation
-qDebug("(test)  Textonizing");
-QVector< Image<short> > textons = texton.textonize( lab_images, names );
-  /**** Storing textons ****/
-saveTextons( save_filename+"TRAIN", textons, names );
-
-//PROCESS TESTING DATA IN SEQUENCE
-qDebug("(test)  Loading the database for training");
-
-QVector< QString > filenames = listVOC2010( TEST );
-QVector< QString > tmpFilenames;
-
-int blockDim = filenames.size()/blockSize + (filenames.size()%blockSize==0?0:1);
-
-QVector< ColorImage > tmpImages;
-QVector< Image<float> > tmpLab_images;
-QVector< LabelImage > tmpLabels;
-QVector< QString > tmpNames;
-
-for(int blockIndex = 0; blockIndex<blockDim; blockIndex++)
-{
-  tmpFilenames.clear();
-  tmpImages.clear();
-  tmpLab_images.clear();
-  tmpLabels.clear();
-  tmpNames.clear();
-  int startIndex = blockIndex*blockSize;
-  int endIndex = (blockIndex+1)*blockSize;
-  int fileIndex = startIndex;
-  while(fileIndex<filenames.size() && fileIndex <endIndex)
-  {
-    tmpFilenames.append(filenames.at(fileIndex));
-    fileIndex++;
-  }
-  loadVOC2010byNames( tmpImages, tmpLabels, tmpNames, TEST, filenames);
-  qDebug("(test)  Converting to Lab");
-  tmpLab_images = RGBtoLab( tmpImages );
-    // Evalutation
-  qDebug(std::string("(test)  Textonizing TEST BLOCK "+std::to_string(blockIndex)).c_str());
-  QVector< Image<short> > tmpTextons = texton.textonize( tmpLab_images, tmpNames );
-    /**** Storing textons ****/
-  char targetname[100];
-  char* test = "TEST";
-  std::string number = std::to_string(blockIndex);
-  strcpy(targetname,argv[1]);
-  strcat(targetname,test);
-  strcat(targetname,number.c_str());
-  saveTextons( targetname, tmpTextons, tmpNames );
-}
+	qDebug("(test)  Loading the database");
+	loadImages( images, labels, names, ALL );
+	// Color Conversion
+	qDebug("(test)  Converting to Lab");
+	lab_images = RGBtoLab( images );
+	// Evalutation
+	qDebug("(test)  Textonizing");
+	QVector< Image<short> > textons = texton.textonize( lab_images, names );
+	
+	/**** Storing textons ****/
+	saveTextons( save_filename, textons, names );
 }

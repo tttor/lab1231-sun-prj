@@ -65,7 +65,7 @@ int main( int argc, char * argv[]){
 	
 	int nTextons = argc-2;
 	for( int i=2; i<argc; i++ ){
-		QVector< Image<short> > tmp = loadTextons( strcat(argv[i],"TRAIN"), names );
+		QVector< Image<short> > tmp = loadTextons( argv[i], names );
 		for( int j=0; j<tmp.size(); j++ ){
 			if (j >= textons.count())
 				textons.append( Image<short>(tmp[j].width(), tmp[j].height(), nTextons) );

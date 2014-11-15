@@ -24,16 +24,16 @@
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-static const int BLOCK_SIZE = 200;
+
 #pragma once
 // TODO: Make sure to adjust the parameters in this file
-#define USE_MSRC
+//#define USE_MSRC
 
 // Dataset parameters
-static const char MSRC_DIRECTORY  [] = "../data/msrc/";
-static const char MSRC_TRAIN_FILE [] = "../data/msrc/Train.txt";
-static const char MSRC_VALID_FILE [] = "../data/msrc/Validation.txt";
-static const char MSRC_TEST_FILE  [] = "../data/msrc/Test.txt";
+static const char MSRC_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/datasets";
+static const char MSRC_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Train.txt";
+static const char MSRC_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Validation.txt";
+static const char MSRC_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Test.txt";
 
 // // Exact annotations
 // static const char MSRC_DIRECTORY  [] = "../data/msrc/";
@@ -42,22 +42,35 @@ static const char MSRC_TEST_FILE  [] = "../data/msrc/Test.txt";
 // static const char MSRC_TEST_FILE  [] = "../data/msrc/newgt/Test.txt";
 
 // Dataset parameters
-static const char VOC2010_DIRECTORY  [] = "../data/voc/VOC2010/";
-static const char VOC2010_TRAIN_FILE [] = "../data/voc/VOC2010/Train.txt";
-static const char VOC2010_VALID_FILE [] = "../data/voc/VOC2010/Validation.txt";
-static const char VOC2010_TEST_FILE  [] = "../data/voc/VOC2010/Test.txt";
+static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/google/datasets";
+static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
+static const char VOC2010_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Validation.txt";
+static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Test.txt";
 
 // VOC Cache
 static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
 
+//for google annotation, comment if unnessery
+// static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/google/datasets";
+// static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
+// static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
+// static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
+
+
 // Texton parameters
-static const int N_TEXTONS = 100;
-static const float FILTER_BANK_SIZE = 1.0;
+/*static const int N_TEXTONS = 400;
+static const float FILTER_BANK_SIZE = 1.0;*/
+//VOC settings
+static const int N_TEXTONS = 50;
+static const float FILTER_BANK_SIZE = 1;
 
 // Boosting parameters
 static const int N_BOOSTING_ROUNDS  = 2500; // Number of boosting rounds
 static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]
 static const int N_THRESHOLDS       = 100; // Number of thresholds to test [per round]
+/*static const int N_BOOSTING_ROUNDS  = 10000; // Number of boosting rounds
+static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]
+static const int N_THRESHOLDS       = 100; // Number of thresholds to test [per round]*/
 // static const int N_BOOSTING_ROUNDS  = 10000; // Number of boosting rounds
 // static const int N_CLASSIFIERS      = 750; // Number of random classifiers to test [per round]
 // static const int N_THRESHOLDS       = 150; // Number of thresholds to test [per round]

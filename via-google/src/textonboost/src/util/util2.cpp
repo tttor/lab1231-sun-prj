@@ -87,8 +87,8 @@ static QVector< QString > listVOC2010( int type ){
 			while(!f.atEnd()){
 				QByteArray name = f.readLine().trimmed();
 				if (name.length() > 0){
-					QString filename = base_dir+"/JPEGImages/"+name;
-					if(!QFile::exists( filename+".jpg" ))
+					QString filename = base_dir+"/PNGImages/"+name;
+					if(!QFile::exists( filename+".png" ))
 						qWarning( "File not found '%s'", qPrintable( filename ) );
 					names.append( filename );
 				}
@@ -103,14 +103,14 @@ void loadVOC2010(QVector< ColorImage >& images, QVector< LabelImage >& annotatio
 	annotations.clear();
 	names.clear();
 	foreach (QString name, filenames ){
-		QString jpgname = name;
+		QString pngname = name;
 		QString gtname = name;
-		jpgname+=".jpg";
-		gtname.replace("/JPEGImages/", "/SegmentationClass/");
+		pngname+=".png";
+		gtname.replace("/PNGImages/", "/SegmentationClass/");
 		gtname+=".png";
 		ColorImage im;
 		LabelImage gt;
-		im.load( jpgname );
+		im.load( pngname );
 		gt.load( gtname, VOC2010 );
 		images.append( im );
 		annotations.append( gt );

@@ -33,6 +33,7 @@ static QMap< unsigned int, signed char > init_msrc(){
 	QMap< unsigned int, signed char > color_to_id;
 	color_to_id[ qRgb(0,0,0) ] = -1;
 	int i = 0;
+	color_to_id[ qRgb(4,4,4) ] = i++;
 	color_to_id[ qRgb(128,0,0) ] = i++;
 	color_to_id[ qRgb(0,128,0) ] = i++;
 	color_to_id[ qRgb(128,128,0) ] = i++;
@@ -56,6 +57,7 @@ static QMap< unsigned int, signed char > init_msrc(){
 	color_to_id[ qRgb(128,192,128) ] = i++;
 	color_to_id[ qRgb(64,64,0) ] = i++;
 	color_to_id[ qRgb(192,64,0) ] = i++;
+	color_to_id[ qRgb(64,64,64) ] = i++;
 	return color_to_id;
 }
 static QMap< unsigned int, signed char > init_voc2007(){
@@ -78,6 +80,7 @@ static QMap< signed char, unsigned int > init_msrc_colors(){
 	QMap< signed char, unsigned int > color_to_id;
 	color_to_id[ -1 ] = qRgb(0,0,0);
 	int i = 0;
+	color_to_id[ i++ ] = qRgb(4,4,4);
 	color_to_id[ i++ ] = qRgb(128,0,0);
 	color_to_id[ i++ ] = qRgb(0,128,0);
 	color_to_id[ i++ ] = qRgb(128,128,0);
@@ -99,6 +102,7 @@ static QMap< signed char, unsigned int > init_msrc_colors(){
 	color_to_id[ i++ ] = qRgb(128,192,128);
 	color_to_id[ i++ ] = qRgb(64,64,0);
 	color_to_id[ i++ ] = qRgb(192,64,0);
+	color_to_id[ i++ ] = qRgb(64,64,64);
 	return color_to_id;
 }
 static QMap< signed char, unsigned int > init_voc2007_colors(){
