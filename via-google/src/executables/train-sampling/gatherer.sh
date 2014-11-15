@@ -1,16 +1,19 @@
+source ../config
 echo "Target class list file:"
-echo "$1"
+echo "$classlistfile"
+echo "Images per Class size:"
+echo "$classSize"
 echo "Source images folders per class directory:"
-echo "$2"
+echo "$googleimgfolder"
 echo "Target training images folders:"
-echo "$3"
+echo "$trainfolder"
 echo "Target Test.txt folder directory:"
-echo "$4"
+echo "$splitfolder"
 echo "######################"
 
-classlist=`cat $1`
+classlist=`cat $classlistfile`
 
-imgfolddirs=`ls -d $2/*`
+imgfolddirs=`ls -d $googleimgfolder/*`
 
 
 # for class in $classlist
@@ -26,18 +29,18 @@ do
 done
 
 IFS=$'\n' read -d '' -r -a imgfolds < imgfolddir
-IFS=$'\n' read -d '' -r -a classes < $1
+IFS=$'\n' read -d '' -r -a classes < $classlistfile
 
 
 
 
 #`rm compilation`
-`rm $4/Test.txt`
+`rm $splitfolder/Test.txt`
 c=0
-limit=10
+limit=$classSize
 #half=10
 #`expr $limit / 2`
-max=`wc -l < $1`
+max=`wc -l < $classlistfile`
 echo $max
 while [ $c -lt $max ]
 do
@@ -50,13 +53,8 @@ do
 			filename=$(basename "$imgname")
 			extension="${filename##*.}"
 			singlename="${filename%.*}"
-			`cp $imgname $3/${classes[$c]}$filename`
-#			if [ $counter -lt $half ]
-#			then
-#				echo "${classes[$c]}$singlename" >> $4/Validation.txt
-#			else
-				echo "${classes[$c]}$singlename" >> $4/Test.txt
-#			fi
+			`cp $imgname $trainfolder/${classes[$c]}$filename`
+			echo "${classes[$c]}$singlename" >> $splitfolder/Test.txt
 		else
 			break
 		fi

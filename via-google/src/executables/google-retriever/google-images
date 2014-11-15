@@ -1,6 +1,8 @@
 #!/bin/bash
 # requires phantomjs from http://phantomjs.org/download.html
 # and google-images.js
+source ../config
+targetfolder=$googleimgfolder
 [ $# = 0 ] && { prog=`basename "$0"`;
 echo >&2 "usage: $prog query count parallel safe opts timeout tries agent1 agent2
 e.g. : $prog ostrich
@@ -9,7 +11,7 @@ scriptdir="$(readlink -f "`dirname "$0"`")"
 query=$1 count=${2:-20} parallel=${3:-10} safe=$4 opts=$5 timeout=${6:-10} tries=${7:-2}
 agent1=${8:-Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36} agent2=${9:-Googlebot-Image/1.0}
 query_esc=`perl -e 'use URI::Escape; print uri_escape($ARGV[0]);' "$query"`
-dir=`echo "$query_esc" | sed 's/%20/-/g'`-`date +%s`; mkdir "$dir" || exit 2; cd "$dir"
+dir=`echo "$query_esc" | sed 's/%20/-/g'`-`date +%s`; mkdir "$targetfolder/$dir" || exit 2; cd "$targetfolder/$dir"
 url="http://www.google.com/search?tbm=isch&safe=$safe&tbs=$opts&q=$query_esc" procs=0
 echo >.URL "$url" ; for A; do echo >>.args "$A"; done
 htmlsplit() { tr '\n\r \t' ' ' | sed 's/</\n</g; s/>/>\n/g; s/\n *\n/\n/g; s/^ *\n//; s/ $//;'; }
