@@ -34,8 +34,8 @@ IFS=$'\n' read -d '' -r -a classes < $1
 #`rm compilation`
 `rm $4/Test.txt`
 c=0
-limit=60
-half=10
+limit=10
+#half=10
 #`expr $limit / 2`
 max=`wc -l < $1`
 echo $max
@@ -51,12 +51,12 @@ do
 			extension="${filename##*.}"
 			singlename="${filename%.*}"
 			`cp $imgname $3/${classes[$c]}$filename`
-			if [ $counter -lt $half ]
-			then
-				echo "${classes[$c]}$singlename" >> $4/Validation.txt
-			else
+#			if [ $counter -lt $half ]
+#			then
+#				echo "${classes[$c]}$singlename" >> $4/Validation.txt
+#			else
 				echo "${classes[$c]}$singlename" >> $4/Test.txt
-			fi
+#			fi
 		else
 			break
 		fi

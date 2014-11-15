@@ -1,1 +1,1 @@
-./gatherer.sh /home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/classlist /home/rizkivmaster/ws/googleimages/cropped /home/rizkivmaster/ws/TextonBoost/voc/datasets/JPEGImages /home/rizkivmaster/ws/TextonBoost/voc/split
+./gatherer.sh /home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/classlist /home/rizkivmaster/ws/googleimages/cropped /home/rizkivmaster/ws/TextonBoost/google/datasets/JPEGImages /home/rizkivmaster/ws/TextonBoost/google/split
