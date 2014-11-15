@@ -1,20 +1,24 @@
+source ../config
 echo "Target model name list file:"
-echo "$1"
+echo "$classlistfile"
 echo "Target model directory:"
-echo "$2"
+echo "$modelfolder"
 echo "Target images folders per class directory:"
-echo "$3"
-echo "Model Size"
-echo `wc -l $1`
+echo "$googleimgfolder"
+echo "Target cropped image folder:"
+echo "$targetcropfolder"
+echo "Target xml folder"
+echo "$targetxmlfolder"
+
 echo "######################"
 
-classlist=`cat $1`
+classlist=`cat $classlistfile`
 
 
-modeldirs=`ls -d $2/*`
+modeldirs=`ls -d $modelfolder/*`
 
 
-imgfolddirs=`ls -d $3/*`
+imgfolddirs=`ls -d $googleimgfolder/*`
 
 
 # for class in $classlist
@@ -36,7 +40,7 @@ do
 done
 
 IFS=$'\n' read -d '' -r -a imgfolds < imgfolddir
-IFS=$'\n' read -d '' -r -a classes < $1
+IFS=$'\n' read -d '' -r -a classes < $classlistfile
 IFS=$'\n' read -d '' -r -a models < modeldir
 
 
@@ -44,7 +48,7 @@ IFS=$'\n' read -d '' -r -a models < modeldir
 
 `rm compilation`
 c=0
-max=`wc -l < $1`
+max=`wc -l < $classlistfile`
 echo $max
 while [ $c -lt $max ]
 do
@@ -55,7 +59,7 @@ do
 	imgnames=`cat ${imgfolds[$c]}/ok`
 	for imgname in $imgnames
 	do
-		echo "$c,${classes[$c]},${models[$c]},${imgfolds[$c]}/$imgname,$4/${classes[$c]},$5/${classes[$c]}" >> compilation
+		echo "$c,${classes[$c]},${models[$c]},${imgfolds[$c]}/$imgname,$targetcropfolder/${classes[$c]},$targetxmlfolder/${classes[$c]}" >> compilation
 		echo "$c,${classes[$c]},${models[$c]},${imgfolds[$c]}/$imgname"
 	done
 	`rm ok`
@@ -63,9 +67,5 @@ do
 	(( c++ ))
 done
 `rm imgfolddir`
- # echo `wc -l modeldir`
-
-# echo "${classes[0]}"
-# echo "${models[0]}"
-
 `rm modeldir`
+

@@ -1,0 +1,33 @@
+#directory to put raw google images
+googleimgfolder="~/google"
+
+#VOC config
+classlistfile="/home/rizkivmaster/ws/googleimages/list-compilator/classlist"
+
+#DPM config
+sourcefolder="~/deformable"
+modelfolder="/home/rizkivmaster/ws/googleimages/list-compilator/models"
+targetcropfolder="/home/rizkivmaster/ws/googleimages/cropped"
+targetxmlfolder="/home/rizkivmaster/ws/googleimages/xml"
+extractorfolder="~/extract-boundaries"
+
+#GoogleTexton
+splitfolder="~/split"
+trainfolder="~/train"
+#Segmentation Class
+segclassfolder="~/segmen"
+unaryfolder="~/unaries"
+createGUfile="~/createGU.sh"
+classSize=10
+
+#MRF
+anntype="googlevoc"
+googlevocannbinpath="~/main"
+googleannbinpath="~/main"
+anncsvfolder="~/ann"
+
+
+#Baseline VOC
+testlistfile="~/list"
+#as baseline annotator
+vocannbinpath="~/main"
