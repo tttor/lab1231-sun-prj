@@ -11,13 +11,16 @@ targetcropfolder="/home/rizkivmaster/ws/googleimages/cropped"
 targetxmlfolder="/home/rizkivmaster/ws/googleimages/xml"
 extractorfolder="~/extract-boundaries"
 
-#GoogleTexton
+#TextonBoost
 splitfolder="~/split"
 trainfolder="~/train"
 #Segmentation Class
 segclassfolder="~/segmen"
 unaryfolder="~/unaries"
 createGUfile="~/createGU.sh"
+
+#Google
+gpngfolder="~/"
 classSize=10
 
 #MRF
