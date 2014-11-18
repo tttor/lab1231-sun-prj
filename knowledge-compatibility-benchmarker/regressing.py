@@ -182,12 +182,12 @@ def main():
         perf_of_datasets.append(perf)
 
     #
-    best_perf_dic = {}
-    best_perf_dic['mse'] = get_best_perf(perf_of_datasets, 'mse')
-    best_perf_dic['r2'] = get_best_perf(perf_of_datasets, 'r2')
+    best_perf_basedon = {}
+    best_perf_basedon['mse'] = get_best_perf(perf_of_datasets, 'mse')
+    best_perf_basedon['r2'] = get_best_perf(perf_of_datasets, 'r2')
 
     #
-    for scoring, perf in best_perf_dic.iteritems():
+    for scoring, perf in best_perf_basedon.iteritems():
         #
         fig, ax = plt.subplots()
         scatter_plot = ax.scatter(perf['y_true'], perf['y_pred'])
@@ -202,8 +202,6 @@ def main():
         plt.xlim(xlim)
         plt.ylim(ylim)
         ax.grid(True)
-
-
 
         with PdfPages(out_dir + '/best_ypred_vs_ytrue_based_on_'+scoring+'.pdf') as pdf:
             pdf.savefig(fig)
