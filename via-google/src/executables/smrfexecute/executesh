@@ -1,0 +1,1 @@
+./caller.sh /home/rizkivmaster/ws/googleimages/executables/datasets-compilator/aeroplanesmrf

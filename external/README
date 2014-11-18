@@ -19,3 +19,43 @@ http://graphics.stanford.edu/projects/densecrf/unary/probimage.zip
 ===
 textonboost
 http://graphics.stanford.edu/projects/densecrf/textonboost/classification.zip
+
+===
+opengm-2.3.3
+
+1) Set CMakeLists.txt:
+...
+#--------------------------------------------------------------
+# options
+#--------------------------------------------------------------
+OPTION(BUILD_EXAMPLES "Build Examples" OFF)
+OPTION(BUILD_COMMANDLINE "Build Commandline" OFF)
+OPTION(WITH_AD3 "Include AD3" OFF)
+OPTION(WITH_CPLEX "Include CPLEX" OFF)
+OPTION(WITH_GUROBI "Include GUROBI" OFF)
+OPTION(WITH_BOOST "Include BOOST" OFF)
+OPTION(WITH_HDF5 "Include HDF5" OFF)
+OPTION(WITH_TRWS "Include wrapper for TRWS code" OFF)
+OPTION(WITH_GCO "Include wrapper for GCO code" OFF)
+OPTION(WITH_MRF "Include wrapper for MRF code" OFF)
+OPTION(WITH_QPBO "Include wrapper for QPBO code" ON)
+OPTION(WITH_FASTPD "Include wrapper for FastPD code" OFF)
+OPTION(WITH_MAXFLOW "Include wrapper for MAXFLOW code" ON)
+OPTION(WITH_MAXFLOW_IBFS "Include wrapper for MAXFLOW-IBFScode" ON)
+OPTION(WITH_LIBDAI "Include wrapper for LIBDAI code" OFF)
+OPTION(WITH_DAOOPT "Include wrapper for DAOOPT code" OFF)
+OPTION(WITH_MPLP "Include wrapper for MPLP code" OFF)
+OPTION(WITH_OPENMP "Include OpenMP" OFF)
+OPTION(WITH_CONICBUNDLE "Include ConicBundleLibrary" OFF)
+OPTION(WITH_MATLAB "Activate MatLab-Code" OFF)
+OPTION(BUILD_CONVERTER "Build several converters" OFF)
+OPTION(BUILD_PYTHON_WRAPPER "Build python wrapper" OFF)
+OPTION(BUILD_MATLAB_WRAPPER "Build matlab wrapper" OFF)
+###Grante needs C++11. Since we have not tested OpenGM under this standard yet, using Grante is realy experimental!!!
+###OPTION(WITH_GRANTE "Include wrapper for grante" OFF)
+
+2) Complete the external patches at <...>/src/external
+
+===
+rapidxml-1.13
+http://sourceforge.net/projects/rapidxml/files/latest/download
