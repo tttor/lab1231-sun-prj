@@ -26,6 +26,5 @@ head -n "$count" |
 tee -a .images.tsv |
 while IFS=$'\t' read -r save img ref; do
 wget -U"$agent2" -T"$timeout" --tries="$tries" --referer="$ref" -O "$save" "$img" || rm "$save" &
-echo "ini $save"
 procs=$[$procs + 1]; [ $procs = $parallel ] && { wait; procs=0; }
 done ; wait

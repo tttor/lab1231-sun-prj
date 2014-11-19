@@ -1,17 +1,32 @@
+#LINKER
+
+#GOOGLE IMAGE -OBJECT
+google_object_file="//home/rizkivmaster/ws/testdatasets/google/google_object"
+
+#OBJECT-DPM
+object_dpm_file="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/object_dpm"
+
+#GOOGLEIMAGES
 #directory to put raw google images
-googleimgfolder="~/google"
+google_folder="/home/rizkivmaster/ws/testdatasets/google"
+google_size=1
+google_unaries_dir=""
+google_test=""
 
-#VOC config
-classlistfile="/home/rizkivmaster/ws/googleimages/list-compilator/classlist"
+#VOC
+object_list_file="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/classlist"
+normal_param=""
+improved_param=""
 
-#DPM config
-sourcefolder="~/deformable"
-modelfolder="/home/rizkivmaster/ws/googleimages/list-compilator/models"
-targetcropfolder="/home/rizkivmaster/ws/googleimages/cropped"
-targetxmlfolder="/home/rizkivmaster/ws/googleimages/xml"
-extractorfolder="~/extract-boundaries"
+
+#DPM
+dpm_folder="/home/rizkivmaster/ws/deformable"
+dpm_img_folder="/home/rizkivmaster/ws/testdatasets/dpmimg"
+dpm_xml_folder="/home/rizkivmaster/ws/testdatasets/dpmxml"
 
 #TextonBoost
+train_bin=""
+predict_bin=""
 splitfolder="~/split"
 trainfolder="~/train"
 #Segmentation Class

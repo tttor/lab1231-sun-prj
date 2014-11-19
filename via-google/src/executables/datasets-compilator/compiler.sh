@@ -26,7 +26,6 @@ imgfolddirs=`ls -d $2/*`
 for dir in $imgfolddirs
 do
 	echo $dir >> imgfolddir
-	#echo $dir
 done
 
 IFS=$'\n' read -d '' -r -a imgfolds < imgfolddir
