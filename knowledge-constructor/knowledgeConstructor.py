@@ -37,6 +37,7 @@ class KnowledgeConstructor:
 	pArraySize=None
 	rArray=None
 	relative_is_around_threshold = None
+	relative_is_below_threshold = None
 	generatedTime=None
     
 	def __init__(self, fileOutputName):
@@ -237,6 +238,7 @@ class KnowledgeConstructor:
 		root = etree.Element("relative_knowledge")
 		root.set("dataset","pascal_voc_2010")
 		root.set("timestamp", str(self.generatedTime))
+		root.set("below_threshold", str(self.relative_is_below_threshold))
 		root.set("around_threshold", str(self.relative_is_around_threshold))
 		
 		for class_name in range(1, self.cArraySize):
@@ -250,8 +252,8 @@ class KnowledgeConstructor:
 			around_total = 0
 			for x in range (1, self.cArraySize):
 				below_total = below_total + self.rArray[class_name][x][0]
-				beside_total = beside_total + self.rArray[class_name][x][0]
-				around_total = around_total + self.rArray[class_name][x][0]
+				beside_total = beside_total + self.rArray[class_name][x][1]
+				around_total = around_total + self.rArray[class_name][x][2]
 				
 			for its_pair in range(1, self.cArraySize):
 				subsubsub_below = etree.SubElement(subsub_below, "class")
@@ -438,8 +440,6 @@ class KnowledgeConstructor:
 			for place in tree.findall("place"):
 				placeName=place.get("name")
 				self.placeList.append(placeName)
-				if placeName == 'hill':
-					print(infile)
 				
 		self.placeList=list(set(self.placeList))
 		self.placeList.sort()
@@ -464,15 +464,11 @@ class KnowledgeConstructor:
 						arrayPos = arrayPos + 1 # to search the position to place the counter until it's found
 					self.propertyArray[arrayPos][int(nameToIndexDict[objectName])] = self.propertyArray[arrayPos][int(nameToIndexDict[objectName])] + 1
 		
-		print ("tempat-tempat yang ada pada placelist")
-		print (self.placeList)
-		print()
-		print("banyaknya benda muncul pada tempat-tempat tersebut")
-		for x in range (0, self.pArraySize):
-			print (self.propertyArray[x])
+		#for x in range (0, self.pArraySize):
+		#	print (self.propertyArray[x])
 		self.pXML()	
 				
-	def relative_knowledge(self):
+	def relative_knowledge(self, below_beside_th, around_th):
 		
 		for label in range (1,self.cArraySize):
 			self.rArray[0][label]=indexToNameDict[str(label)]
@@ -482,7 +478,8 @@ class KnowledgeConstructor:
 		relative_xml_file_group = glob.glob(os.path.join(self.rxmlpath, "*.xml"))
 		xmlTotal=len(relative_xml_file_group)
 		
-		self.relative_is_around_threshold = 20
+		self.relative_is_around_threshold = around_th
+		self.relative_is_below_threshold = below_beside_th
 		
 		for (num, infile) in enumerate (relative_xml_file_group):
 			
@@ -510,32 +507,19 @@ class KnowledgeConstructor:
 					else:
 						obj1=imgList[x]
 						obj2=imgList[y]
-						#obj1=["person","50","40","70","60"]
-						#obj2=["person","10","10","60","60"]
 						obj1_classname = obj1[0]
 						obj2_classname = obj2[0]
 						obj1_arrayindex = int(nameToIndexDict[obj1_classname])
 						obj2_arrayindex = int(nameToIndexDict[obj2_classname])
-						obj1_xmin = int(obj1[1]) 
-						obj1_ymin = int(obj1[2]) 
-						obj1_xmax = int(obj1[3]) 
-						obj1_ymax = int(obj1[4]) 
-						obj2_xmin = int(obj2[1]) 
-						obj2_ymin = int(obj2[2])
-						obj2_xmax = int(obj2[3])
-						obj2_ymax = int(obj2[4])
 						
 						#below
-						if obj1_ymax <= obj2_ymin:
-							#objek 2 ada di bawah objek 1
-							self.rArray[obj2_arrayindex][obj1_arrayindex][0] = self.rArray[obj2_arrayindex][obj1_arrayindex][0] + 1
-						elif obj2_ymax <= obj1_ymin:
-							#objek 1 ada di bawah objek 2
+						if PositionSearcher.isBelow(obj1, obj2, self.relative_is_below_threshold):
 							self.rArray[obj1_arrayindex][obj2_arrayindex][0] = self.rArray[obj1_arrayindex][obj2_arrayindex][0] + 1
+
 						
-						#beside
+						#beside, doesn't handle intersection
 						# if some object located on the leftside or rightside of the other object and obj2 does not located to far from obj1 vertically
-						if (obj1_xmin > obj2_xmax or obj1_xmax < obj2_xmin) and ((obj1_ymin < obj2_ymin and obj1_ymax < obj2_ymax) or (obj1_ymin > obj2_ymin and obj1_ymax > obj2_ymax) or (obj1_ymin < obj2_ymin and obj1_ymax > obj2_ymax) or (obj1_ymin > obj2_ymin and obj1_ymax < obj2_ymax)):
+						if PositionSearcher.isBeside(obj1, obj2):
 							self.rArray[obj1_arrayindex][obj2_arrayindex][1] = self.rArray[obj1_arrayindex][obj2_arrayindex][1] + 1
 						
 						#around
@@ -543,11 +527,9 @@ class KnowledgeConstructor:
 						#objek 1 ada di dalam objek 2
 						if PositionSearcher.isInside(obj1, obj2):
 							self.rArray[obj1_arrayindex][obj2_arrayindex][2] = self.rArray[obj1_arrayindex][obj2_arrayindex][2] + 1
-						#objek 2 ada di dalam objek 1
-						elif PositionSearcher.isInside(obj2,obj1):
-							self.rArray[obj2_arrayindex][obj1_arrayindex][2] = self.rArray[obj2_arrayindex][obj1_arrayindex][2] + 1
+						#ada di sekitar, dimana threshold terpenuhi
 						elif PositionSearcher.isAround(obj1, obj2, self.relative_is_around_threshold):
 							self.rArray[obj1_arrayindex][obj2_arrayindex][2] = self.rArray[obj1_arrayindex][obj2_arrayindex][2] + 1
-		
+						
 		self.rXML()
 
