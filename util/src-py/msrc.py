@@ -1,4 +1,7 @@
+# Based on http://drwn.anu.edu.au/drwnProjMultiSeg.html
 color_class_map = {
+	(0, 0, 0) :255, #case on accurate GT from Phillipp
+	(64,64,64) :255, #case on accurate GT from Phillipp
 	(0, 0, 0) : -1,
 	(128, 0, 0) : 0, 
 	(0, 128, 0) : 1, 
@@ -21,4 +24,28 @@ color_class_map = {
 	(128, 192, 128) : 18,
 	(64, 64, 0) : 19,
 	(192, 64, 0) : 20
+}
+
+class_name_map = {
+	0 : "building",
+	1 : "grass",
+	2 : "tree",
+	3 : "cow",
+	4 : "sheep",
+	5 : "sky",
+	6 : "airplane",
+	7 : "water",
+	8 : "face",
+	9 : "car",
+	10: "bicycle",
+	11: "flower",
+	12: "sign",
+	13: "bird",
+	14: "book",
+	15: "chair",
+	16: "road",
+	17: "cat",
+	18: "dog",
+	19: "body",
+	20: "boat"
 }
