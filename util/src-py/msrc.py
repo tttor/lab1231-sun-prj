@@ -1,3 +1,4 @@
+# Based on http://drwn.anu.edu.au/drwnProjMultiSeg.html
 color_class_map = {
 	(0, 0, 0) : -1,
 	(128, 0, 0) : 0, 
