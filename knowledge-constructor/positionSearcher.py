@@ -19,6 +19,70 @@ class PositionSearcher:
 		if obj1_xmin > obj2_xmin and obj1_xmax < obj2_xmax and obj1_ymin > obj2_ymin and obj1_ymax < obj2_ymax:
 			return True
 	
+	def isBelow(ob1, ob2, th):
+		obj1_xmin = int(ob1[1]) 
+		obj1_ymin = int(ob1[2]) 
+		obj1_xmax = int(ob1[3]) 
+		obj1_ymax = int(ob1[4]) 
+		obj2_xmin = int(ob2[1]) 
+		obj2_ymin = int(ob2[2])
+		obj2_xmax = int(ob2[3])
+		obj2_ymax = int(ob2[4])
+		
+		if obj2_xmin > obj1_xmin and obj2_xmax < obj1_xmax and obj1_ymax > obj2_ymax and obj2_ymin < obj1_ymin < obj2_ymax:
+			difference_area = (obj2_ymax - obj1_ymin) * (obj2_xmax - obj2_xmin)
+			obj2_area = PositionSearcher.compute_rect_area(ob2)
+			#threshold
+			if obj2_area != 0:
+				if difference_area / obj2_area < th/100:
+					print(ob1[0] + " dibawah " + ob2[0] + " , beririsan sedikit, " + ob2[0] + " lebih kecil dari " + ob1[0])
+					return True
+		
+		elif obj2_xmin < obj1_xmin and obj2_xmax > obj1_xmax and obj1_ymax > obj2_ymax and obj2_ymin < obj1_ymin < obj2_ymax:
+			difference_area = (obj2_ymax - obj1_ymin) * (obj1_xmax - obj1_xmin)
+			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
+			#threshold
+			if obj_area != 0:
+				if difference_area / obj_area < th/100:
+					print(ob1[0] + " dibawah " + ob2[0] + " , beririsan sedikit, " + ob1[0] + " lebih kecil dari " + ob2[0])
+					return True
+		
+		elif obj2_xmin < obj1_xmax < obj2_xmax and obj2_ymin < obj1_ymin < obj2_ymax :
+			difference_area = (obj1_xmax - obj2_xmin) * (obj2_ymax - obj1_ymin)
+			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
+			#threshold
+			if obj_area != 0:
+				if difference_area /obj_area < th/100:
+					print(ob2[0] + " ada di atas kanan " + ob1[0])
+					return True
+				
+		elif obj2_xmin < obj1_xmin < obj2_xmax and obj2_ymin < obj1_ymin < obj2_ymax :
+			difference_area = (obj2_xmax - obj1_xmin) * (obj2_ymax - obj1_ymin)
+			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
+			#threshold
+			if obj_area != 0:
+				if difference_area /obj_area < th/100:
+					print(ob2[0] + " ada di atas kiri " + ob1[0])
+					return True
+			
+		#tidak bersentuhan
+		elif obj1_ymin > obj2_ymax:
+			print(ob1[0] + " ada di bawah " + ob2[0] + " ,tidak bersentuhan")
+			return True
+				
+	def isBeside(ob1, ob2):
+		obj1_xmin = int(ob1[1]) 
+		obj1_ymin = int(ob1[2]) 
+		obj1_xmax = int(ob1[3]) 
+		obj1_ymax = int(ob1[4]) 
+		obj2_xmin = int(ob2[1]) 
+		obj2_ymin = int(ob2[2])
+		obj2_xmax = int(ob2[3])
+		obj2_ymax = int(ob2[4])
+		
+		if (obj1_xmin > obj2_xmax or obj1_xmax < obj2_xmin) and ((obj1_ymin < obj2_ymin and obj1_ymax < obj2_ymax) or (obj1_ymin > obj2_ymin and obj1_ymax > obj2_ymax) or (obj1_ymin < obj2_ymin and obj1_ymax > obj2_ymax) or (obj1_ymin > obj2_ymin and obj1_ymax < obj2_ymax)):
+			return True
+		
 	def isAround(ob1, ob2, th):
 		obj1_xmin = int(ob1[1]) 
 		obj1_ymin = int(ob1[2]) 
@@ -35,7 +99,7 @@ class PositionSearcher:
 			obj1_area = PositionSearcher.compute_rect_area(ob1)
 			#threshold
 			if difference_area / obj1_area > th/100:
-				#print("diatas")
+				print("intersect diatas")
 				return True
 		
 		#intersect around bottom
@@ -44,7 +108,7 @@ class PositionSearcher:
 			obj1_area = PositionSearcher.compute_rect_area(ob1)
 			#threshold
 			if difference_area / obj1_area > th/100:
-				#print("dibawah")
+				print("intersect dibawah")
 				return True
 				
 		#intersect around left
@@ -53,7 +117,7 @@ class PositionSearcher:
 			obj1_area = PositionSearcher.compute_rect_area(ob1)
 			#threshold
 			if difference_area / obj1_area > th/100:
-				#print("dikiri")
+				print("intersect dikiri")
 				return True
 				
 		#intersect around right
@@ -62,7 +126,7 @@ class PositionSearcher:
 			obj1_area = PositionSearcher.compute_rect_area(ob1)
 			#threshold
 			if difference_area / obj1_area > th/100:
-				#print("dikanan")
+				print("intersect dikanan")
 				return True
 				
 		#intersect bigger top
@@ -70,7 +134,7 @@ class PositionSearcher:
 			difference_area = (obj1_ymax - obj2_ymin) * (obj2_xmax - obj2_xmin)
 			obj2_area = PositionSearcher.compute_rect_area(ob2)
 			#threshold
-			#print("siap-siap diatas gede")
+			print("siap-siap diatas gede")
 			if difference_area / obj2_area > th/100:
 				return True
 			
@@ -79,7 +143,7 @@ class PositionSearcher:
 			difference_area = (obj2_ymax - obj1_ymin) * (obj2_xmax - obj2_xmin)
 			obj2_area = PositionSearcher.compute_rect_area(ob2)
 			#threshold
-			#print("siap-siap dibawah gede")
+			print("siap-siap dibawah gede")
 			if difference_area / obj2_area > th/100:
 				return True
 				
@@ -88,7 +152,7 @@ class PositionSearcher:
 			difference_area = (obj1_xmax - obj2_xmin) * (obj2_ymax - obj2_ymin)
 			obj2_area = PositionSearcher.compute_rect_area(ob2)
 			#threshold
-			#print("siap-siap dikiri gede")
+			print("siap-siap dikiri gede")
 			if difference_area / obj2_area > th/100:
 				return True
 		
@@ -97,7 +161,7 @@ class PositionSearcher:
 			difference_area = (obj2_xmax - obj1_xmin) * (obj2_ymax - obj2_ymin)
 			obj2_area = PositionSearcher.compute_rect_area(ob2)
 			#threshold
-			#print("siap-siap dikanan gede")
+			print("siap-siap dikanan gede")
 			if difference_area / obj2_area > th/100:
 				return True
 				
@@ -107,7 +171,7 @@ class PositionSearcher:
 			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
 			#threshold
 			if difference_area /obj_area > th/100:
-				#print("pojok kiri atas")
+				print("pojok kiri atas")
 				return True
 				
 		#intersect around topright
@@ -116,7 +180,7 @@ class PositionSearcher:
 			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
 			#threshold
 			if difference_area /obj_area > th/100:
-				#print("pojok kanan atas")
+				print("pojok kanan atas")
 				return True
 				
 		#around bottomleft
@@ -125,7 +189,7 @@ class PositionSearcher:
 			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
 			#threshold
 			if difference_area /obj_area > th/100:
-				#print("pojok kiri bawah")
+				print("pojok kiri bawah")
 				return True
 				
 		#around bottomright
@@ -134,7 +198,7 @@ class PositionSearcher:
 			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
 			#threshold
 			if difference_area /obj_area > th/100:
-				#print("pojok kanan bawah")
+				print("pojok kanan bawah")
 				return True
 				
 		#crossing horizontally
@@ -143,7 +207,7 @@ class PositionSearcher:
 			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
 			#threshold
 			if difference_area /obj_area > th/100:
-				#print("nyamping miring")
+				print("nyamping miring")
 				return True
 				
 		#crossing vertically
@@ -152,6 +216,6 @@ class PositionSearcher:
 			obj_area = min(PositionSearcher.compute_rect_area(ob1) , PositionSearcher.compute_rect_area(ob2))
 			#threshold
 			if difference_area /obj_area > th/100:
-				#print("nyamping tegak")
+				print("nyamping tegak")
 				return True
 			
