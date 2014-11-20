@@ -160,10 +160,10 @@ def main():
     (class_avg_acc_data,global_acc_data) = eval(target_list, pred_dir, gt_dir)
 
     class_avg_acc = get_class_avg_acc(class_avg_acc_data)
-    print class_avg_acc
+    print 'class_avg_acc=', class_avg_acc
 
     global_acc = get_global_acc(global_acc_data)
-    print global_acc
+    print 'global_acc=', global_acc
 
 if __name__ == '__main__':
     main()
