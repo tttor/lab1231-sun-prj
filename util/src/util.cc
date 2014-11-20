@@ -48,6 +48,8 @@ std::vector<std::string> sun::util::read_list(const std::string& list_path) {
   if (test_img_list_file.is_open()) {
     string line;
     while ( getline(test_img_list_file,line) ) {
+      const string last = line.substr(line.size()-1);
+      if (last=="\r" or last=="\n") line = line.substr(0,line.size()-1);
       test_img_filenames.push_back(line);
     }
     test_img_list_file.close();
