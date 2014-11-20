@@ -120,6 +120,7 @@ def main():
     with open(target_listpath) as f:
         target_list = f.readlines()
     target_list = [x.strip('\n') for x in target_list]
+    target_list = [x[0:-4] for x in target_list if x[-4:]=='.csv']
 
     class_perf_map = eval(target_list, pred_dir, gt_dir)
 
