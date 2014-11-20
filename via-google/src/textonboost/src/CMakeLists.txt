@@ -22,17 +22,17 @@ add_definitions(-fPIC)
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # Add the executables
-add_executable( textonize textonize.cpp )
-target_link_libraries( textonize util feature )
+#add_executable( textonize textonize.cpp )
+#target_link_libraries( textonize util feature )
 
-add_executable( textonview textonview.cpp )
-target_link_libraries( textonview util feature )
+#add_executable( textonview textonview.cpp )
+#target_link_libraries( textonview util feature )
 
-add_executable( textonboost textonboost.cpp )
-target_link_libraries( textonboost util feature classifier )
+#add_executable( textonboost textonboost.cpp )
+#target_link_libraries( textonboost util feature classifier )
 
-add_executable( evaluate evaluate.cpp )
-target_link_libraries( evaluate util feature classifier )
+#add_executable( evaluate evaluate.cpp )
+#target_link_libraries( evaluate util feature classifier )
 
 add_executable( trainer trainer.cpp )
 target_link_libraries( trainer util feature classifier )

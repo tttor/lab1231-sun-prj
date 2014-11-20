@@ -1,3 +1,5 @@
+
+
 /*
     Copyright (c) 2011, Philipp Krähenbühl
     All rights reserved.
@@ -43,10 +45,12 @@ enum DataType{
 
 // void loadMSRC( QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type );
 // void loadVOC2010( QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type );
-<<<<<<< HEAD
 void loadImages( QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type );
-=======
 void loadImages( QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type );
 QVector< QString > listVOC2010( int type );
 void loadVOC2010byNames(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names,QVector< QString >& filenames);
->>>>>>> fc24483... damn modularization business
+
+void loadImages(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names,  QString list_path,QString img_folder,QString png_folder);
+QVector< QString > listImagesPath( QString path , QString base_dir);
+void loadImagesbyNames(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names,QVector< QString >& filenames, QString img_folder);
+
