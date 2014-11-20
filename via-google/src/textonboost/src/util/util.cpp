@@ -105,7 +105,11 @@ void loadVOC2010(QVector< ColorImage >& images, QVector< LabelImage >& annotatio
 	foreach (QString name, filenames ){
 		QString jpgname = name;
 		QString gtname = name;
+<<<<<<< HEAD
 		jpgname+=".jpg";
+=======
+		pngname+=".jpg";
+>>>>>>> fc24483... damn modularization business
 		gtname.replace("/JPEGImages/", "/SegmentationClass/");
 		gtname+=".png";
 		ColorImage im;
@@ -118,6 +122,29 @@ void loadVOC2010(QVector< ColorImage >& images, QVector< LabelImage >& annotatio
 	}
 }
 
+<<<<<<< HEAD
+=======
+void loadVOC2010byNames(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names,QVector< QString >& filenames) {
+  images.clear();
+  annotations.clear();
+  names.clear();
+  foreach (QString name, filenames ){
+    QString pngname = name;
+    QString gtname = name;
+    pngname+=".jpg";
+    gtname.replace("/JPEGImages/", "/SegmentationClass/");
+    gtname+=".png";
+    ColorImage im;
+    LabelImage gt;    
+    im.load( pngname );
+    gt.load( gtname, VOC2010 );
+    images.append( im );
+    annotations.append( gt );
+    names.append( QFileInfo( name ).baseName() );
+  }
+}
+
+>>>>>>> fc24483... damn modularization business
 void loadImages(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type) {
 #ifdef USE_MSRC
 	loadMSRC(images, annotations, names, type);

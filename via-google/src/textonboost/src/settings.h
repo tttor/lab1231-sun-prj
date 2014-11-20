@@ -42,10 +42,17 @@ static const char MSRC_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/s
 // static const char MSRC_TEST_FILE  [] = "../data/msrc/newgt/Test.txt";
 
 // Dataset parameters
+<<<<<<< HEAD
 static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/google/datasets";
 static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
 static const char VOC2010_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Validation.txt";
 static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Test.txt";
+=======
+static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/datasets/voc2010";
+static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/datasets/voc2010/testsplit/Train.txt";
+static const char VOC2010_VALID_FILE [] = "/home/rizkivmaster/ws/datasets/voc2010/testsplit/Validation.txt";
+static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/datasets/voc2010/testsplit/Test.txt";
+>>>>>>> fc24483... damn modularization business
 
 // VOC Cache
 static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
@@ -58,14 +65,19 @@ static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
 
 
 // Texton parameters
+<<<<<<< HEAD
 /*static const int N_TEXTONS = 400;
 static const float FILTER_BANK_SIZE = 1.0;*/
 //VOC settings
 static const int N_TEXTONS = 50;
 static const float FILTER_BANK_SIZE = 1;
+=======
+static const int N_TEXTONS = 5;
+static const float FILTER_BANK_SIZE = 1.0;
+>>>>>>> fc24483... damn modularization business
 
 // Boosting parameters
-static const int N_BOOSTING_ROUNDS  = 2500; // Number of boosting rounds
+static const int N_BOOSTING_ROUNDS  = 100; // Number of boosting rounds
 static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]
 static const int N_THRESHOLDS       = 100; // Number of thresholds to test [per round]
 /*static const int N_BOOSTING_ROUNDS  = 10000; // Number of boosting rounds
@@ -87,4 +99,4 @@ static const int MAX_RECT_SIZE      = 200; // Maximum size of texton rectangle
 #define GAUSSIAN_OFFSET // Use Sample the offset from a gaussian centered at 0
 
 // Shall we return the raw boosting results H or P = 1/Z * exp(-H)
-#define RAW_BOOSTING_OUTPUT
+//#define RAW_BOOSTING_OUTPUT
