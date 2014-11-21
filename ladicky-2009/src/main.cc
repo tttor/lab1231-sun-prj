@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
   sun::util::DataParam data_param;
   sun::util::EnergyParam energy_param;
 
-  if (argc == 10) {
+  if (argc == 9) {
     //
     data_param["dataset_name"] = argv[1];
     data_param["n_label"] = argv[2];
@@ -19,11 +19,11 @@ int main(int argc, char* argv[]) {
     data_param["test_img_list_filepath"] = argv[4];
     data_param["result_dir"] = argv[5];
     data_param["unary_philipp_dir"] = argv[6];
+    data_param["superpixel_dir"] = argv[7];
+    data_param["param_superpixel"] = argv[8];
 
-    // Train
-    energy_param["SLIC_region"] = boost::lexical_cast<double>(argv[7]);
-    energy_param["SLIC_regularization"] = boost::lexical_cast<double>(argv[8]);
-    energy_param["SLIC_min_region"] = boost::lexical_cast<double>(argv[9]);
+    energy_param["theta_phi_1"] = 4.5;
+    energy_param["theta_phi_2"] = 1;
   }
   else {
     assert(false && "UNSUFFICIENT ARGUMENTS!");
@@ -35,10 +35,13 @@ int main(int argc, char* argv[]) {
   
   for (size_t i=0; i<test_img_filenames.size(); ++i) {
     const string img_filename = test_img_filenames.at(i);
+    string superpixel_file_name = string(img_filename.substr(0,img_filename.size()-4)) + "/" + 
+                                  string(img_filename.substr(0,img_filename.size()-4)) + data_param["param_superpixel"] + ".sup";
+
     cout << "ANNOTATING: " << img_filename << " (" << i+1 << "/" << test_img_filenames.size() << ")" << endl;
 
     Eigen::MatrixXi ann;
-    ann = sun::ladicky::annotate(img_filename, data_param, energy_param);
+    ann = sun::ladicky::annotate(img_filename, superpixel_file_name, data_param, energy_param);
 
     const string ann_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".ann");
     const string ann_img_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".bmp");
