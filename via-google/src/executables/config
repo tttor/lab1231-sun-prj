@@ -1,36 +1,47 @@
+#PLEASE DONT EMPTY ANYTHING!!!!!!!!!!!!!!!
+#LINKER
+
+#GOOGLE IMAGE -OBJECT
+google_object_file="//home/rizkivmaster/ws/testdatasets/google/google_object"
+
+#OBJECT-DPM
+object_dpm_file="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/object_dpm"
+
+
+#GOOGLEIMAGES
 #directory to put raw google images
-googleimgfolder="~/google"
+google_size=1
+google_folder="/home/rizkivmaster/ws/testdatasets/google"
+google_unaries_dir="/home/rizkivmaster/ws/testdatasets/unaries"
+google_png_dir="/home/rizkivmaster/ws/testdatasets/png"
+google_ann_dir="/home/rizkivmaster/ws/testdatasets/annotation"
+google_train_list="/home/rizkivmaster/ws/testdatasets/google_train"
+combined_train_list="/home/rizkivmaster/ws/testdatasets/combined_train_list"
+google_sampling_size="1"
 
-#VOC config
-classlistfile="/home/rizkivmaster/ws/googleimages/list-compilator/classlist"
+#VOC
+object_list_file="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/classlist"
+voc_img_folder="/home/rizkivmaster/ws/datasets/voc2010/JPEGImages"
+voc_png_folder="/home/rizkivmaster/ws/datasets/voc2010/SegmentationClass"
+voc_train_list="/home/rizkivmaster/ws/datasets/voc2010/testsplit/Train.txt"
+voc_test_list="/home/rizkivmaster/ws/datasets/voc2010/testsplit/Test.txt"
+voc_test_unary_dir="/home/rizkivmaster/ws/testdatasets/test_unary"
 
-#DPM config
-sourcefolder="~/deformable"
-modelfolder="/home/rizkivmaster/ws/googleimages/list-compilator/models"
-targetcropfolder="/home/rizkivmaster/ws/googleimages/cropped"
-targetxmlfolder="/home/rizkivmaster/ws/googleimages/xml"
-extractorfolder="~/extract-boundaries"
+
+
+#RESULTS
+normal_param="/home/rizkivmaster/ws/testdatasets/normal_param"
+improved_param="/home/rizkivmaster/ws/testdatasets/improved_param"
+
+
+#DPM
+dpm_folder="/home/rizkivmaster/ws/deformable"
+dpm_img_folder="/home/rizkivmaster/ws/testdatasets/dpmimg"
+dpm_xml_folder="/home/rizkivmaster/ws/testdatasets/dpmxml"
 
 #TextonBoost
-splitfolder="~/split"
-trainfolder="~/train"
-#Segmentation Class
-segclassfolder="~/segmen"
-unaryfolder="~/unaries"
-createGUfile="~/createGU.sh"
-
-#Google
-gpngfolder="~/"
-classSize=10
+train_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/trainer"
+predict_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/predictor"
 
 #MRF
-anntype="googlevoc"
-googlevocannbinpath="~/main"
-googleannbinpath="~/main"
-anncsvfolder="~/ann"
-
-
-#Baseline VOC
-testlistfile="~/list"
-#as baseline annotator
-vocannbinpath="~/main"
+fg_annotator_path=

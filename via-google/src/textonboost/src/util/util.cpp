@@ -74,7 +74,7 @@ void loadMSRC(QVector< ColorImage >& images, QVector< LabelImage >& annotations,
 	}
 }
 
-static QVector< QString > listVOC2010( int type ){
+QVector< QString > listVOC2010( int type ){
 	QString base_dir = VOC2010_DIRECTORY;
 	QVector< QString > names;
 	int types[] = {TRAIN, VALID, TEST};
@@ -105,11 +105,7 @@ void loadVOC2010(QVector< ColorImage >& images, QVector< LabelImage >& annotatio
 	foreach (QString name, filenames ){
 		QString jpgname = name;
 		QString gtname = name;
-<<<<<<< HEAD
 		jpgname+=".jpg";
-=======
-		pngname+=".jpg";
->>>>>>> fc24483... damn modularization business
 		gtname.replace("/JPEGImages/", "/SegmentationClass/");
 		gtname+=".png";
 		ColorImage im;
@@ -122,8 +118,60 @@ void loadVOC2010(QVector< ColorImage >& images, QVector< LabelImage >& annotatio
 	}
 }
 
-<<<<<<< HEAD
-=======
+void loadImages(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names,  QString list_path,QString img_folder,QString png_folder) {
+  QVector< QString > filenames = listImagesPath( list_path,img_folder);
+  images.clear();
+  annotations.clear();
+  names.clear();
+  foreach (QString name, filenames ){
+    QString jpgname = name;
+    QString gtname = name;
+    jpgname+=".jpg";
+    gtname.replace(img_folder, png_folder);
+    gtname+=".png";
+    ColorImage im;
+    LabelImage gt;
+    im.load( jpgname );
+    gt.load( gtname, VOC2010 );
+    images.append( im );
+    annotations.append( gt );
+    names.append( QFileInfo( name ).baseName() );
+  }
+}
+QVector< QString > listImagesPath( QString path , QString base_dir){
+  QVector< QString > names;
+  QFile f( path);
+      if (!f.open(QFile::ReadOnly))
+        qFatal( "Failed to open file '%s'!", path.toStdString().c_str());
+      while(!f.atEnd()){
+        QByteArray name = f.readLine().trimmed();
+        if (name.length() > 0){
+          QString filename = base_dir+"/"+name;
+          if(!QFile::exists( filename+".jpg" ))
+            qWarning( "File not found '%s'", qPrintable( filename ) );
+          names.append( filename );
+        }
+      }
+  return names;
+}
+
+void loadImagesbyNames(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names,QVector< QString >& filenames, QString img_folder) {
+  images.clear();
+  annotations.clear();
+  names.clear();
+  foreach (QString name, filenames ){
+    QString pngname = name;
+    pngname+=".jpg";
+    ColorImage im;
+    LabelImage gt;    
+    im.load( pngname );
+    images.append( im );
+    names.append( QFileInfo( name ).baseName() );
+  }
+}
+
+
+
 void loadVOC2010byNames(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names,QVector< QString >& filenames) {
   images.clear();
   annotations.clear();
@@ -144,7 +192,6 @@ void loadVOC2010byNames(QVector< ColorImage >& images, QVector< LabelImage >& an
   }
 }
 
->>>>>>> fc24483... damn modularization business
 void loadImages(QVector< ColorImage >& images, QVector< LabelImage >& annotations, QVector< QString > & names, int type) {
 #ifdef USE_MSRC
 	loadMSRC(images, annotations, names, type);

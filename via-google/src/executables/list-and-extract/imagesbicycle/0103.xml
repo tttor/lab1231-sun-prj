@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotation>
+   <filename>0103.png</filename>
+   <filedir>/home/rizkivmaster/EXPERIMENT/deformable/images/0103.png</filedir>
+   <object>
+      <name>bicycle</name>
+      <bndbox>
+         <xmin>1</xmin>
+         <xmax>663.1937</xmax>
+         <ymin>399.9583</ymin>
+         <ymax>959.8509</ymax>
+      </bndbox>
+   </object>
+</annotation>

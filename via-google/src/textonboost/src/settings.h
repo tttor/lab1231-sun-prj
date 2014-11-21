@@ -28,31 +28,19 @@
 #pragma once
 // TODO: Make sure to adjust the parameters in this file
 //#define USE_MSRC
+const int CACHE_SIZE = 100;
 
 // Dataset parameters
 static const char MSRC_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/datasets";
 static const char MSRC_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Train.txt";
 static const char MSRC_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Validation.txt";
 static const char MSRC_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Test.txt";
-
-// // Exact annotations
-// static const char MSRC_DIRECTORY  [] = "../data/msrc/";
-// static const char MSRC_TRAIN_FILE [] = "../data/msrc/newgt/Train.txt";
-// static const char MSRC_VALID_FILE [] = "../data/msrc/newgt/Validation.txt";
-// static const char MSRC_TEST_FILE  [] = "../data/msrc/newgt/Test.txt";
-
 // Dataset parameters
-<<<<<<< HEAD
 static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/google/datasets";
 static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
 static const char VOC2010_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Validation.txt";
 static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Test.txt";
-=======
-static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/datasets/voc2010";
-static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/datasets/voc2010/testsplit/Train.txt";
-static const char VOC2010_VALID_FILE [] = "/home/rizkivmaster/ws/datasets/voc2010/testsplit/Validation.txt";
-static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/datasets/voc2010/testsplit/Test.txt";
->>>>>>> fc24483... damn modularization business
+
 
 // VOC Cache
 static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
@@ -65,16 +53,11 @@ static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
 
 
 // Texton parameters
-<<<<<<< HEAD
 /*static const int N_TEXTONS = 400;
 static const float FILTER_BANK_SIZE = 1.0;*/
 //VOC settings
-static const int N_TEXTONS = 50;
-static const float FILTER_BANK_SIZE = 1;
-=======
 static const int N_TEXTONS = 5;
 static const float FILTER_BANK_SIZE = 1.0;
->>>>>>> fc24483... damn modularization business
 
 // Boosting parameters
 static const int N_BOOSTING_ROUNDS  = 100; // Number of boosting rounds

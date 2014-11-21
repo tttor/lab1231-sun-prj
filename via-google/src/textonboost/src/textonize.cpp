@@ -110,7 +110,6 @@ int main( int argc, char * argv[]){
 	
 	
 	/**** Evaluation ****/
-<<<<<<< HEAD
 	qDebug("(test)  Loading the database");
 	loadImages( images, labels, names, ALL );
 	// Color Conversion
@@ -120,64 +119,5 @@ int main( int argc, char * argv[]){
 	qDebug("(test)  Textonizing");
 	QVector< Image<short> > textons = texton.textonize( lab_images, names );
 	
-	/**** Storing textons ****/
-	saveTextons( save_filename, textons, names );
-=======
-	//PROCESS TRAINING DATA FIRST
-int blockSize = BLOCK_SIZE;
-qDebug("(test)  Loading the database for training");
-loadImages( images, labels, names, TRAIN );
-  // Color Conversion
-qDebug("(test)  Converting to Lab");
-lab_images = RGBtoLab( images );
-  // Evalutation
-qDebug("(test)  Textonizing");
-QVector< Image<short> > textons = texton.textonize( lab_images, names );
-  /**** Storing textons ****/
-saveTextons( save_filename+"TRAIN", textons, names );
-
-//PROCESS TESTING DATA IN SEQUENCE
-qDebug("(test)  Loading the database for training");
-
-QVector< QString > filenames = listVOC2010( TEST );
-QVector< QString > tmpFilenames;
-
-int blockDim = filenames.size()/blockSize + (filenames.size()%blockSize==0?0:1);
-
-QVector< ColorImage > tmpImages;
-QVector< Image<float> > tmpLab_images;
-QVector< LabelImage > tmpLabels;
-QVector< QString > tmpNames;
-
-for(int blockIndex = 0; blockIndex<blockDim; blockIndex++)
-{
-  tmpFilenames.clear();
-  tmpImages.clear();
-  tmpLab_images.clear();
-  tmpLabels.clear();
-  tmpNames.clear();
-  int startIndex = blockIndex*blockSize;
-  int endIndex = (blockIndex+1)*blockSize;
-  int fileIndex = startIndex;
-  while(fileIndex<filenames.size() && fileIndex <endIndex)
-  {
-    tmpFilenames.append(filenames.at(fileIndex));
-    fileIndex++;
-  }
-  loadVOC2010byNames( tmpImages, tmpLabels, tmpNames, filenames);
-  qDebug("(test)  Converting to Lab");
-  tmpLab_images = RGBtoLab( tmpImages );
-    // Evalutation
-  qDebug(std::string("(test)  Textonizing TEST BLOCK "+std::to_string(blockIndex)).c_str());
-  QVector< Image<short> > tmpTextons = texton.textonize( tmpLab_images, tmpNames );
-    /**** Storing textons ****/
-  char targetname[100];
-  char* test = "TEST";
-  std::string number = std::to_string(blockIndex);
-  strcpy(targetname,argv[1]);
-  strcat(targetname,test);
-  strcat(targetname,number.c_str());
-  saveTextons( targetname, tmpTextons, tmpNames );
-}
->>>>>>> fc24483... damn modularization business
+	
 }

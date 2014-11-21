@@ -47,7 +47,11 @@
     int main( int argc, char * argv[]){
 //need folder of parameters
       //set thou folder to put all your parameter
-      QString param_dir = argv[1];
+      
+      QString list_path = argv[1];
+      QString img_folder = argv[2];
+      QString png_folder = argv[3];
+      QString param_dir = argv[4];
 //inner params
   //texton
       int nTextons = 4;
@@ -61,18 +65,17 @@
       int subsample = BOOSTING_SUBSAMPLE;
       int min_rect_size = MIN_RECT_SIZE;
       int max_rect_size = MAX_RECT_SIZE;
-      qDebug("Hello");
 
       QSharedPointer<Feature> filter[4] = {QSharedPointer<Feature>( new FilterBank( filterbank_size ) ),QSharedPointer<Feature>( new ColorFeature() ),QSharedPointer<Feature>( new LocationFeature() ), QSharedPointer<Feature>( new HogFeature(type) )};
-      qDebug("Hello");
       QVector< ColorImage > images;
       QVector< Image<float> > lab_images;
       QVector< LabelImage > labels;
       QVector< QString > names;
       QVector< Image<short> > textons;
 
+      qDebug("WELCOME TO THE ALICE WONDERLAND!");
       qDebug("(train) Loading the database");
-      loadImages( images, labels, names, TRAIN );
+      loadImages( images, labels, names, list_path,img_folder, png_folder);
       qDebug("(train) Converting to Lab");
       lab_images = RGBtoLab( images );
 
