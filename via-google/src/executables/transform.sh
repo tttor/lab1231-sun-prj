@@ -27,7 +27,7 @@ cd param-enhancer
 ./execute.sh
 cd ..
 #generate test unary
-cd test-generator
+cd test-unary-generator
 ./execute.sh
 cd ..
 #perform multiclass segmentation

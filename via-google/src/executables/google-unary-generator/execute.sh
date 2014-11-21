@@ -8,4 +8,3 @@ echo "##################################"
 
 #create google unary
 `$predict_bin $normal_param $google_train_list $dpm_img_folder  $google_unaries_dir`
-

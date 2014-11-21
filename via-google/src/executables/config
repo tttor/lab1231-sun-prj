@@ -1,3 +1,4 @@
+#PLEASE DONT EMPTY ANYTHING!!!!!!!!!!!!!!!
 #LINKER
 
 #GOOGLE IMAGE -OBJECT
@@ -10,12 +11,12 @@ object_dpm_file="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executable
 #GOOGLEIMAGES
 #directory to put raw google images
 google_size=1
-google_test=""
 google_folder="/home/rizkivmaster/ws/testdatasets/google"
 google_unaries_dir="/home/rizkivmaster/ws/testdatasets/unaries"
 google_png_dir="/home/rizkivmaster/ws/testdatasets/png"
 google_ann_dir="/home/rizkivmaster/ws/testdatasets/annotation"
 google_train_list="/home/rizkivmaster/ws/testdatasets/google_train"
+combined_train_list="/home/rizkivmaster/ws/testdatasets/combined_train_list"
 google_sampling_size="1"
 
 #VOC
@@ -24,6 +25,8 @@ voc_img_folder="/home/rizkivmaster/ws/datasets/voc2010/JPEGImages"
 voc_png_folder="/home/rizkivmaster/ws/datasets/voc2010/SegmentationClass"
 voc_train_list="/home/rizkivmaster/ws/datasets/voc2010/testsplit/Train.txt"
 voc_test_list="/home/rizkivmaster/ws/datasets/voc2010/testsplit/Test.txt"
+voc_test_unary_dir="/home/rizkivmaster/ws/testdatasets/test_unary"
+
 
 
 #RESULTS
@@ -40,15 +43,5 @@ dpm_xml_folder="/home/rizkivmaster/ws/testdatasets/dpmxml"
 train_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/trainer"
 predict_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/predictor"
 
-
 #MRF
-anntype="googlevoc"
-fg_annotator_path="~/main"
-multi_annotator_path="~/main"
-anncsvfolder="~/ann"
-
-
-#Baseline VOC
-testlistfile="~/list"
-#as baseline annotator
-vocannbinpath="~/main"
+fg_annotator_path=

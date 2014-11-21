@@ -1,2 +1,2 @@
-add_subdirectory( vocmrf )
-add_subdirectory( vocgooglemrf )
+add_subdirectory( multiannotator )
+add_subdirectory( fgannotator )

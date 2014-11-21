@@ -1,6 +1,6 @@
 source ../config
 #we need img, unary,class,target png
-echo "FG Annotator path: $fg_annotator_path"
+echo "Multi Annotator path: $fg_annotator_path"
 echo "Google Image-Object linker: $google_object_file"
 echo "DPM Image folder: $dpm_img_folder"
 echo "Google Unaries folder: $google_unaries_dir"
