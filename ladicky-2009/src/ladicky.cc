@@ -2,7 +2,7 @@
 
 namespace sun = lab1231_sun_prj;
 
-Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, sun::util::DataParam data_param, sun::util::EnergyParam energy_param) {
+Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, const std::string& superpixel_filename, sun::util::DataParam data_param, sun::util::EnergyParam energy_param) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
   cout << "annotate(): BEGIN\n";
@@ -13,12 +13,8 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, sun::uti
   cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
 
   // Segmentation for hi-order energy
-  const size_t region = energy_param["SLIC_region"];
-  const size_t regularization = energy_param["SLIC_regularization"];
-  const size_t min_region = energy_param["SLIC_min_region"];
-
   vector<sun::util::Superpixel> superpixels;
-  superpixels = sun::slic_segment_wrapper::segment(img, region, regularization, min_region);
+  superpixels = sun::util::loadSuperpixel(data_param["superpixel_dir"]+superpixel_filename);
 
   //inititialize energy 
   const size_t n_var = img.rows * img.cols;

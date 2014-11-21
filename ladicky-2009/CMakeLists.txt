@@ -7,7 +7,7 @@ find_package(OpenCV REQUIRED)
 #
 set (VLFEAT_DIR ../external/vlfeat-0.9.19)
 set (PROBIMAGE_DIR ../external/prob-image)
-set (EIGEN_DIR /usr/local/include/eigen3)
+set (EIGEN_DIR /usr/include/eigen3)
 #
 include_directories (../external)
 include_directories (../util/include)

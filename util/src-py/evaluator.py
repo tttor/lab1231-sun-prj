@@ -2,16 +2,14 @@ import cv2
 import numpy
 
 class Evaluator:
-	def __init__(self, list_pred_img, dir_gt, param):
-		self.list_pred_img = list_pred_img
-		self.dir_gt = dir_gt
+	def __init__(self, param):
 		self.param = param
 		self.list_acc_class = []
 		self.conf_mat = self.init_conf_mat()
 
 	def init_conf_mat(self):
 		conf_mat = []
-		n_label = self.param["n_label"]	+ 1
+		n_label = self.param["n_label"]
 		for i in range(n_label):
 			conf_mat.append([0] * n_label)
 		return conf_mat
@@ -45,20 +43,21 @@ class Evaluator:
 	def evaluate(self, list_ann_label, list_gt_label):
 		conf_mat = self.init_conf_mat()
 		for ann_label, gt_label in zip (list_ann_label, list_gt_label):
-			self.conf_mat[gt_label][ann_label] += 1
-			conf_mat[gt_label][ann_label] += 1
+			if gt_label != -1 :
+				self.conf_mat[gt_label][ann_label] += 1
+				conf_mat[gt_label][ann_label] += 1
 		list_acc_class = self.calc_acc_each_class(conf_mat)
 		return conf_mat, list_acc_class
 
 	def evaluate_all(self):
 		self.conf_mat = self.init_conf_mat()
-		for x in xrange(len(self.list_pred_img)): 
-			list_ann_label = self.make_list_from_ann_file(self.list_pred_img[x])
-			gt_file_name = self.dir_gt + self.list_pred_img[x].split('\\')[-1].replace('ann','bmp')
+		for x in xrange(len(self.param["ann_filepaths"])): 
+			list_ann_label = self.make_list_from_ann_file(self.param["ann_filepaths"][x])
+			gt_file_name = self.param["gt_img_dir"] + self.param["ann_filepaths"][x].split('/')[-1].replace('ann','bmp')
 			list_gt_label = self.make_list_from_img_file(gt_file_name)
 			res_conf_mat, res_list_acc = self.evaluate(list_ann_label, list_gt_label)
 			average_acc = self.get_avg_acc(res_list_acc)
-			file_output = self.param["dir_output"] + self.list_pred_img[x].split('\\')[-1].replace('ann','out')			
+			file_output = self.param["dir_output"] + self.param["ann_filepaths"][x].split('/')[-1].replace('ann','out')			
 			self.write_to_file(file_output, res_list_acc, res_conf_mat, average_acc)
 			print "image " + str(x) + " done"
 		file_output = self.param["dir_output"] + 'global.out'
@@ -78,7 +77,7 @@ class Evaluator:
 
 	def calc_acc_each_class(self, conf_mat):
 		list_res = []
-		n_label = self.param["n_label"] + 1
+		n_label = self.param["n_label"]
 		for j in range(n_label):
 			all_gtj = sum (conf_mat[j])
 			all_predj = sum([item[j] for item in conf_mat]) 
