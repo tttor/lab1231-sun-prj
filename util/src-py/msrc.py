@@ -2,7 +2,6 @@
 color_class_map = {
 	(0, 0, 0) :255, #case on accurate GT from Phillipp
 	(64,64,64) :255, #case on accurate GT from Phillipp
-	(0, 0, 0) : -1,
 	(128, 0, 0) : 0, 
 	(0, 128, 0) : 1, 
 	(128, 128, 0) : 2, 
