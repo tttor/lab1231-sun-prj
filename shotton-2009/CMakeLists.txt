@@ -7,7 +7,7 @@ find_package( Boost REQUIRED )
 
 #
 set(EigenIncludeDir /usr/local/include/eigen3)
-set(OpenGMDir /home/tor/sun4/ws/mrf/opengm-master-2.3.1)
+set(OpenGMDir ~/EXPERIMENT/opengm)
 set(ProbImageDir ../external/ProbImage)
 
 #
@@ -15,7 +15,7 @@ include_directories (${OpenGMDir}/include)
 include_directories (${OpenGMDir}/src/external/MaxFlow-v3.02.src-patched)
 include_directories (${OpenGMDir}/src/external/QPBO-v1.3.src-patched)
 include_directories (../external/ProbImage)
-include_directories (../util)
+include_directories (../util/include)
 
 include_directories (${EigenIncludeDir})
 include_directories (include)
@@ -23,24 +23,24 @@ include_directories (include)
 #
 add_library( 
   probimage 
-  ../external/ProbImage/probimage.cpp 
+  ../external/prob-image/ProbImage/probimage.cpp 
 )
 
 add_library( 
   shotton 
-  src/shotton/shotton.cc
-  src/shotton/edge_potential.cc
+  src/shotton.cc
+  src/edge_potential.cc
 )
 
 add_library (
   util
-  ../util/util/util.cc
+  ../util/src/util.cc
 )
 
 # 
 add_executable ( 
   main 
-  src/main/main.cc 
+  src/main.cc 
 )
 
 #

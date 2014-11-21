@@ -9,7 +9,7 @@ class Evaluator:
 
 	def init_conf_mat(self):
 		conf_mat = []
-		n_label = self.param["n_label"]	+ 1
+		n_label = self.param["n_label"]
 		for i in range(n_label):
 			conf_mat.append([0] * n_label)
 		return conf_mat
@@ -43,7 +43,7 @@ class Evaluator:
 	def evaluate(self, list_ann_label, list_gt_label):
 		conf_mat = self.init_conf_mat()
 		for ann_label, gt_label in zip (list_ann_label, list_gt_label):
-			if gt_label!=-1:
+			if gt_label != -1 :
 				self.conf_mat[gt_label][ann_label] += 1
 				conf_mat[gt_label][ann_label] += 1
 		list_acc_class = self.calc_acc_each_class(conf_mat)
@@ -77,7 +77,7 @@ class Evaluator:
 
 	def calc_acc_each_class(self, conf_mat):
 		list_res = []
-		n_label = self.param["n_label"] + 1
+		n_label = self.param["n_label"]
 		for j in range(n_label):
 			all_gtj = sum (conf_mat[j])
 			all_predj = sum([item[j] for item in conf_mat]) 

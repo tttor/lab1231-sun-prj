@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import sys
 import numpy as np
 from sklearn.cross_validation import train_test_split
 
@@ -12,19 +13,36 @@ def chunks(l, n):
         yield l[i:i+n]
 
 def main():
-    dir_path = '/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass-csv/'
-    filenames = os.listdir(dir_path)
+    if len(sys.argv) != 5:
+        assert False, "INSUFFICIENT ARGUMENTS!"
+
+    src_dir = sys.argv[1]
+    filenames = os.listdir(src_dir)
 
     # D_tr and D_tr keep the index of filenames
-    D_tr, D_te = train_test_split(range(len(filenames)),test_size=0.2)
+    if '.' in sys.argv[2]:
+        test_size = float(sys.argv[2])
+    else:
+        test_size = int(sys.argv[2])
+
+    D_tr, D_te = train_test_split(range(len(filenames)),test_size=test_size)
+    # print 'len(D_tr)=', len(D_tr)
+    # print 'len(D_te)=', len(D_te)
 
     #
-    max_chunk_size = 300
+    max_chunk_size = int(sys.argv[3])
     D_tr_splitted = list(chunks(D_tr, max_chunk_size))
+    D_te_splitted = list(chunks(D_te, max_chunk_size))
 
-    list_dirpath = '/home/tor/sun4/xprmnt/ladicky-robustpn-voc2012/meta/'
+    list_dir = sys.argv[4]
     for i,d in enumerate(D_tr_splitted):
-        list_filepath = list_dirpath + 'train' + str(i) + '.list'
+        list_filepath = list_dir + 'train' + str(i+1) + '.list'
+        with open(list_filepath, "w") as list_file:
+            for j,k in enumerate(d):
+                list_file.write("%s\n" % filenames[k])
+
+    for i,d in enumerate(D_te_splitted):
+        list_filepath = list_dir + 'test' + str(i+1) + '.list'
         with open(list_filepath, "w") as list_file:
             for j,k in enumerate(d):
                 list_file.write("%s\n" % filenames[k])
