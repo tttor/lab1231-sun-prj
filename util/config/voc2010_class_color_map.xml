@@ -1,0 +1,65 @@
+<class_color_map dataset_name="pascal_voc_2010">
+  <class num="0" name="background">
+    <color b="0" g="0" r="0"/>
+  </class>
+  <class num="1" name="aeroplane">
+    <color b="0" g="0" r="128"/>
+  </class>
+  <class num="2" name="bicycle">
+    <color b="0" g="128" r="0"/>
+  </class>
+  <class num="3" name="bird">
+    <color b="0" g="128" r="128"/>
+  </class>
+  <class num="4" name="boat">
+    <color b="128" g="0" r="0"/>
+  </class>
+  <class num="5" name="bottle">
+    <color b="128" g="0" r="128"/>
+  </class>
+  <class num="6" name="bus">
+    <color b="128" g="128" r="0"/>
+  </class>
+  <class num="7" name="car">
+    <color b="128" g="128" r="128"/>
+  </class>
+  <class num="8" name="cat">
+    <color b="0" g="0" r="64"/>
+  </class>
+  <class num="9" name="chair">
+    <color b="0" g="0" r="192"/>
+  </class>
+  <class num="10" name="cow">
+    <color b="0" g="128" r="64"/>
+  </class>
+  <class num="11" name="diningtable">
+    <color b="0" g="128" r="192"/>
+  </class>
+  <class num="12" name="dog">
+    <color b="128" g="0" r="64"/>
+  </class>
+  <class num="13" name="horse">
+    <color b="128" g="0" r="192"/>
+  </class>
+  <class num="14" name="motorbike">
+    <color b="128" g="128" r="64"/>
+  </class>
+  <class num="15" name="person">
+    <color b="128" g="128" r="192"/>
+  </class>
+  <class num="16" name="pottedplant">
+    <color b="0" g="64" r="0"/>
+  </class>
+  <class num="17" name="sheep">
+    <color b="0" g="64" r="128"/>
+  </class>
+  <class num="18" name="sofa">
+    <color b="0" g="192" r="0"/>
+  </class>
+  <class num="19" name="train">
+    <color b="0" g="192" r="128"/>
+  </class>
+  <class num="20" name="tvmonitor">
+    <color b="128" g="64" r="0"/>
+  </class>
+</class_color_map>
