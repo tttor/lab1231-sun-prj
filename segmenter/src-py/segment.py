@@ -5,19 +5,19 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from skimage.data import lena
 from skimage.segmentation import felzenszwalb, slic, quickshift
+from skimage import color
 from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_float
 from skimage import io
 
 def doSegment(param, img):
   if param[0] == 'slic':
-    segments_res = slic(img, n_segments=int(param[1]), compactness=int(param[2]), sigma=int(param[3]))
+    segments_res = slic(img, n_segments=int(param[1]), compactness=int(param[2]), sigma=int(param[3]), convert2lab=True)
   elif param[0] == 'pff':
     segments_res = felzenszwalb(img, scale=int(param[1]), sigma=float(param[2]), min_size=int(param[3]))
   elif param[0] == 'quick':
-    segments_res = quickshift(img, kernel_size=int(param[1]), max_dist=int(param[2]), ratio=float(param[3]))
+    segments_res = quickshift(img, kernel_size=int(param[1]), max_dist=int(param[2]), ratio=float(param[3]), convert2lab=True)
   return segments_res
 
 def ensure_path(path):
@@ -28,7 +28,7 @@ def ensure_path(path):
 
 def segmentsToFile(path_output, segments):
   map_segment = {}
-  for i in xrange(len(np.unique(segments))):
+  for i in range(np.max(segments)+1):
     map_segment.setdefault(i, [])
   
   for row in range(len(segments)):
