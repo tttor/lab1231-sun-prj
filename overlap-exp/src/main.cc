@@ -22,6 +22,9 @@ int main(int argc, char* argv[]) {
     data_param["superpixel_dir"] = argv[7];
     data_param["param_superpixel_list"] = argv[8];
     data_param["final_result_dir"] = argv[9];
+
+    energy_param["theta_phi_1"] = 4.5;
+    energy_param["theta_phi_2"] = 1;
   }
   else {
     assert(false && "UNSUFFICIENT ARGUMENTS!");
@@ -68,6 +71,8 @@ int main(int argc, char* argv[]) {
     Eigen::MatrixXi final_ann = sun::majority::get_final_result_from_buffer(buffer_result, img.rows, img.cols, n_label);
     cv::imwrite(ann_img_filepath_final, sun::util::ann2img(final_ann, data_param["dataset_name"]));
     sun::util::csv_write<Eigen::MatrixXi>(final_ann, ann_filepath_final);
+
+    delete[] buffer_result;
   }
 
   return 0;
