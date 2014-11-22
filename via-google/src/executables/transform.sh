@@ -1,7 +1,8 @@
 #download google images
-# cd google-retriever
-# ./execute.sh
-# cd ..
+cd google-retriever
+./execute.sh
+cd ..
+#
 # cd list-and-extract
 # ./execute.sh
 # cd ..
@@ -9,7 +10,7 @@
 # cd list-and-resize
 # ./execute.sh
 # cd ..
-# #train initial parameters
+# #train initial parameters START HERE
 # cd param-generator
 # ./execute.sh
 # cd ..
@@ -21,19 +22,19 @@
 # cd fgannotator
 # ./execute.sh
 # cd ..
-# #train voc with google
+# #train voc with google/ COMBINATION
 cd param-enhancer
 ./execute.sh
 cd ..
-# #generate test unary
-# cd test-unary-generator
-# ./execute.sh
-# cd ..
+# #generate test unary DTE
+cd test-unary-generator
+./execute.sh
+cd ..
 # #perform multiclass segmentation
-# cd multiannotator
-# ./execute.sh
-# cd ..
+cd multiannotator
+./execute.sh
+cd ..
 # #performance evaluation
-# cd evaluation
-# ./execute.sh
-# cd ..
+cd evaluation
+./execute.sh
+cd ..

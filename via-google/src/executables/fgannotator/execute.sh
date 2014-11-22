@@ -4,7 +4,7 @@ echo "FG Annotator path: $fg_annotator_path"
 echo "Google Image-Object linker: $google_object_file"
 echo "DPM Image folder: $dpm_img_folder"
 echo "Google Unaries folder: $google_unaries_dir"
-echo "Google Annotation folder: $google_ann_dir"
+echo "Google Annotation folder: $google_csv_dir"
 echo "Google PNG folder: $google_png_dir"
 echo "##################################"
 #relist

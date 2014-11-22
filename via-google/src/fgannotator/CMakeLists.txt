@@ -1,7 +1,11 @@
 
 add_executable ( 
-  vocgooglemain
+  fgmain
   main.cc
+)
+add_executable ( 
+  dumper
+  dumper.cpp
 )
 
 add_library( 
@@ -11,7 +15,7 @@ add_library(
 )
 
 target_link_libraries ( 
-  vocgooglemain
+  fgmain
   shotton2
   probimage
   color_map
@@ -20,5 +24,21 @@ target_link_libraries (
   ${OpenGMDir}/build/src/external/libexternal-library-maxflow.a 
   ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
   ${saliency_libs}
+  ${QT_QTGUI_LIBRARY} 
+  ${QT_QTCORE_LIBRARY}
+)
+
+target_link_libraries ( 
+  dumper
+  shotton2
+  probimage
+  color_map
+  util
+  ${OpenCV_LIBS} 
+  ${OpenGMDir}/build/src/external/libexternal-library-maxflow.a 
+  ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
+  ${saliency_libs}
+  ${QT_QTGUI_LIBRARY} 
+  ${QT_QTCORE_LIBRARY}
 )
 

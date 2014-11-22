@@ -4,28 +4,31 @@
 executables_root="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables"
 
 #GOOGLE IMAGE -OBJECT
+#daftar gambar yg didownload
 google_object_file="$executables_root/google_object"
 
 #OBJECT-DPM
+#class-dpmmodel relationship list
 object_dpm_file="$executables_root/object_dpm"
-
 object_list_file="$executables_root/classlist"
-
 
 #GOOGLEIMAGES
 #directory to put raw google images
+#jumlah gambar yang didownload
 google_size=1
+#root dari folder google images
 google_root="/home/rizkivmaster/ws/testdatasets/google"
 google_folder="$google_root/raw"
 google_unaries_dir="$google_root/unaries"
 google_png_dir="$google_root/annotation"
-google_ann_dir="$google_root/csv"
+google_csv_dir="$google_root/csv"
 google_train_list="$google_root/google_train"
 combined_train_list="$google_root/combined_train_list"
 google_sampling_size="1"
-improved_param="$google_root/param"
 dpm_img_folder="$google_root/isolated"
 dpm_xml_folder="$google_root/xml"
+normal_param="$google_root/init_param"
+improved_param="$google_root/improved_param"
 
 #VOC
 voc_root="/home/rizkivmaster/ws/datasets/voc2010"
@@ -34,24 +37,15 @@ voc_png_folder="$voc_root/SegmentationClass"
 voc_train_list="$voc_root/testsplit/Train.txt"
 voc_test_list="$voc_root/testsplit/Test.txt"
 voc_test_unary_dir="$voc_root/unaries"
-normal_param="$voc_root/param"
-voc_test_csv="$voc_root/csv"
 voc_gt_csv="$voc_root/gt_csv"
-voc_eval_list="$voc_root/csv_list"
-
-#RESULTS
-
-
-
-
-#DPM
-dpm_folder="/home/rizkivmaster/ws/deformable"
-
 
 #TextonBoost
 train_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/trainer"
 predict_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/predictor"
 
 #MRF
-fg_annotator_path=""
-multiannotator_path=""
+fg_annotator_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/build/src/fgannotator/fgmain"
+multiannotator_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/build/src/fgannotator/mtmain"
+
+#EVALUATOR
+evaluator_path="/home/rizkivmaster/ws/lab1231-sun-prj/util/src-py/evaluator_tor.py"
