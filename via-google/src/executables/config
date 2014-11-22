@@ -63,7 +63,7 @@ google_test_csv_dir="$current_exp/test_csv"
 google_train_list="$current_exp/google_predict"
 google_test_unary_path="$current_exp/test_unaries"
 combined_train_list="$current_exp/combined_train_list"
-google_sampling_size="1"
+google_sampling_size="2"
 init_train_path="$current_exp/init_train_list"
 normal_param="$current_exp/init_param"
 improved_param="$current_exp/improved_param"
@@ -74,10 +74,10 @@ voc_img_folder="$voc_root/JPEGImages"
 voc_png_folder="$voc_root/SegmentationClass"
 voc_train_list="$voc_root/split/Train.txt"
 #in debug
-#voc_test_list="$voc_root/split/Test.txt"
-voc_test_list="$init_train_path"
+voc_test_list="$voc_root/split/Test.txt"
+#voc_test_list="$init_train_path"
 voc_gt_csv="$voc_root/SegmentationClass-csv"
-voc_train_size=1
+voc_train_size=100
 
 #TextonBoost
 train_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/trainer"
