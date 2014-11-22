@@ -30,7 +30,7 @@ for ll = 1:size(ids,1)
     annotation.appendChild(fldir);
     
     %test(name, model, 0.7);
-    try
+    %try
     image = imread(fullsrc);
     im = image;
     [h w d] = size(image);
@@ -119,7 +119,7 @@ for ll = 1:size(ids,1)
     if(needtowrite)
         xmlwrite(tgtxmlpath,docNode);
     end
-    catch
-    fprintf('Skipping a file \n');
-    end
+    %catch
+    %fprintf('Skipping a file \n');
+    %end
 end

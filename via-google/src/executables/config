@@ -1,47 +1,57 @@
 #PLEASE DONT EMPTY ANYTHING!!!!!!!!!!!!!!!
 #LINKER
 
+executables_root="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables"
+
 #GOOGLE IMAGE -OBJECT
-google_object_file="//home/rizkivmaster/ws/testdatasets/google/google_object"
+google_object_file="$executables_root/google_object"
 
 #OBJECT-DPM
-object_dpm_file="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/object_dpm"
+object_dpm_file="$executables_root/object_dpm"
+
+object_list_file="$executables_root/classlist"
 
 
 #GOOGLEIMAGES
 #directory to put raw google images
 google_size=1
-google_folder="/home/rizkivmaster/ws/testdatasets/google"
-google_unaries_dir="/home/rizkivmaster/ws/testdatasets/unaries"
-google_png_dir="/home/rizkivmaster/ws/testdatasets/png"
-google_ann_dir="/home/rizkivmaster/ws/testdatasets/annotation"
-google_train_list="/home/rizkivmaster/ws/testdatasets/google_train"
-combined_train_list="/home/rizkivmaster/ws/testdatasets/combined_train_list"
+google_root="/home/rizkivmaster/ws/testdatasets/google"
+google_folder="$google_root/raw"
+google_unaries_dir="$google_root/unaries"
+google_png_dir="$google_root/annotation"
+google_ann_dir="$google_root/csv"
+google_train_list="$google_root/google_train"
+combined_train_list="$google_root/combined_train_list"
 google_sampling_size="1"
+improved_param="$google_root/param"
+dpm_img_folder="$google_root/isolated"
+dpm_xml_folder="$google_root/xml"
 
 #VOC
-object_list_file="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables/classlist"
-voc_img_folder="/home/rizkivmaster/ws/datasets/voc2010/JPEGImages"
-voc_png_folder="/home/rizkivmaster/ws/datasets/voc2010/SegmentationClass"
-voc_train_list="/home/rizkivmaster/ws/datasets/voc2010/testsplit/Train.txt"
-voc_test_list="/home/rizkivmaster/ws/datasets/voc2010/testsplit/Test.txt"
-voc_test_unary_dir="/home/rizkivmaster/ws/testdatasets/test_unary"
-
-
+voc_root="/home/rizkivmaster/ws/datasets/voc2010"
+voc_img_folder="$voc_root/JPEGImages"
+voc_png_folder="$voc_root/SegmentationClass"
+voc_train_list="$voc_root/testsplit/Train.txt"
+voc_test_list="$voc_root/testsplit/Test.txt"
+voc_test_unary_dir="$voc_root/unaries"
+normal_param="$voc_root/param"
+voc_test_csv="$voc_root/csv"
+voc_gt_csv="$voc_root/gt_csv"
+voc_eval_list="$voc_root/csv_list"
 
 #RESULTS
-normal_param="/home/rizkivmaster/ws/testdatasets/normal_param"
-improved_param="/home/rizkivmaster/ws/testdatasets/improved_param"
+
+
 
 
 #DPM
 dpm_folder="/home/rizkivmaster/ws/deformable"
-dpm_img_folder="/home/rizkivmaster/ws/testdatasets/dpmimg"
-dpm_xml_folder="/home/rizkivmaster/ws/testdatasets/dpmxml"
+
 
 #TextonBoost
 train_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/trainer"
 predict_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/predictor"
 
 #MRF
-fg_annotator_path=
+fg_annotator_path=""
+multiannotator_path=""

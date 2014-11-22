@@ -2,12 +2,14 @@
 # requires phantomjs from http://phantomjs.org/download.html
 # and google-images.js
 source ../config
-targetfolder=$googleimgfolder
+targetfolder=$google_folder
+echo "$targetfolder"
 [ $# = 0 ] && { prog=`basename "$0"`;
 echo >&2 "usage: $prog query count parallel safe opts timeout tries agent1 agent2
 e.g. : $prog ostrich
        $prog wombat 100 20 on isz:l,itp:clipart 5 10"; exit 2; }
-scriptdir="$(readlink -f "`dirname "$0"`")"
+#scriptdir="$(readlink -f "`dirname "$0"`")"
+scriptdir="${PWD}"
 query=$1 count=${2:-20} parallel=${3:-10} safe=$4 opts=$5 timeout=${6:-10} tries=${7:-2}
 agent1=${8:-Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36} agent2=${9:-Googlebot-Image/1.0}
 query_esc=`perl -e 'use URI::Escape; print uri_escape($ARGV[0]);' "$query"`

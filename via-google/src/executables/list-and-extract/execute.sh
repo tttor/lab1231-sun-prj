@@ -12,7 +12,6 @@ echo "$object_dpm_file"
 echo "Google Image Source"
 echo "$google_folder"
 
-
 echo "Target cropped image folder:"
 echo "$dpm_img_folder"
 
@@ -82,7 +81,7 @@ do
     (( c++ ))
 done
 
-matlab -nodesktop -nosplash -r "extract();quit;"
+/usr/local/MATLAB/R2012a/bin/matlab -nodesktop -nosplash -r "extract();quit;"
 
 echo "Image isolation is finished"
 `rm compilation`
