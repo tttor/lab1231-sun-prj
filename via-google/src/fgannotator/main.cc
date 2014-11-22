@@ -14,24 +14,26 @@
 #include <QtGlobal>
 
 
-void png_write(Eigen::MatrixXi m, QString png_path) {
+void png_write(Eigen::MatrixXi m, QString png_path,size_t label) {
 
   QString colorfile = "VOC2010.ct";
   QVector<QRgb> colorTable;
   QFile file(colorfile);
   if (!file.open(QFile::ReadOnly))
-              qFatal( "Failed to save means to '%s'", qPrintable( colorfile ) );
+              qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
   QDataStream s(&file);
   s >> colorTable;
   file.close();
 
-  QImage targetPNG(m.cols(),m.rows(),QImage::Format_Mono);
+  QImage targetPNG(m.cols(),m.rows(),QImage::Format_Indexed8);
+  
+  targetPNG.setColorTable(colorTable);
   for(int  ii=0; ii<m.rows(); ii++){
     for(int jj=0; jj<m.cols(); jj++){
-      targetPNG.setPixel(jj,ii,m(ii,jj));
+      if(m(ii,jj)==1) targetPNG.setPixel(jj,ii,label);
+      if(m(ii,jj)==0) targetPNG.setPixel(jj,ii,255);
     }
   }
-  targetPNG.setColorTable(colorTable);
   targetPNG.save(png_path,"png",0);
 }
 
@@ -61,7 +63,7 @@ int main(int argc, char* argv[]) {
   // util::csv_write(ann, ann_dir);
   // cv::Mat output = util::ann2img(ann,"msrc");
   // imwrite(ann_img_dir,output);
-    png_write(ann,png_dir);
+    png_write(ann,png_dir,object_label);
 
 
   // Annotate

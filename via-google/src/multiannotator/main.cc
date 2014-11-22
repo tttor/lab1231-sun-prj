@@ -19,18 +19,19 @@ void png_write(Eigen::MatrixXi m, QString png_path) {
   QVector<QRgb> colorTable;
   QFile file(colorfile);
   if (!file.open(QFile::ReadOnly))
-              qFatal( "Failed to save means to '%s'", qPrintable( colorfile ) );
+              qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
   QDataStream s(&file);
   s >> colorTable;
   file.close();
 
-  QImage targetPNG(m.cols(),m.rows(),QImage::Format_Mono);
+
+  QImage targetPNG(m.cols(),m.rows(),QImage::Format_Indexed8);
+  targetPNG.setColorTable(colorTable);
   for(int  ii=0; ii<m.rows(); ii++){
     for(int jj=0; jj<m.cols(); jj++){
       targetPNG.setPixel(jj,ii,m(ii,jj));
     }
   }
-  targetPNG.setColorTable(colorTable);
   targetPNG.save(png_path,"png",0);
 }
 

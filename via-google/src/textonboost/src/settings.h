@@ -45,22 +45,14 @@ static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/goo
 // VOC Cache
 static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
 
-//for google annotation, comment if unnessery
-// static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/google/datasets";
-// static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
-// static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
-// static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
 
-
-// Texton parameters
-/*static const int N_TEXTONS = 400;
-static const float FILTER_BANK_SIZE = 1.0;*/
-//VOC settings
 static const int N_TEXTONS = 5;
+///DEFAULT TO static const int N_TEXTONS = 400;
+
 static const float FILTER_BANK_SIZE = 1.0;
 
 // Boosting parameters
-static const int N_BOOSTING_ROUNDS  = 100; // Number of boosting rounds
+static const int N_BOOSTING_ROUNDS  = 5; // Number of boosting rounds
 static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]
 static const int N_THRESHOLDS       = 100; // Number of thresholds to test [per round]
 /*static const int N_BOOSTING_ROUNDS  = 10000; // Number of boosting rounds

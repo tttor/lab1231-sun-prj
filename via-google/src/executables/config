@@ -5,10 +5,10 @@ executables_root="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executabl
 
 #GOOGLE IMAGE -OBJECT
 #daftar gambar yg didownload
-google_object_file="$executables_root/google_object"
 
 #OBJECT-DPM
 #class-dpmmodel relationship list
+
 object_dpm_file="$executables_root/object_dpm"
 object_list_file="$executables_root/classlist"
 
@@ -17,35 +17,76 @@ object_list_file="$executables_root/classlist"
 #jumlah gambar yang didownload
 google_size=1
 #root dari folder google images
-google_root="/home/rizkivmaster/ws/testdatasets/google"
+google_root="/home/rizkivmaster/ws/datasets/google-sun"
 google_folder="$google_root/raw"
-google_unaries_dir="$google_root/unaries"
-google_png_dir="$google_root/annotation"
-google_csv_dir="$google_root/csv"
-google_train_list="$google_root/google_train"
-combined_train_list="$google_root/combined_train_list"
-google_sampling_size="1"
 dpm_img_folder="$google_root/isolated"
-dpm_xml_folder="$google_root/xml"
-normal_param="$google_root/init_param"
-improved_param="$google_root/improved_param"
+google_object_file="$google_root/google_object"
+
+
+source $executables_root/config_current
+exp_folder="/home/rizkivmaster/ws/results"
+current_exp="$exp_folder/$exp_id"
+if [[ $exp_id != "" ]]; then
+	if [[  -d $current_exp ]]; then
+		echo ""
+	else
+		`mkdir $current_exp`
+		`mkdir $current_exp/xml`
+		`mkdir $current_exp/unaries`
+		`mkdir $current_exp/test_csv`
+		`mkdir $current_exp/png`
+		`mkdir $current_exp/test_png`
+		`mkdir $current_exp/init_param`
+		`mkdir $current_exp/improved_param`
+		`mkdir $current_exp/test_unaries`
+	fi
+else
+	exp_id="$RANDOM"
+	current_exp="$exp_folder/$exp_id"
+	`mkdir $current_exp`
+	`mkdir $current_exp/xml`
+	`mkdir $current_exp/unaries`
+	`mkdir $current_exp/test_csv`
+	`mkdir $current_exp/png`
+	`mkdir $current_exp/test_png`
+	`mkdir $current_exp/init_param`
+	`mkdir $current_exp/improved_param`
+	`mkdir $current_exp/test_unaries`
+	`echo "exp_id=\"$exp_id\"" > $executables_root/config_current`
+fi
+
+dpm_xml_folder="$current_exp/xml"
+google_unaries_dir="$current_exp/unaries"
+google_png_dir="$current_exp/png"
+google_test_png_dir="$current_exp/test_png"
+google_test_csv_dir="$current_exp/test_csv"
+google_train_list="$current_exp/google_predict"
+google_test_unary_path="$current_exp/test_unaries"
+combined_train_list="$current_exp/combined_train_list"
+google_sampling_size="1"
+init_train_path="$current_exp/init_train_list"
+normal_param="$current_exp/init_param"
+improved_param="$current_exp/improved_param"
 
 #VOC
 voc_root="/home/rizkivmaster/ws/datasets/voc2010"
 voc_img_folder="$voc_root/JPEGImages"
 voc_png_folder="$voc_root/SegmentationClass"
-voc_train_list="$voc_root/testsplit/Train.txt"
-voc_test_list="$voc_root/testsplit/Test.txt"
-voc_test_unary_dir="$voc_root/unaries"
-voc_gt_csv="$voc_root/gt_csv"
+voc_train_list="$voc_root/split/Train.txt"
+#in debug
+#voc_test_list="$voc_root/split/Test.txt"
+voc_test_list="$init_train_path"
+voc_gt_csv="$voc_root/SegmentationClass-csv"
+voc_train_size=1
 
 #TextonBoost
 train_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/trainer"
 predict_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/predictor"
+settings_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/src/settings.h"
 
 #MRF
 fg_annotator_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/build/src/fgannotator/fgmain"
-multiannotator_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/build/src/fgannotator/mtmain"
+multiannotator_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/build/src/multiannotator/mtmain"
 
 #EVALUATOR
 evaluator_path="/home/rizkivmaster/ws/lab1231-sun-prj/util/src-py/evaluator_tor.py"

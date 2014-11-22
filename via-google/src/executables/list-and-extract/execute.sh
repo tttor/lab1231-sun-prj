@@ -12,6 +12,7 @@ echo "$object_dpm_file"
 echo "Google Image Source"
 echo "$google_folder"
 
+
 echo "Target cropped image folder:"
 echo "$dpm_img_folder"
 
