@@ -50,5 +50,6 @@ class_name_map = {
 	19: "body",
 	20: "boat",
 	21: "mountain",
-	22: "horse"
+	22: "horse",
+	255: "void"
 }
