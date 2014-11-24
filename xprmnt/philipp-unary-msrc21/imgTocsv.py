@@ -19,16 +19,16 @@ def make_list_from_img_file(img_path):
 def main():
   # assert len(sys.argv)==4, 'INSUFFICIENT NUMBER OF ARGUMENTS'
 
-  target_listpath = '/home/tor/sun4/xprmnt/philipp-unary-msrc21/meta/split-msrc-tor/All_591.txt'#sys.argv[1]
-  gt_dir = '/home/tor/sun3/dataset/msrc/unmix/GroundTruth'#sys.argv[2]
-  output_dir = '/home/tor/sun3/dataset/msrc/unmix/GroundTruth-csv'#sys.argv[3]
+  target_listpath = '/home/tor/sun4/xprmnt/philipp-unary-msrc21/meta/split-msrc-tor/Test_93.txt'#sys.argv[1]
+  gt_dir = '/home/tor/sun3/dataset/msrc/unmix/GroundTruth-accurate-philipp'#sys.argv[2]
+  output_dir = '/home/tor/sun3/dataset/msrc/unmix/GroundTruth-accurate-philipp-csv'#sys.argv[3]
 
   with open(target_listpath) as f:
     target_list = f.readlines()
   target_list = [x.strip('\n') for x in target_list]
   target_list = [x[0:-4] for x in target_list if x[-4:]=='.csv' or x[-4:]=='.bmp']
 
-  data = [ {'gt_img': gt_dir+'/'+target+'.bmp', 'gt_csv': gt_dir+'/'+target+'.csv'} for target in target_list ]
+  data = [ {'gt_img': gt_dir+'/'+target+'_GT.bmp', 'gt_csv': output_dir+'/'+target+'.csv'} for target in target_list ]
 
   for data_in in data:
     # print (data_in["gt_img"])

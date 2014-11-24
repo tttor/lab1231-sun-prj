@@ -10,4 +10,4 @@ target_listpath=$root_dir/meta/split-msrc-tor/Test_93.txt
 
 #
 exe=../../util/src-py/evaluator_tor.py 
-python $exe $target_listpath $pred_dir $gt_csv_dir
+python $exe $target_listpath $pred_dir $accurate_gt_csv_dir
