@@ -4,7 +4,7 @@ echo "FG Annotator path: $fg_annotator_path"
 echo "Google Image-Object linker: $google_object_file"
 echo "DPM Image folder: $dpm_img_folder"
 echo "Google Unaries folder: $google_unaries_dir"
-echo "Google Annotation folder: $google_ann_dir"
+echo "Google Annotation folder: $google_csv_dir"
 echo "Google PNG folder: $google_png_dir"
 echo "##################################"
 #relist
@@ -31,22 +31,24 @@ do
 		#check unaries
 		if [[ -f "$google_unaries_dir/$singlename.unary" ]]; then
 			#in debug
-			#`$fg_annotator_path VOC 21 ${objid[$c]} $dpm_img_folder/$singlename.jpg $google_unaries_dir/$singlename.unary $google_unaries_dir/$singlename.unary $google_unaries_dir/$singlename.ann $google_unaries_dir/$singlename.png`
-			echo "$fg_annotator_path VOC 21 ${objid[$c]} $dpm_img_folder/$singlename.jpg $google_unaries_dir/$singlename.unary $google_unaries_dir/$singlename.unary $google_unaries_dir/$singlename.ann $google_unaries_dir/$singlename.png"
+			echo "Annotating $filename"
+			# echo "$fg_annotator_path VOC 21 ${objid[$c]} $dpm_img_folder/$singlename.jpg  $google_unaries_dir/$singlename.unary $google_png_dir/$singlename.png"
+			`$fg_annotator_path VOC 21 ${objid[$c]} $dpm_img_folder/$singlename.jpg $google_unaries_dir/$singlename.unary $google_png_dir/$singlename.png`
 		fi
 	fi
     (( c++ ))
 done
 
-pngfolddirs=`ls -d $google_png_dir/*`
+# pngfolddirs=`ls -d $google_png_dir/*`
 
-#PALETTING
-`rm pnglist_tmp`
-for path in $pngfolddirs
-do
-	`echo "$path" >> pnglist_tmp`
-done
-matlab -nodesktop -nosplash -r "paletting();quit;"
-`rm pnglist_tmp`
+# #PALETTING
+# `rm pnglist_tmp`
+# for path in $pngfolddirs
+# do
+# 	`echo "$path" >> pnglist_tmp`
+# done
+# matlab -nodesktop -nosplash -r "paletting();quit;"
+# `rm pnglist_tmp`
 
 #FINISH PALETTING
+echo "FINISH"

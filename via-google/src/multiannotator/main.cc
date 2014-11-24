@@ -4,6 +4,36 @@
 
 #include <shotton/shotton.h>
 #include <util/util.h>
+#include <QVector>
+#include <QString>
+#include <QRgb>
+#include <QDataStream>
+#include <QFile>
+#include <QString>
+#include <QImage>
+#include <QtGlobal>
+
+void png_write(Eigen::MatrixXi m, QString png_path) {
+
+  QString colorfile = "VOC2010.ct";
+  QVector<QRgb> colorTable;
+  QFile file(colorfile);
+  if (!file.open(QFile::ReadOnly))
+              qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
+  QDataStream s(&file);
+  s >> colorTable;
+  file.close();
+
+
+  QImage targetPNG(m.cols(),m.rows(),QImage::Format_Indexed8);
+  targetPNG.setColorTable(colorTable);
+  for(int  ii=0; ii<m.rows(); ii++){
+    for(int jj=0; jj<m.cols(); jj++){
+      targetPNG.setPixel(jj,ii,m(ii,jj));
+    }
+  }
+  targetPNG.save(png_path,"png",0);
+}
 
 int main(int argc, char* argv[]) {
   using namespace std;
@@ -16,8 +46,8 @@ int main(int argc, char* argv[]) {
   const size_t n_label = atoi(argv[2]);
   const string img_dir = argv[3];
   const string unary_dir = argv[4];
-  const string ann_dir = argv[5];
-  const string ann_img_dir = argv[6];
+  QString png_dir = argv[5];
+  const string csv_dir = argv[6];
 
   // Train
   shotton::EnergyParam energy_param;
@@ -28,9 +58,10 @@ int main(int argc, char* argv[]) {
       printf("%d",ann(i,j));
     }
   }*/
-  util::csv_write(ann, ann_dir);
-  cv::Mat output = util::ann2img(ann,"msrc");
-  imwrite(ann_img_dir,output);
+  png_write(ann,png_dir);
+  util::csv_write(ann, csv_dir);
+  // cv::Mat output = util::ann2img(ann,"msrc");
+  // imwrite(ann_img_dir,output);
 
 
   // Annotate

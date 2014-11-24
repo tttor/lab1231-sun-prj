@@ -4,6 +4,38 @@
 
 #include <shotton/shotton.h>
 #include <util/util.h>
+#include <QVector>
+#include <QString>
+#include <QRgb>
+#include <QDataStream>
+#include <QFile>
+#include <QString>
+#include <QImage>
+#include <QtGlobal>
+
+
+void png_write(Eigen::MatrixXi m, QString png_path,size_t label) {
+
+  QString colorfile = "VOC2010.ct";
+  QVector<QRgb> colorTable;
+  QFile file(colorfile);
+  if (!file.open(QFile::ReadOnly))
+              qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
+  QDataStream s(&file);
+  s >> colorTable;
+  file.close();
+
+  QImage targetPNG(m.cols(),m.rows(),QImage::Format_Indexed8);
+  
+  targetPNG.setColorTable(colorTable);
+  for(int  ii=0; ii<m.rows(); ii++){
+    for(int jj=0; jj<m.cols(); jj++){
+      if(m(ii,jj)==1) targetPNG.setPixel(jj,ii,label);
+      if(m(ii,jj)==0) targetPNG.setPixel(jj,ii,255);
+    }
+  }
+  targetPNG.save(png_path,"png",0);
+}
 
 int main(int argc, char* argv[]) {
   using namespace std;
@@ -17,8 +49,7 @@ int main(int argc, char* argv[]) {
   const size_t object_label = atoi(argv[3]);
   const string img_dir = argv[4];
   const string unary_dir = argv[5];
-  const string ann_dir = argv[6];
-  const string ann_img_dir = argv[7];
+  QString png_dir = argv[6];
 
   // Train
   shotton::EnergyParam energy_param;
@@ -29,9 +60,10 @@ int main(int argc, char* argv[]) {
       printf("%d",ann(i,j));
     }
   }*/
-  util::csv_write(ann, ann_dir);
-  cv::Mat output = util::ann2img(ann,"msrc");
-  imwrite(ann_img_dir,output);
+  // util::csv_write(ann, ann_dir);
+  // cv::Mat output = util::ann2img(ann,"msrc");
+  // imwrite(ann_img_dir,output);
+    png_write(ann,png_dir,object_label);
 
 
   // Annotate

@@ -12,12 +12,13 @@ targetfolder=$google_folder
 `cut -d , -f 2 $object_list_file > classname`
 IFS=$'\n' read -d '' -r -a ids < classid
 IFS=$'\n' read -d '' -r -a names < classname
+scriptdir="${PWD}"
+echo "Retriever dir: $scriptdir"
 
 c=0
 max=`wc -l < $object_list_file`
 while [ $c -lt $max ]
 do
-	scriptdir="${PWD}"
 	query=${names[$c]} count=${google_size:-20} parallel=${3:-10} safe=$4 opts=$5 timeout=${6:-10} tries=${7:-2}
 	agent1=${8:-Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36} agent2=${9:-Googlebot-Image/1.0}
 	query_esc=`perl -e 'use URI::Escape; print uri_escape($ARGV[0]);' "$query"`
@@ -35,7 +36,7 @@ do
 	head -n "$count" |
 	tee -a .images.tsv |
 	while IFS=$'\t' read -r save img ref; do
-	wget -U"$agent2" -T"$timeout" --tries="$tries" --referer="$ref" -O "${names[$c]}$save" "$img" || rm "$save" &
+	wget -U"$agent2" -T"$timeout" --tries="$tries" --referer="$ref" -O "${names[$c]}$save" "$img" || rm "${names[$c]}$save" &
 	procs=$[$procs + 1]; [ $procs = $parallel ] && { wait; procs=0; }
 	echo "${ids[$c]},${names[$c]}$save" >> $google_object_file
 	done ; wait

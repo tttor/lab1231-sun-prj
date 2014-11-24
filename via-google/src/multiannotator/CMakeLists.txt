@@ -1,6 +1,6 @@
 
 add_executable ( 
-  vocmain 
+  mtmain 
   ./main.cc 
 )
 
@@ -11,7 +11,7 @@ add_library(
 )
 
 target_link_libraries ( 
-  vocmain 
+  mtmain 
   shotton1
   probimage
   color_map
@@ -19,5 +19,7 @@ target_link_libraries (
   ${OpenCV_LIBS} 
   ${OpenGMDir}/build/src/external/libexternal-library-maxflow.a 
   ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
+  ${QT_QTGUI_LIBRARY} 
+  ${QT_QTCORE_LIBRARY}
 )
 

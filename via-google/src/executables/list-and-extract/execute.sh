@@ -82,7 +82,7 @@ do
     (( c++ ))
 done
 
-matlab -nodesktop -nosplash -r "extract();quit;"
+/usr/local/MATLAB/R2012a/bin/matlab -nodesktop -nosplash -r "extract();quit;"
 
 echo "Image isolation is finished"
 `rm compilation`

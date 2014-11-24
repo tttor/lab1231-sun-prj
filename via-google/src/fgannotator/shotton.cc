@@ -29,7 +29,7 @@ Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const strin
   cv::Mat img_mat = cv::imread(img_dir, CV_LOAD_IMAGE_COLOR);
   ///read unary
   ProbImage unary_mat;
-  unary_mat.decompress( unary_dir.c_str() );
+  unary_mat.load( unary_dir.c_str() );
 
   Saliency saliency;
   const cv::Mat_<double> saliencyMap = saliency.saliency(img_mat);
@@ -115,12 +115,12 @@ void set_1st_order(const cv::Mat img_mat,const cv::Mat_<double> saliency_mat, Pr
       const size_t shape[] = {2};
       opengm::ExplicitFunction<float> energy(shape, shape+1);
 
-      energy(1) = -unary_mat(x,y,object_label) + (1-saliency_mat.at<double>(y,x));; 
+      energy(1) = -unary_mat(x,y,object_label) + (1-saliency_mat.at<double>(y,x));
       energy(0) = 100000000.0;
 
       for(size_t i = 0; i < n_label; i++)     
         if(i!=object_label)
-          energy(0) = min(energy(0),-unary_mat(x,y,i));
+          energy(0) = min(energy(0),unary_mat(x,y,i));
 
       energy(0) +=alpha*saliency_mat.at<double>(y,x);
    

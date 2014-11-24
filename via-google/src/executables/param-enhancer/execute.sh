@@ -7,7 +7,8 @@ echo "Google PNG folder: $google_png_dir"
 
 echo "VOC training folder: $voc_img_folder"
 echo "VOC PNG folder: $voc_png_folder"
-echo "VOC train list: $voc_train_list"
+echo "VOC init train list: $init_train_path"
+echo "Combined train list: $combined_train_list"
 echo "##################################"
 #relist
 `cut -d , -f 1 $google_object_file > objid_tmp`
@@ -16,10 +17,11 @@ IFS=$'\n' read -d '' -r -a objid < objid_tmp
 IFS=$'\n' read -d '' -r -a imgname < imgname_tmp
 `rm objid_tmp`
 `rm imgname_tmp`
+`rm $combined_train_list`
 #initialize sampling bucket
-for (( ii = 0; ii < 21; ii++ )); do
-	quota[$ii]=0
-done
+# for (( ii = 0; ii < 21; ii++ )); do
+# 	quota[$ii]=0
+# done
 
 image_size=${#imgname[@]}
 c=0
@@ -32,15 +34,16 @@ do
 		if [[ -f "$google_png_dir/$singlename.png" ]]; then
 			`echo "$singlename" >> $combined_train_list`
 			`cp $dpm_img_folder/$singlename.jpg $voc_img_folder/$singlename.jpg`
-			`cp $google_png_dir/$singlename.jpg $voc_png_folder/$singlename.png`
+			`cp $google_png_dir/$singlename.png $voc_png_folder/$singlename.png`
 		fi
 	fi
     (( c++ ))
 done
 
-`cat $voc_train_list >> $combined_train_list`
+`cat $init_train_path >> $combined_train_list`
 
 #create google 
+echo "START TRAINING IMPROVED MODEL"
 `$train_bin $combined_train_list  $voc_img_folder $voc_png_folder $improved_param`
 
 
