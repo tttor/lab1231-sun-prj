@@ -74,8 +74,8 @@ def single_eval(pred_filepath, true_filepath):
     assert len(y_pred_raw)==len(y_true_raw), 'len(y_pred_raw)!=len(y_true_raw)'
 
     # remove void
-    void_num = 255
-    nonvoid_idxes = [i for i in range(len(y_true_raw)) if y_true_raw[i]!=void_num]
+    msrc_void_class_num = [255, 21, 22]
+    nonvoid_idxes = [i for i in range(len(y_true_raw)) if y_true_raw[i] not in msrc_void_class_num]
 
     y_pred = [y_pred_raw[i] for i in nonvoid_idxes]
     y_true = [y_true_raw[i] for i in nonvoid_idxes]
