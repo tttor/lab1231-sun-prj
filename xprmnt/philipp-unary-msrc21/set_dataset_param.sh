@@ -6,4 +6,5 @@ n_label=21 #
 ori_img_dir=/home/tor/sun3/dataset/msrc/unmix/Images
 gt_img_dir=/home/tor/sun3/dataset/msrc/unmix/GroundTruth
 gt_csv_dir=/home/tor/sun3/dataset/msrc/unmix/GroundTruth-csv
+accurate_gt_csv_dir=/home/tor/sun3/dataset/msrc/unmix/GroundTruth-accurate-philipp-csv
 unary_philipp_dir=/home/tor/sun3/dataset/msrc/unary_philipp/msrc_compressed
