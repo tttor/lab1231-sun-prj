@@ -44,14 +44,13 @@ def extract_fea_c(ann, knowledge):
     probs = [knowledge[classes[i]][classes[j]] for i in range(len(classes)-1) for j in range(i+1,len(classes))]
     probs = np.asarray(probs)
 
-    c = []
+    n_element = 4
+    c = [0.0] * n_element
     if len(probs) != 0:
         c = [np.mean(probs), 
              np.percentile(probs, 25), 
              np.percentile(probs, 50), 
              np.percentile(probs, 75)]
-    else:
-        c = [0.0] * 4
 
     return c
 
@@ -75,14 +74,13 @@ def extract_fea_s(ann, knowledge):
                 prob = knowledge[ann_ij][spatial]
                 probs.append(prob)
 
-    s = []
+    n_element = 4
+    s = [0.0] * n_element
     if len(probs) != 0:
         s = [np.mean(probs), 
              np.percentile(probs, 25), 
              np.percentile(probs, 50), 
              np.percentile(probs, 75)]
-    else:
-        s = [0.0] * 4
     
     return s
 
@@ -103,14 +101,13 @@ def extract_fea_p(ann, knowledge, filename):
 
     probs = [knowledge[scene_class][obj] for obj in present_objects if scene_class in knowledge]
     
-    p = []
+    n_element = 4
+    p = [0.0] * n_element
     if len(probs) != 0:
         p = [np.mean(probs), 
              np.percentile(probs, 25), 
              np.percentile(probs, 50), 
              np.percentile(probs, 75)]
-    else:
-        p = [0.0] * 4
 
     return p
 
