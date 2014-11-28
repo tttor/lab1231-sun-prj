@@ -1,0 +1,20 @@
+To generate texton model:
+1. Set target model folder
+2. Make training image list with format, ex: sample.jpg -> sample
+3. Determine original Dtr images folder
+4. Determine annotation png image folder
+5. Build trainer executable:
+	a. go to via-google/src/fgannotator
+	b. mkdir build, cmake .., and make
+6. Set trainer parameter after binary name (e.g. trainer), i.e.: trainer <training image list> <training original image folder path> <training annotation png folder path> <target model files path>
+7. Execute
+
+To generate texton unary:
+1. Determine target model folder
+2. Make testing image list with format, ex: sample.jpg -> sample
+3. Determine original Dte images folder
+4. Build predictor executable:
+	a. go to via-google/src/fgannotator
+	b. mkdir build, cmake .., and make
+5. Set trainer parameter after binary name (e.g. predictor), i.e.: predictor <model files path> <test images list> <test original images folder path> <output unaries folder path>
+6. Execute
