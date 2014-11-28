@@ -5,13 +5,13 @@ project (PhilippUnary)
 find_package(OpenCV REQUIRED)
 
 #
-set(OPENGM_DIR ../../external/opengm-2.3.3)
-set(PROBIMAGE_DIR ../../external/prob-image)
+set(OPENGM_DIR ../../../external/opengm-2.3.3)
+set(PROBIMAGE_DIR ../../../external/prob-image)
 set(EIGEN_DIR /usr/local/include/eigen3)
 
 #
-include_directories(../../external)
-include_directories(../../util/include)
+include_directories(../../../external)
+include_directories(../../../util/include)
 include_directories(${OPENGM_DIR}/include)
 include_directories(${OPENGM_DIR}/src/external/MaxFlow-v3.02.src-patched)
 include_directories(${EIGEN_DIR})
@@ -21,8 +21,8 @@ include_directories(${EIGEN_DIR})
 
 #
 add_library(util
-  ../../util/src/util.cc
-  ../../util/src/color_map.cc
+  ../../../util/src/util.cc
+  ../../../util/src/color_map.cc
 )
 
 # 

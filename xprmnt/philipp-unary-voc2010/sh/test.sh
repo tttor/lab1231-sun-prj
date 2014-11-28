@@ -6,7 +6,7 @@ fi
 curr_dir="$(dirname "$0")"
 
 # Constant params across num
-exe=build/main 
+exe=../cc/build/main
 root_dir=/home/tor/sun4/xprmnt/philipp-unary-voc2010
 . "$curr_dir/set_dataset_param.sh"
 

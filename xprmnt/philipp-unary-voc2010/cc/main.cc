@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
     ann = annotate(img_filename, data_param);
 
     const string ann_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".csv");
-    const string ann_img_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".bmp");
     sun::util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
-    cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
+    // const string ann_img_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".bmp");
+    // cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
   }
 
   return 0;
