@@ -108,13 +108,6 @@
       float filterbank_size = FILTER_BANK_SIZE;
       int n_textons = N_TEXTONS;
       HogFeature::HogFeatureType type = HogFeature::L;
-  //textonboost
-      int n_rounds = N_BOOSTING_ROUNDS;
-      int n_classifiers = N_CLASSIFIERS;
-      int n_thresholds = N_THRESHOLDS;
-      int subsample = BOOSTING_SUBSAMPLE;
-      int min_rect_size = MIN_RECT_SIZE;
-      int max_rect_size = MAX_RECT_SIZE;
       //evaluation
       int blockSize=CACHE_SIZE;
       qDebug("WELCOME TO OUR WORLD. GET HIGH!");

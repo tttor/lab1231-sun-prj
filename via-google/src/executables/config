@@ -1,7 +1,11 @@
 #PLEASE DONT EMPTY ANYTHING!!!!!!!!!!!!!!!
 #LINKER
 
-executables_root="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/executables"
+main_root="/home/rizkivmaster/ws/lab1231-sun-prj/via-google"
+binary_root="$source_root/build"
+source_root="$main_root/src"
+executables_root="$source_root/executables"
+exp_folder="/home/rizkivmaster/ws/results"
 
 #GOOGLE IMAGE -OBJECT
 #daftar gambar yg didownload
@@ -24,7 +28,6 @@ google_object_file="$google_root/google_object"
 
 
 source $executables_root/config_current
-exp_folder="/home/rizkivmaster/ws/results"
 current_exp="$exp_folder/$exp_id"
 if [[ $exp_id != "" ]]; then
 	if [[  -d $current_exp ]]; then
@@ -80,13 +83,13 @@ voc_gt_csv="$voc_root/SegmentationClass-csv"
 voc_train_size=100
 
 #TextonBoost
-train_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/trainer"
-predict_bin="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/build/src/predictor"
-settings_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/src/textonboost/src/settings.h"
+train_bin="$binary_root/src/textonboost/src/trainer"
+predict_bin="$binary_root/src/textonboost/src/predictor"
+settings_path="$source_root/textonboost/src/settings.h"
 
 #MRF
-fg_annotator_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/build/src/fgannotator/fgmain"
-multiannotator_path="/home/rizkivmaster/ws/lab1231-sun-prj/via-google/build/src/multiannotator/mtmain"
+fg_annotator_path="$binary_root/src/fgannotator/fgmain"
+multiannotator_path="$binary_root/src/multiannotator/mtmain"
 
 #EVALUATOR
 evaluator_path="/home/rizkivmaster/ws/lab1231-sun-prj/util/src-py/evaluator_tor.py"
