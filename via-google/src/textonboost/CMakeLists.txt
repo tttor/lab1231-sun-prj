@@ -1,7 +1,7 @@
-project(classification)
-cmake_minimum_required(VERSION 2.6)
+#project(classification)
+#cmake_minimum_required(VERSION 2.6)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/src/textonboost/cmake/")
 set(CMAKE_CXX_FLAGS "-Wall")
 
 find_package(Qt4 REQUIRED)

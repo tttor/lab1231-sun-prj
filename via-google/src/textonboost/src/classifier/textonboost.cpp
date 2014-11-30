@@ -231,7 +231,9 @@ void TextonBoost::train( QVector< Image< short > >& textons, const QVector< Labe
 				}
 			}
 	}
-	
+  int_images.clear();
+  //gt.clear();
+  textons.clear();
 	JointBoost<TextonClassifier>::train( data, groundtruth, n_classes, n_rounds, n_classifiers, n_thresholds );
 }
 Image< float > TextonBoost::evaluate(const Image< short >& textons) const {

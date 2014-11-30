@@ -23,22 +23,22 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # Add the executables
 #add_executable( textonize textonize.cpp )
-#target_link_libraries( textonize util feature )
+#target_link_libraries( textonize textonutil feature )
 
 #add_executable( textonview textonview.cpp )
-#target_link_libraries( textonview util feature )
+#target_link_libraries( textonview textonutil feature )
 
 #add_executable( textonboost textonboost.cpp )
-#target_link_libraries( textonboost util feature classifier )
+#target_link_libraries( textonboost textonutil feature classifier )
 
 #add_executable( evaluate evaluate.cpp )
-#target_link_libraries( evaluate util feature classifier )
+#target_link_libraries( evaluate textonutil feature classifier )
 
 add_executable( trainer trainer.cpp )
-target_link_libraries( trainer util feature classifier )
+target_link_libraries( trainer textonutil feature classifier )
 
 add_executable( predictor predictor.cpp )
-target_link_libraries( predictor util feature classifier )
+target_link_libraries( predictor textonutil feature classifier )
 
 
 # Add the subdirectories
