@@ -1,6 +1,5 @@
 #include <util/util.h>
 #include <iostream>
-
 #include <stdlib.h>
 #include <util/color_map.h>
 
