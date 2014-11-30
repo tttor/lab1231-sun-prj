@@ -18,7 +18,7 @@ sun::util::color_map::ClassColorMap sun::util::color_map::voc() {
   sun::util::color_map::ClassColorMap map;
   cv::Vec3b color;
 
-  rapidxml::file<> xmlFile("/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/class-color/class_color_map.xml");
+  rapidxml::file<> xmlFile("/home/rizkivmaster/ws/lab1231-sun-prj/util/config/class_color_map.xml");
   rapidxml::xml_document<> doc;
   doc.parse<0>(xmlFile.data());
 

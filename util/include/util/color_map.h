@@ -25,7 +25,7 @@ ClassColorMap msrc();
 /*!
  * @brief The coloring scheme follows color map
  */
-ClassColorMap voc();
+ ClassColorMap voc();
 
 /*!
  * @brief ...
