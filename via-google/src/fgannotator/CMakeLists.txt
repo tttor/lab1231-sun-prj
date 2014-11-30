@@ -21,9 +21,9 @@ target_link_libraries (
   color_map
   util
   ${OpenCV_LIBS} 
+  ${saliency_libs}
   ${OpenGMDir}/build/src/external/libexternal-library-maxflow.a 
   ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
-  ${saliency_libs}
   ${QT_QTGUI_LIBRARY} 
   ${QT_QTCORE_LIBRARY}
 )
