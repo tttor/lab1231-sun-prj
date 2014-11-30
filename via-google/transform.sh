@@ -89,4 +89,12 @@ cd evaluation
 ./execute.sh
 cd ..
 
+echo "START BASELINE EVALUATION" >> $logpath
+date +"%m-%d-%y %T" >> $logpath
+
+cd baseline-evaluation
+./execute.sh
+cd ..
+
+
 cd ../..
