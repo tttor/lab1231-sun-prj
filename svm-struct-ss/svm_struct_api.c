@@ -22,6 +22,8 @@
 #include "svm_struct/svm_struct_common.h"
 #include "svm_struct_api.h"
 
+#include "ssvm_ss_dataset_constraint.h"
+
 void        svm_struct_learn_api_init(int argc, char* argv[])
 {
   /* Called in learning part before anything else is done to allow
@@ -52,14 +54,16 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
      examples must be written into sample.n */
   SAMPLE   sample;  /* sample */
   EXAMPLE  *examples;
-  long     n;       /* number of examples */
+  long     n_sample;       /* number of examples */
 
-  n=100; /* replace by appropriate number of examples */
-  examples=(EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n);
+  n_sample=ssvm_ss::dataset::n_example; /* replace by appropriate number of examples */
+  examples=(EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n+sample);
 
   /* fill in your code here */
+  
 
-  sample.n=n;
+  //
+  sample.n=n_sample;
   sample.examples=examples;
   return(sample);
 }
