@@ -2,7 +2,7 @@
 
 namespace sun = lab1231_sun_prj;
 
-sun::util::color_map::ClassColorMap sun::util::color_map::class_color_map(const std::string dataset) {
+sun::util::color_map::ClassColorMap sun::util::color_map::class_color_map(const std::string& dataset) {
   if (dataset=="msrc")
     return sun::util::color_map::msrc();
   if (dataset=="voc2010" or dataset=="voc2012")
@@ -18,7 +18,7 @@ sun::util::color_map::ClassColorMap sun::util::color_map::voc() {
   sun::util::color_map::ClassColorMap map;
   cv::Vec3b color;
 
-  rapidxml::file<> xmlFile("/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/class-color/class_color_map.xml");
+  rapidxml::file<> xmlFile("/home/rizkivmaster/ws/lab1231-sun-prj/util/config/class_color_map.xml");
   rapidxml::xml_document<> doc;
   doc.parse<0>(xmlFile.data());
 
@@ -134,11 +134,4 @@ sun::util::color_map::ClassColorMap sun::util::color_map::msrc() {
   map[20] = color;
 
   return map;
-}
-
-sun::util::color_map::ClassColorMap sun::util::color_map::class_color_map(const std::string& dataset) {
-  if (dataset=="msrc")
-    return sun::util::color_map::msrc();
-  else
-    assert(false && "color_map(): UNKNOWN DATASET!");
 }

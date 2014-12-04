@@ -98,23 +98,18 @@
 //need folder of parameters
       //set thou folder containing parameter
       QString param_dir = argv[1];
+      QString list_path = argv[2];
+      QString img_folder = argv[3];
       //set thou folder to put thou unaries
-      QString save_dir = argv[2];
+      QString save_dir = argv[4];
 //inner params
   //texton
       int nTextons = 4;
       float filterbank_size = FILTER_BANK_SIZE;
       int n_textons = N_TEXTONS;
       HogFeature::HogFeatureType type = HogFeature::L;
-  //textonboost
-      int n_rounds = N_BOOSTING_ROUNDS;
-      int n_classifiers = N_CLASSIFIERS;
-      int n_thresholds = N_THRESHOLDS;
-      int subsample = BOOSTING_SUBSAMPLE;
-      int min_rect_size = MIN_RECT_SIZE;
-      int max_rect_size = MAX_RECT_SIZE;
       //evaluation
-      int blockSize=BLOCK_SIZE;
+      int blockSize=CACHE_SIZE;
       qDebug("WELCOME TO OUR WORLD. GET HIGH!");
 
       QSharedPointer<Feature> filter[4] = {QSharedPointer<Feature>( new FilterBank( filterbank_size ) ),QSharedPointer<Feature>( new ColorFeature() ),QSharedPointer<Feature>( new LocationFeature() ), QSharedPointer<Feature>( new HogFeature(type) )};
@@ -125,14 +120,15 @@
       QVector< QString > names;
 
       qDebug("Loading the database");      
-      QVector< QString > filenames = listVOC2010( TRAIN );
+      QVector< QString > filenames = listImagesPath( list_path, img_folder );
 
       for( int nn=0; nn<filenames.count(); nn+=blockSize ){
         QVector< QString > cur_names;
         for( int ii=nn; ii<nn+blockSize && ii<filenames.count(); ii++ )
           cur_names.append( filenames[ii] );
         qDebug(QString("Generating unaries for first %1th images").arg(nn+blockSize).toStdString().c_str());
-        loadVOC2010byNames(images, labels, names, cur_names);
+
+        loadImagesbyNames(images, labels, names, cur_names,img_folder);
         qDebug("Converting to Lab");
         lab_images = RGBtoLab( images );          
         QVector< Image<short> > textons;

@@ -4,11 +4,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")# Activate C++11
 
 find_package( OpenCV REQUIRED )
 find_package( Boost REQUIRED )
+find_package( Qt4 REQUIRED)
 
 #
-set(EigenIncludeDir /usr/local/include/eigen3)
-set(OpenGMDir /home/rizkivmaster/ws/opengm)
-set(ProbImageDir ../external/prob-image/ProbImage)
+set(ExternalLibrary /home/rizkivmaster/ws/lab1231-sun-prj/external)
+set(EigenIncludeDir /usr/include/eigen3)
+set(OpenGMDir ${ExternalLibrary}/opengm)
+set(ProbImageDir ${ExternalLibrary}/prob-image/ProbImage)
+set(SaliencySource ${ExternalLibrary}/saliencyfilters)
 
 #
 include_directories (${OpenGMDir}/include)
@@ -19,8 +22,8 @@ include_directories (../util/include)
 
 include_directories (${EigenIncludeDir})
 include_directories (include)
-
-
+include_directories (${ExternalLibrary})
+include_directories(${QT_INCLUDES} external/include)
 
 add_library( 
   probimage 
@@ -40,12 +43,10 @@ add_library (
 target_link_libraries ( util color_map  )
 
 #SaliencyFilters library
-set(SALIENCY_DIR /home/rizkivmaster/ws/saliencyfilters)
-include_directories(${SALIENCY_DIR}/src)
-
+include_directories(${SaliencySource}/src)
 set(saliency_libs 
-${SALIENCY_DIR}/build/src/saliency/libsaliency.a
-${SALIENCY_DIR}/build/src/filter/libfilter.a
-${SALIENCY_DIR}/build/src/superpixel/libsuperpixel.a)
+${SaliencySource}/build/src/saliency/libsaliency.a
+${SaliencySource}/build/src/filter/libfilter.a
+${SaliencySource}/build/src/superpixel/libsuperpixel.a)
 
 add_subdirectory( src )

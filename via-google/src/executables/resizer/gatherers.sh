@@ -2,7 +2,7 @@ source ../config
 target=$googleimgfolder
 echo "Target cropped image folder:"
 echo "$target"
-echo "target classlist file:"
+echo "Class list"
 echo "$classlistfile"
 echo "######################"
 
@@ -22,7 +22,6 @@ IFS=$'\n' read -d '' -r -a imgfolds < imgfolddir
 
 c=0
 max=`wc -l < $classlistfile`
-#max=1
 echo $max
 while [ $c -lt $max ]
 do

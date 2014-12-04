@@ -59,3 +59,8 @@ OPTION(BUILD_MATLAB_WRAPPER "Build matlab wrapper" OFF)
 ===
 rapidxml-1.13
 http://sourceforge.net/projects/rapidxml/files/latest/download
+
+===
+VOCdevkit
+http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2012/VOCdevkit_18-May-2011.tar
+

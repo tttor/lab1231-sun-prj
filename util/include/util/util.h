@@ -33,29 +33,24 @@ namespace lab1231_sun_prj {
  * @brief
  */
 template<typename MatType>
- void csv_write(const MatType m, const std::string csv_path) {
+void csv_write(const MatType m, const std::string csv_path) {
   using namespace std;
   using namespace boost;
-  
+
   ofstream csv;
   csv.open(csv_path.c_str());
   BOOST_ASSERT_MSG(csv.is_open(), string("ERROR: Cannot open: " + csv_path).c_str());
-  
+
   for(uint64_t  i=0; i<m.rows(); i++){
     for(uint64_t j=0; j<m.cols(); j++){
-     string str = lexical_cast<std::string>(m(i,j));
-     printf("%s ", str.c_str());
-     if(j+1 == m.cols()){
-       csv << str;
-     }else{
-       csv << str << ",";
-     }
-   }
-   // printf("\n");
-   csv << "\n";
- }
- 
- csv.close();  
+      string str = lexical_cast<std::string>(m(i,j));
+      if(j+1 == m.cols()) csv << str;
+      else csv << str << ",";
+    }
+    csv << "\n";
+  }
+
+  csv.close();  
 }
 
 /*!
@@ -115,6 +110,9 @@ MatType csv_read(const std::string& csv_path) {
   return xmat;
 }
 
+
+
+
 /*!
  * @brief
  */
@@ -169,6 +167,8 @@ Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
  * @brief
  */
  cv::Mat ann2img(const Eigen::MatrixXi& ann, const std::string& dataset);
+
+
 
 }// namespace util
 } // namespace lab1231_sun_prj

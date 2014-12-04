@@ -1,0 +1,2 @@
+source config
+echo "Sip"

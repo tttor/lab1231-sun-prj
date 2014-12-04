@@ -40,10 +40,13 @@ class Evaluator:
 				output.append(label_of_px)
 		return output
 
-	def evaluate(self, list_ann_label, list_gt_label):
+	def evaluate(self, list_ann_label_raw, list_gt_label_raw):
 		conf_mat = self.init_conf_mat()
-		for ann_label, gt_label in zip (list_ann_label, list_gt_label):
-			if gt_label != -1 :
+		void_num = 255
+		nonvoid_idxes = [i for i in range(len(list_gt_label_raw)) if list_gt_label_raw[i]!=void_num]
+		list_ann_label = [list_ann_label_raw[i] for i in nonvoid_idxes]
+		list_gt_label = [list_gt_label_raw[i] for i in nonvoid_idxes]
+		for ann_label, gt_label in zip (list_ann_label, list_gt_label):			
 				self.conf_mat[gt_label][ann_label] += 1
 				conf_mat[gt_label][ann_label] += 1
 		list_acc_class = self.calc_acc_each_class(conf_mat)
@@ -62,7 +65,7 @@ class Evaluator:
 			print "image " + str(x) + " done"
 		file_output = self.param["dir_output"] + 'global.out'
 		list_acc_class_global = self.calc_acc_each_class(self.conf_mat)
-		average_acc = self.get_avg_acc(res_list_acc)
+		average_acc = self.get_avg_acc(list_acc_class_global)
 		self.write_to_file(file_output, list_acc_class_global, self.conf_mat, average_acc)
 			
 

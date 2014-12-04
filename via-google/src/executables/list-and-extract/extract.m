@@ -10,27 +10,14 @@ tgtimgdirs = C{5};
 tgtxmldirs = C{6};
 
 for ll = 1:size(ids,1)
-    load(char(modeldirs{ll}));
+    load(['VOC2010/' char(modeldirs{ll})]);
     class = char(classnames{ll});
     id = ids(ll);
     fullsrc = char(srcdirs{ll});
-    tgtimgdir = char(tgtimgdirs{ll});
-    tgtxmldir = char(tgtxmldirs{ll});
+    tgtimgpath = char(tgtimgdirs{ll});
+    tgtxmlpath = char(tgtxmldirs{ll});
     
-    dirExists = exist(tgtimgdir, 'dir');
-    if(~dirExists)
-        fprintf('making directory %s',tgtimgdir);
-        mkdir(tgtimgdir);
-    end
-    
-    
-    dirExists = exist(tgtxmldir, 'dir');
-    if(~dirExists)
-        fprintf('making directory %s',tgtxmldir);
-        mkdir(tgtxmldir);
-    end
-                
-    [pathstr,filename,ext] = fileparts(fullsrc);
+                  
     needtowrite = false;
     
     %prepar
@@ -43,21 +30,21 @@ for ll = 1:size(ids,1)
     annotation.appendChild(fldir);
     
     %test(name, model, 0.7);
-    try
+    %try
     image = imread(fullsrc);
     im = image;
     [h w d] = size(image);
     scale = 1;
     %normalizing windows
     if(w>h)
-        if(w >1024)
-            im = imresize(image,[NaN 1024]);
-            scale = w/1024;
+        if(w >500)
+            im = imresize(image,[NaN 500]);
+            scale = w/500;
         end
     else
-        if(h >1024)
-            im = imresize(image,[1024 NaN]);
-            scale = h/1024;
+        if(h >500)
+            im = imresize(image,[500 NaN]);
+            scale = h/500;
         end
     end
     
@@ -65,6 +52,7 @@ for ll = 1:size(ids,1)
     fprintf(['Processing class ' class ' on ' fullsrc '\n']);
     
     % detect objects
+    
     [ds, bs] = imgdetect(im, model, thresh);
     top = nms(ds, 0.5);
     clf;
@@ -123,15 +111,15 @@ for ll = 1:size(ids,1)
                 obj.appendChild(objbnd);
                 annotation.appendChild(obj);
                 croppedImage = image(round(ymin+1):round(ymax+1),round(xmin+1):round(xmax+1),:);
-                imwrite(croppedImage,[tgtimgdir '/' filename '.jpg'],'jpg');
+                imwrite(croppedImage,tgtimgpath,'jpg');
                 needtowrite = true;
             end
         end
     end
     if(needtowrite)
-        xmlwrite([tgtxmldir '/' filename '.xml'],docNode);
+        xmlwrite(tgtxmlpath,docNode);
     end
-    catch
-    fprintf('Skipping a file \n');
-    end
+    %catch
+    %fprintf('Skipping a file \n');
+    %end
 end

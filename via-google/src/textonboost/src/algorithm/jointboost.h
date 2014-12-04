@@ -230,6 +230,7 @@ template<typename D>
 			QVector<double> kc_num( n_classes, 0.0 );
 			QVector<double> kc_den( n_classes, 0.0 );
 			double * tcw = class_weight.data();
+			//complexity O(n*c)
 			for( int i=0; i<gt.count(); i++ )
 				for( int c=0; c<n_classes; c++, tcw++ ){
 					kc_num[c] += gt[i]==c ? *tcw : -*tcw;
