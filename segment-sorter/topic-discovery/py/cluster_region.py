@@ -13,39 +13,10 @@ KMeans model
 import cPickle
 from sklearn.cluster import KMeans
 
-def read_region(filepath):
-    '''
-    \filepath path to a file from Region Descriptors, see http://www.robots.ox.ac.uk/~vgg/research/affine/descriptors.html#binaries
-    \return a list of dictionary of {'param': <reg-location-param>, 'sift': <sift descriptor>}
-    '''
-    #
-    with open(filepath) as f:
-        content = f.readlines()
-    content = [i.strip('\n') for i in content]
+import sys
+sys.path.append('/home/tor/sun/ws/lab1231-sun-prj/segment-sorter/common')
 
-    #
-    n_location_param = 5
-    n_sift_param = int(content[0])
-    n_region = int(content[1])
-    
-    content = content[2:]
-
-    #
-    region_list = []
-    for line in content:
-        region_param = [float(i) for i in line.split(' ')]
-
-        region = {}
-        region['loc'] = region_param[0:n_location_param]
-        region['sift'] = region_param[n_location_param:]
-        assert len(region['sift'])==n_sift_param, 'len(region[])!=n_sift_param'
-        
-        region_list.append(region)
-
-    #
-    assert len(region_list)==n_region, 'len(region_list)!=n_region'
-
-    return region_list
+import segment_sorter_util as util
 
 def read_region_from_list(list_filepath, region_data_dir):
     with open(list_filepath) as f:
@@ -55,10 +26,39 @@ def read_region_from_list(list_filepath, region_data_dir):
     region_list = []
     for i, filename in enumerate(content):
         print('reading region data from: %s (%i of %i)' % (filename, i+1, len(content)))
-        filepath = region_data_dir + '/' + filename 
-        region_list = region_list + read_region(filepath)
+        filepath = region_data_dir + '/' + filename + '.sift'
+        local_region_list = util.get_region_from_regfile(filepath, clustered=False)
+
+        local_region_list_with_id = []
+        for region in local_region_list:
+            new_region = region
+            new_region['id'] = filename
+            local_region_list_with_id.append(new_region)
+
+        region_list = region_list + local_region_list_with_id
 
     return region_list
+
+def write_clustered_region(region_list, clustered_region_dir):
+    filenames = set( [region['id'] for region in region_list] )
+
+    for filename in filenames:
+        filepath = clustered_region_dir + '/' + filename + '.sift.cls'
+        fo = open(filepath, "wb")
+
+        local_region_list = [region for region in region_list if region['id']==filename]
+        n_sift_param = len(local_region_list[0]['sift'])
+        fo.write(str(n_sift_param)+'\n')
+        fo.write(str(len(local_region_list))+'\n')
+        for region in local_region_list:
+            loc_param_str = ''.join(str(i)+' ' for i in region['loc'])
+            sift_param_str = ''.join(str(i)+' ' for i in region['sift'])
+            label_param_str = str(region['label']) + ' '
+            id_param_str = region['id']
+
+            line = loc_param_str + sift_param_str + label_param_str + id_param_str + '\n'
+            fo.write(line)
+        fo.close()
 
 def main():
     # Load
@@ -70,7 +70,7 @@ def main():
     # Cluster
     # TODO: preprocess?
     X = [ i['sift'] for i in region_list ]
-    n_word = 1000 # a magic 1000
+    n_word = 2000 # a magic number, see the paper of [Russel, 2006]
 
     print('n_data= %i' % (len(region_list)))
     print('n_word= %i' % (n_word))
@@ -84,8 +84,10 @@ def main():
     for i, region in enumerate(region_list):
         region['label'] = kmeans.labels_[i]
 
-    # Visualize
-    # TODO: implement
+    # 
+    clustered_region_dir = '/home/tor/sun4/xprmnt/segment-sorter/region-clustered/msrc-21'
+    write_clustered_region(region_list, clustered_region_dir)
+    # TODO: Visualize
 
     # Save the k-means model
     model_dir = '/home/tor/sun4/xprmnt/segment-sorter/kmeans-model'
