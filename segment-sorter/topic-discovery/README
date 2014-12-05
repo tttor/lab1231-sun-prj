@@ -1,0 +1,13 @@
+README
+
+Goal:
+> construct $P(w|z)$ using training data, where $w$ is a word, $z$ is a topic
+> construct a set of words from a set of raw-words, this step is called word quantization
+
+Steps:
+> determine the training image set: $D_{tr} = {img_i}$
+> determine the set of topics $Z$; a topic is an object-class
+> extract Affine Covariant Regions of $img$, see http://www.robots.ox.ac.uk/~vgg/research/affine/
+> for each region, compute the region descriptor, see http://www.robots.ox.ac.uk/~vgg/research/affine/
+> quantize the raw-words into a set of K words; K is predetermined; a word is an affine covariant region thar is described by, for example, SIFT
+> run pLSA or LSA to obtain $P(w|z)$
