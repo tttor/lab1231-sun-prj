@@ -9,12 +9,13 @@ from PIL import Image
 from io import StringIO, BytesIO
 
 import cv2
-import numpy as np
 from skimage.segmentation import slic
 from skimage.segmentation import mark_boundaries
 import matplotlib.pyplot as plt
 from skimage.util import img_as_float
 from scipy import ndimage
+import matplotlib.cm as cm
+import json
 
 #dictionary
 indexToNameDict=voc_obj_intolbl.LABELS
@@ -96,22 +97,17 @@ def gould_relative_location_probability_map():
 								norm_weight = weight * (40000 / float(imageWidth*imageHeight))
 								probability_map[(each_class+1)][pixel_class][int(norm_height)][int(norm_width)] = weight * norm_offset
 						
-
-		tes = (probability_map[int(nameToIndexDict['aeroplane'])] [int(nameToIndexDict['aeroplane'])])
-		plt.imshow(tes)
-		plt.savefig('tes.jpg')
-		outfile = "/home/ian-djakman/Desktop/gould_relative_position"
-		np.save(outfile,probability_map)
-		plt.show(tes)
+		keyval_for_json = {'prob_map' : probability_map}
+		outfile = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/knowledge/gould_relative_pos_map/gould_relative_position_map.json'
+		with open(outfile, 'w') as f:
+			json.dump(keyval_for_json, f)
 		
 def main():
 	dataset_name = "voc"
 	global training_image_list
 	global annotation_path
 	annotation_path =  '/home/ian-djakman/Documents/data/input/voc_dataset_2012/SegmentationClass'
-	#class_list = get_class_of(dataset_name)
-	#training_image_list = get_training_image_list(dataset_name)
-	training_image_list = '/home/ian-djakman/online/Github/lab1231-sun-prj/knowledge-constructor/test'
+	training_image_list = '/home/ian-djakman/Documents/data/input/voc_dataset_2012/voc_gt_img'
 	global probability_map
 	gould_relative_location_probability_map()
 
