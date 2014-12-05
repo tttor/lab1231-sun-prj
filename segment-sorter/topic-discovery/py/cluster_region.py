@@ -1,5 +1,8 @@
 #!/usr/bin/python
 '''
+Goal:
+Cluster (quantize) regions (raw-words)
+
 Input:
 List of region-data file, e.g. .sift
 
@@ -67,12 +70,12 @@ def main():
     # Cluster
     # TODO: preprocess?
     X = [ i['sift'] for i in region_list ]
-    n_class = 21
+    n_word = 1000 # a magic 1000
 
     print('n_data= %i' % (len(region_list)))
-    print('n_class= %i' % (n_class))
+    print('n_word= %i' % (n_word))
 
-    kmeans = KMeans(init='k-means++', n_clusters=n_class, n_init=10, max_iter= 300)
+    kmeans = KMeans(init='k-means++', n_clusters=n_word, n_init=10, max_iter= 300)
 
     print('kmeans.fit()...')
     kmeans.fit(X)
