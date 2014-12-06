@@ -9,8 +9,8 @@ VOCcode_dir = '../../../external/VOCdevkit/VOCcode';
 addpath(VOCcode_dir);
 
 %%
-csv_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/result/merged_test_csv';
-png_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/result/merged_test_cls';
+csv_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010/annotation/Test-split_voc2010_philipp';
+png_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010/annotation/Test-split_voc2010_philipp_cls';
 
 %%
 listing = dir(csv_dir);
