@@ -49,26 +49,26 @@ def main():
     docs = []
 
     for i, img_id in enumerate(content):
-        print('Processing: %s (%i/%i' % (img_id,i+1,len(content)))
+        print('Processing: %s (%i/%i)' % (img_id,i+1,len(content)))
         region_filepath = clustered_region_dir + '/' + img_id + '.sift.cls'
         regions = util.get_region_from_regfile(region_filepath, clustered=True)
 
         local_segment_dir = segment_dir + '/' + img_id
         segment_filepaths = [ local_segment_dir+'/'+f for f in listdir(local_segment_dir) if isfile(join(local_segment_dir,f)) ]
 
-        for segment_filepath in segment_filepaths:
+        for segment_filepath in segment_filepaths:# as for one image, we may do multiple segmentations
             segments = util.get_segment_from_supfile(segment_filepath)
 
             for segment in segments:
                 contained_regions = get_contained_region(regions, segment)
 
                 if len(contained_regions) != 0:
-                    doc = [str(region['label']) for region in contained_regions]
+                    doc = ['word'+str(region['label']) for region in contained_regions]
                     docs.append(doc)
 
-    print('len(docs)= %i' % (len(docs)))
+    print('n_document(=n_segment)= %i' % (len(docs)))
     if len(docs) != 0:
-        training_data_filepath = '/home/tor/sun4/xprmnt/segment-sorter/lda-data/msrc21.dat'
+        training_data_filepath = '/home/tor/sun4/xprmnt/segment-sorter/lda-data/hot/msrc21.dat'
         write_gibbslda_data(docs, training_data_filepath)
 
 if __name__ == '__main__':
