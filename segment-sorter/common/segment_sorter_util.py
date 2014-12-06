@@ -1,4 +1,4 @@
-#!/usr/bin/python
+   #!/usr/bin/python
 import numpy as np 
 import csv
 
@@ -37,9 +37,10 @@ def get_region_from_regfile(filepath, clustered=False):
     if clustered:
         n_label_param = 1
         n_id_param = 1
+
     n_region = int(content[1])
     
-    content = content[2:]
+    content = content[2:]# have taken element [0] and [1] above
 
     #
     region_list = []
@@ -49,7 +50,7 @@ def get_region_from_regfile(filepath, clustered=False):
 
         region = {}
         region['loc'] = [float(i) for i in region_param[0:n_loc_param]]
-        region['sift'] = [float(i) for i in region_param[n_loc_param:-2]]
+        region['sift'] = [float(i) for i in region_param[n_loc_param:n_loc_param+n_sift_param]]
 
         if clustered:
             region['label'] = region_param[-2]
