@@ -17,7 +17,13 @@ cp $tr_data_filepath $target_dir
 #
 dfile=$target_dir/$tr_data_filename
 ntopics=21
+
+alpha=0.5 #from [Russel, 2006]
+beta=0.5 #from [Russel, 2006]
+
+niters=100#from [Russel, 2006]
+savestep=20
 twords=10
 
 #$ lda -est [-alpha <double>] [-beta <double>] [-ntopics <int>] [-niters <int>] [-savestep <int>] [-twords <int>] -dfile <string>
-$lda -est -dfile $dfile -ntopics $ntopics -twords $twords
+$lda -est -dfile $dfile -ntopics $ntopics -alpha $alpha -beta $beta -niters $niters -savestep $savestep -twords $twords 
