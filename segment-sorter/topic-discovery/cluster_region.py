@@ -9,12 +9,12 @@ List of region-data file, e.g. .sift
 Output:
 KMeans model
 '''
-
+import numpy as np
 import cPickle
 from sklearn.cluster import KMeans
 
 import sys
-sys.path.append('/home/tor/sun/ws/lab1231-sun-prj/segment-sorter/common')
+sys.path.append('../../common')
 
 import segment_sorter_util as util
 
@@ -62,20 +62,21 @@ def write_clustered_region(region_list, clustered_region_dir):
 
 def main():
     # Load
-    list_filepath = '/media/tor/46DAF35ADAF344A9/tor/robotics/prj/011/xprmnt/segment-sorter/meta/msrc-21.sift.list'
-    region_data_dir = '/home/tor/sun4/xprmnt/segment-sorter/region/msrc-21/sift'
+    list_filepath = '/home/tor/xprmnt/segment-sorter/meta/msrc-21.sift.list'
+    region_data_dir = '/home/tor/xprmnt/segment-sorter/region/msrc-21/sift'
 
     region_list = read_region_from_list(list_filepath, region_data_dir)
 
     # Cluster
     # TODO: preprocess?
-    X = [ i['sift'] for i in region_list ]
+    X = np.asarray( [ i['sift'] for i in region_list ] )
     n_word = 2000 # a magic number, see the paper of [Russel, 2006]
 
-    print('n_data= %i' % (len(region_list)))
-    print('n_word= %i' % (n_word))
+    print('n_sample= %i' % (X.shape[0]))
+    print('n_feature= %i' % (X.shape[1]))
+    print('n_word (=n_cluster)= %i' % (n_word))
 
-    kmeans = KMeans(init='k-means++', n_clusters=n_word, n_init=10, max_iter= 300)
+    kmeans = KMeans(n_clusters=n_word)
 
     print('kmeans.fit()...')
     kmeans.fit(X)
@@ -85,13 +86,13 @@ def main():
         region['label'] = kmeans.labels_[i]
 
     # 
-    clustered_region_dir = '/home/tor/sun4/xprmnt/segment-sorter/region-clustered/msrc-21'
+    clustered_region_dir = '/home/tor/xprmnt/segment-sorter/region-clustered'
     write_clustered_region(region_list, clustered_region_dir)
     # TODO: Visualize
 
     # Save the k-means model
-    model_dir = '/home/tor/sun4/xprmnt/segment-sorter/kmeans-model'
-    model_filename = 'test.kmeans'
+    model_dir = '/home/tor/xprmnt/segment-sorter/kmeans-model'
+    model_filename = 'kmeans.' + 'n_cluster.' + str(n_word)
     model_filepath = model_dir + '/' + model_filename
     with open(model_filepath, 'wb') as fid:
         cPickle.dump(kmeans, fid) 
