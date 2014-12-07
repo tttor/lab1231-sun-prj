@@ -3,21 +3,24 @@ import numpy as np
 import csv
 
 def get_segment_from_supfile(filepath):
-    with open(filepath) as f:
-        reader = csv.reader(f)
-        segments = list(reader)
+    segmentation = np.genfromtxt(filepath, delimiter=',')
+    n_segment = len( set(list(segmentation.flatten())) )
 
-    for row in range(len(segments)):
-        for col in range(len(segments[row])):
-            segments[row][col] = int(segments[row][col])
-    max_segment = np.max(segments)+1
-    result = [[] for x in range(max_segment)]
+    #
+    pixels_of_segments = [[] for x in range(n_segment)]
+    for row in range(segmentation.shape[0]):
+        for col in range(segmentation.shape[1]):
+            pixels_of_segments[ int(segmentation[row][col]) ].append( (row,col) )
 
-    for row in range(len(segments)):
-        for col in range(len(segments[row])):
-            result[segments[row][col]].append( (row, col) )  
+    #
+    segments = []
+    for i,pixels in enumerate(pixels_of_segments):
+        segment = {}
+        segment['id'] = i
+        segment['pixels'] = pixels
+        segments.append(segment)
 
-    return result
+    return segments
 
 def get_region_from_regfile(filepath, clustered=False):
     '''
