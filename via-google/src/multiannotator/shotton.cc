@@ -76,7 +76,7 @@ void annotate(size_t n_label, cv::Mat image_matrix, ProbImage unary_matrix, doub
     printf("ok 4\n");
     Eigen::MatrixXi ann(image_matrix.rows, image_matrix.cols);
     printf("ok 5\n");
-    infer("AlphaExpansion", gm, n_var, ann);
+    infer("ICM", gm, n_var, ann);
     for(size_t xx = 0; xx < ann.cols();xx++)
       for(size_t yy = 0; yy < ann.rows();yy++)
         png_matrix.setPixel(xx,yy,ann(yy,xx));
@@ -191,7 +191,7 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_mat,double* unary_weights, c
       for(size_t i = 0; i < n_label; i++) 
       {
         // printf("doing %d %d %d\n",x,y,i);
-        energy(i) = unary_weights[util::flat_idx(x, y, img_mat.cols)] *-unary_mat(x,y,i);  
+        energy(i) = max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)] *-unary_mat(x,y,i));  
       }
         
 
@@ -294,7 +294,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
         unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
 
         //
-        opengm::PottsFunction<float> pott(n_label, n_label, pair_weights[util::flat_idx(x,y,img_mat.cols)]*equal_pen, pair_weights[util::flat_idx(x,y,img_mat.cols)]*unequal_pen);
+        opengm::PottsFunction<float> pott(n_label, n_label, max(0.0,pair_weights[util::flat_idx(x,y,img_mat.cols)]*equal_pen), max(0.0,pair_weights[util::flat_idx(x,y,img_mat.cols)]*unequal_pen));
         GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
         // add a factor
@@ -313,7 +313,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
         unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
 
         //
-        opengm::PottsFunction<float> pott(n_label, n_label, pair_weights[util::flat_idx(x,y,img_mat.cols)]*equal_pen, pair_weights[util::flat_idx(x,y,img_mat.cols)]*unequal_pen);
+        opengm::PottsFunction<float> pott(n_label, n_label, max(0.0,pair_weights[util::flat_idx(x,y,img_mat.cols)]*equal_pen), max(0.0,pair_weights[util::flat_idx(x,y,img_mat.cols)]*unequal_pen));
         GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
         // add a factor

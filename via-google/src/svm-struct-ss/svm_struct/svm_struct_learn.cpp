@@ -837,6 +837,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 
                     _("HURAY 24");
                     free_svector(fydelta);
+                    _("HURAY GG");
                 }
                 else
                 {

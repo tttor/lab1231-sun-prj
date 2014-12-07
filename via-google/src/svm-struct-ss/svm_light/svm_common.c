@@ -232,15 +232,22 @@ SVECTOR *copy_svector_shallow(SVECTOR *vec)
 
 void free_svector(SVECTOR *vec)
 {
+    printf("GAGAL 1\n");
     SVECTOR *next;
     while (vec)
     {
+        printf("GAGAL 2\n");
         if (vec->words)
             free(vec->words);
+        printf("GAGAL 3\n");
         if (vec->userdefined)
             free(vec->userdefined);
+        printf("GAGAL 4\n");
         next = vec->next;
+
+        printf("GAGAL 5\n");
         free(vec);
+        printf("GAGAL 6\n");
         vec = next;
     }
 }

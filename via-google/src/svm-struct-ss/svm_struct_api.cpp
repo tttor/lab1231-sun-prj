@@ -123,8 +123,8 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 
     sample.n = n_sample;
     sample.examples = examples;
-    if(struct_verbosity>=0)
-    printf(" (%d examples) ",sample.n);
+    if (struct_verbosity >= 0)
+        printf(" (%d examples) ", sample.n);
     __("END ", 1);
     return (sample);
 }
@@ -188,43 +188,43 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
     // QImage output_png;
 
 
-    // y.png_matrix = QImage(x.width,x.height,QImage::Format_Indexed8);
-    // QString colorfile = "VOC2010.ct";
-    // QVector<QRgb> colorTable;
-    // QFile file(colorfile);
-    // if (!file.open(QFile::ReadOnly))
-    //   qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
-    // QDataStream s(&file);
-    // s >> colorTable;
-    // file.close();
-    // y.png_matrix.setColorTable(colorTable);
+    y.png_matrix = QImage(x.width, x.height, QImage::Format_Indexed8);
+    QString colorfile = "VOC2010.ct";
+    QVector<QRgb> colorTable;
+    QFile file(colorfile);
+    if (!file.open(QFile::ReadOnly))
+        qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
+    QDataStream s(&file);
+    s >> colorTable;
+    file.close();
+    y.png_matrix.setColorTable(colorTable);
 
-    // y.height = x.height;
-    // y.width = x.width;
-    // y.n_label = ssvm_ss::image_constraint::n_label;
-    // printf("start infer\n");
-
-
-
-    // double * unary_weights = (double*) malloc(sizeof(double)*x.width*x.height);
-    // double * pair_weights = (double*) malloc(sizeof(double)*(x.width-1)*(x.height-1));
-    // set_unary_weights(sm,x,unary_weights);
-    // set_pair_weights(sm,x,pair_weights);
-
-    // ProbImage unary_matrix;
-    // unary_matrix.load(x.unary_path);
-
-    // cv::Mat image_matrix;
-    // image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
-
-    // size_t n_label = y.n_label;
-    // printf("label terdeteksi : %d\n",n_label);
-    // printf("image_size %d %d\n",image_matrix.cols,image_matrix.rows);
-
-    // lab1231_sun_prj::shotton::annotate(n_label,image_matrix,unary_matrix,unary_weights,pair_weights,y.png_matrix);
+    y.height = x.height;
+    y.width = x.width;
+    y.n_label = ssvm_ss::image_constraint::n_label;
+    printf("start infer\n");
 
 
-    y.png_matrix = x.bypass;
+
+    double *unary_weights = (double *) malloc(sizeof(double) * x.width * x.height);
+    double *pair_weights = (double *) malloc(sizeof(double) * (x.width - 1) * (x.height - 1));
+    set_unary_weights(sm, x, unary_weights);
+    set_pair_weights(sm, x, pair_weights);
+
+    ProbImage unary_matrix;
+    unary_matrix.load(x.unary_path);
+
+    cv::Mat image_matrix;
+    image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
+
+    size_t n_label = y.n_label;
+    printf("label terdeteksi : %d\n", n_label);
+    printf("image_size %d %d\n", image_matrix.cols, image_matrix.rows);
+
+    lab1231_sun_prj::shotton::annotate(n_label, image_matrix, unary_matrix, unary_weights, pair_weights, y.png_matrix);
+
+
+    // y.png_matrix = x.bypass;
 
 
     //set up inferer
@@ -241,6 +241,7 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
        weights that can be learned. Later, the weight vector w will
        contain the learned weights for the model. */
     sm->sizePsi = ssvm_ss::image_constraint::feature_size; /* replace by appropriate number of features */
+    sparm->num_features=ssvm_ss::image_constraint::feature_size;
 }
 CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
                                     STRUCT_LEARN_PARM *sparm)
@@ -283,6 +284,7 @@ CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
             c.lhs[i] = create_example(i, 0, 1000000 + i, 1, create_svector(words, "", 1.0));
             c.rhs[i] = 0.0;
         }
+        c.m = sizePsi;
     }
     _("end constraints");
     return (c);
@@ -411,18 +413,19 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
        loss + margin/slack rescaling method. See that paper for details. */
     _("start init psi\n");
     SVECTOR *fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));
-    fvec->words = (WORD *) my_malloc(sizeof(WORD) * (sm->sizePsi));
+    fvec->words = (WORD *) my_malloc(sizeof(WORD) * (sm->sizePsi + 1));
     fvec->next = NULL;
     fvec->factor = 1.0;
     fvec->kernel_id = 0;
+    fvec->userdefined = NULL;
     // __("PSI",1);
-    printf("ukuran sizePsi: %d\n",sm->sizePsi);
+    printf("ukuran sizePsi: %d\n", sm->sizePsi);
     for (size_t indexPsi = 0 ; indexPsi < sm->sizePsi; indexPsi++)
     {
         fvec->words[indexPsi].wnum = indexPsi + 1;
         fvec->words[indexPsi].weight = 0.0;
     }
-    fvec->words[sm->sizePsi-1].wnum = 0;
+    fvec->words[sm->sizePsi].wnum = 0;
     // fvec->words[sm->sizePsi-1].wnum = 0;
     // __("PSI SO SO",((words+1))->wnum);
     size_t windowheight = ssvm_ss::image_constraint::height;
@@ -470,6 +473,8 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     for (size_t xx = 0; xx < x.width - 1; xx++)
         for (size_t yy = 0; yy < x.height - 1; yy++)
         {
+            assert(windowoffset + type1psioffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth <= sm->sizePsi);
+            assert(windowoffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth <= sm->sizePsi);
             fvec->words[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = pair_psi[xx + (yy * (x.width - 1))];
             fvec->words[windowoffset + type1psioffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = pair_psi[type1psioffset + xx + (yy * (x.width - 1))];
         }
@@ -477,7 +482,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
 
     //padding
 
-    
+
 
 
 
@@ -510,8 +515,18 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
         /* Put your code for different loss functions here. But then
            find_most_violated_constraint_???(x, y, sm) has to return the
            highest scoring label with the largest loss. */
-        printf("Unkown loss function\n");
-        exit(1);
+           y.png_matrix.save("temp_output", "png", 0);
+        ybar.png_matrix.save("temp_output_bar", "png", 0);
+        double sum = 0.0;
+        for (int xx = 0; xx < y.width; xx++)
+            for (int yy = 0; yy < y.height; yy++)
+            {
+                sum += (y.png_matrix.pixelIndex(xx, yy) != ybar.png_matrix.pixelIndex(xx, yy)) ? 1.0 : 0.0;
+            }
+        printf("loss : %f\n", sum);
+        return sum*sum;
+        // printf("Unkown loss function\n");
+        // exit(1);
     }
 }
 
@@ -531,6 +546,18 @@ void        print_struct_learning_stats(SAMPLE sample, STRUCTMODEL *sm,
     /* This function is called after training and allows final touches to
        the model sm. But primarly it allows computing and printing any
        kind of statistic (e.g. training error) you might want. */
+       MODEL *model=sm->svm_model;
+  if(model->kernel_parm.kernel_type == LINEAR) {
+    if(struct_verbosity>=1) {
+      printf("Compacting linear model..."); fflush(stdout);
+    }
+    sm->svm_model=compact_linear_model(model);
+    sm->w=sm->svm_model->lin_weights; /* short cut to weight vector */
+    free_model(model,1);
+    if(struct_verbosity>=1) {
+      printf("done\n"); fflush(stdout);
+    }
+  }  
 }
 
 void        print_struct_testing_stats(SAMPLE sample, STRUCTMODEL *sm,
@@ -563,12 +590,129 @@ void        write_struct_model(char *file, STRUCTMODEL *sm,
                                STRUCT_LEARN_PARM *sparm)
 {
     /* Writes structural model sm to file file. */
+  FILE *modelfl;
+  long j,i,sv_num;
+  MODEL *model=sm->svm_model;
+  SVECTOR *v;
+
+  if ((modelfl = fopen (file, "w")) == NULL)
+  { perror (file); exit (1); }
+  fprintf(modelfl,"SVM-multiclass Version %s\n",INST_VERSION);
+  // fprintf(modelfl,"%d # number of classes\n",    sparm->num_classes);
+  fprintf(modelfl,"%d # number of base features\n",    sparm->num_features);
+  fprintf(modelfl,"%d # loss function\n",    sparm->loss_function);
+  fprintf(modelfl,"%ld # kernel type\n",    model->kernel_parm.kernel_type);
+  fprintf(modelfl,"%ld # kernel parameter -d \n",    model->kernel_parm.poly_degree);
+  fprintf(modelfl,"%.8g # kernel parameter -g \n",    model->kernel_parm.rbf_gamma);
+  fprintf(modelfl,"%.8g # kernel parameter -s \n",    model->kernel_parm.coef_lin);
+  fprintf(modelfl,"%.8g # kernel parameter -r \n",    model->kernel_parm.coef_const);
+  fprintf(modelfl,"%s# kernel parameter -u \n",model->kernel_parm.custom);
+  fprintf(modelfl,"%ld # highest feature index \n",model->totwords);
+  fprintf(modelfl,"%ld # number of training documents \n",model->totdoc);
+
+  sv_num=1;
+  for(i=1;i<model->sv_num;i++) {
+   for(v=model->supvec[i]->fvec;v;v=v->next) 
+      sv_num++;
+  }
+  fprintf(modelfl,"%ld # number of support vectors plus 1 \n",sv_num);
+  fprintf(modelfl,"%.8g # threshold b, each following line is a SV (starting with alpha*y)\n",model->b);
+
+  for(i=1;i<model->sv_num;i++) {
+    for(v=model->supvec[i]->fvec;v;v=v->next) {
+      fprintf(modelfl,"%.32g ",model->alpha[i]*v->factor);
+      fprintf(modelfl,"qid:%ld ",v->kernel_id);
+      for (j=0; (v->words[j]).wnum; j++) {
+  fprintf(modelfl,"%ld:%.8g ",
+    (long)(v->words[j]).wnum,
+    (double)(v->words[j]).weight);
+      }
+      if(v->userdefined)
+  fprintf(modelfl,"#%s\n",v->userdefined);
+      else
+  fprintf(modelfl,"#\n");
+    /* NOTE: this could be made more efficient by summing the
+       alpha's of identical vectors before writing them to the
+       file. */
+    }
+  }
+  fclose(modelfl);
+
+
 }
 
 STRUCTMODEL read_struct_model(char *file, STRUCT_LEARN_PARM *sparm)
 {
     /* Reads structural model sm from file file. This function is used
        only in the prediction module, not in the learning module. */
+  FILE *modelfl;
+  STRUCTMODEL sm;
+  long i,queryid,slackid;
+  double costfactor;
+  long max_sv,max_words,ll,wpos;
+  char *line,*comment;
+  WORD *words;
+  char version_buffer[100];
+  MODEL *model;
+
+  nol_ll(file,&max_sv,&max_words,&ll); /* scan size of model file */
+  max_words+=2;
+  ll+=2;
+
+  words = (WORD *)my_malloc(sizeof(WORD)*(max_words+10));
+  line = (char *)my_malloc(sizeof(char)*ll);
+  model = (MODEL *)my_malloc(sizeof(MODEL));
+
+  if ((modelfl = fopen (file, "r")) == NULL)
+  { perror (file); exit (1); }
+
+  fscanf(modelfl,"SVM-multiclass Version %s\n",version_buffer);
+  if(strcmp(version_buffer,INST_VERSION)) {
+    perror ("Version of model-file does not match version of svm_struct_classify!"); 
+    exit (1); 
+  }
+  // fscanf(modelfl,"%d%*[^\n]\n", &sparm->num_classes);  
+  fscanf(modelfl,"%d%*[^\n]\n", &sparm->num_features);  
+  fscanf(modelfl,"%d%*[^\n]\n", &sparm->loss_function);  
+  fscanf(modelfl,"%ld%*[^\n]\n", &model->kernel_parm.kernel_type);  
+  fscanf(modelfl,"%ld%*[^\n]\n", &model->kernel_parm.poly_degree);
+  fscanf(modelfl,"%lf%*[^\n]\n", &model->kernel_parm.rbf_gamma);
+  fscanf(modelfl,"%lf%*[^\n]\n", &model->kernel_parm.coef_lin);
+  fscanf(modelfl,"%lf%*[^\n]\n", &model->kernel_parm.coef_const);
+  fscanf(modelfl,"%[^#]%*[^\n]\n", model->kernel_parm.custom);
+
+  fscanf(modelfl,"%ld%*[^\n]\n", &model->totwords);
+  fscanf(modelfl,"%ld%*[^\n]\n", &model->totdoc);
+  fscanf(modelfl,"%ld%*[^\n]\n", &model->sv_num);
+  fscanf(modelfl,"%lf%*[^\n]\n", &model->b);
+
+  model->supvec = (DOC **)my_malloc(sizeof(DOC *)*model->sv_num);
+  model->alpha = (double *)my_malloc(sizeof(double)*model->sv_num);
+  model->index=NULL;
+  model->lin_weights=NULL;
+
+  for(i=1;i<model->sv_num;i++) {
+    fgets(line,(int)ll,modelfl);
+    if(!parse_document(line,words,&(model->alpha[i]),&queryid,&slackid,
+           &costfactor,&wpos,max_words,&comment)) {
+      printf("\nParsing error while reading model file in SV %ld!\n%s",
+       i,line);
+      exit(1);
+    }
+    model->supvec[i] = create_example(-1,0,0,0.0,
+              create_svector(words,comment,1.0));
+    model->supvec[i]->fvec->kernel_id=queryid;
+  }
+  fclose(modelfl);
+  free(line);
+  free(words);
+  if(verbosity>=1) {
+    fprintf(stdout, " (%d support vectors read) ",(int)(model->sv_num-1));
+  }
+  sm.svm_model=model;
+  sm.sizePsi=model->totwords;
+  sm.w=NULL;
+  return(sm);
 }
 
 void        write_label(FILE *fp, LABEL y)
