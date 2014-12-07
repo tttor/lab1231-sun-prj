@@ -15,7 +15,7 @@ mkdir -p $clustered_region_dir
 
 kmeans_model_dir=$root_dir/kmeans-model
 mkdir -p $kmeans_model_dir
-kmeans_model_filepath=$kmeans_model_dir/kmeans.timestamp.model
+kmeans_model_filepath=$kmeans_model_dir/kmeans.$timestamp.model
 
 #
 n_word_cluster=2000
