@@ -82,12 +82,15 @@ int main (int argc, char* argv[])
     svm_learn_struct_joint(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,ONESLACK_PRIMAL_ALG);
   else if(alg_type == 3)
     svm_learn_struct_joint(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,ONESLACK_DUAL_ALG);
+
   else if(alg_type == 4)
     svm_learn_struct_joint(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,ONESLACK_DUAL_CACHE_ALG);
   else if(alg_type == 9)
     svm_learn_struct_joint_custom(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel);
   else
     exit(1);
+  
+  _("HURAY 10");
 
   /* Warning: The model contains references to the original data 'docs'.
      If you want to free the original data, and only keep the model, you 
@@ -95,11 +98,15 @@ int main (int argc, char* argv[])
   if(struct_verbosity>=1) {
     printf("Writing learned model...");fflush(stdout);
   }
+
+  _("HURAY 8");
   write_struct_model(modelfile,&structmodel,&struct_parm);
   if(struct_verbosity>=1) {
     printf("done\n");fflush(stdout);
   }
 
+
+  _("HURAY 9");
   free_struct_sample(sample);
   free_struct_model(structmodel);
 

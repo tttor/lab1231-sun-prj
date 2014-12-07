@@ -13,7 +13,7 @@ namespace edge_potential {
  * @brief
  */
 float get_beta(cv::Mat &image_rgb);
-float get_beta(cv::Mat *image_rgb);
+// float get_beta(cv::Mat *image_rgb);
 
 /*!
  * @brief
