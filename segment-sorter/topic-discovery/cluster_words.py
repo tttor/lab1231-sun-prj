@@ -9,16 +9,13 @@ List of region-data file, e.g. .sift
 Output:
 KMeans model
 '''
-
+import sys
+import numpy as np
 import cPickle
 from sklearn.cluster import KMeans
-
-import sys
-sys.path.append('/home/tor/sun/ws/lab1231-sun-prj/segment-sorter/common')
-
 import segment_sorter_util as util
 
-def read_region_from_list(list_filepath, region_data_dir):
+def read_region_from_list(list_filepath, region_dir):
     with open(list_filepath) as f:
         content = f.readlines()
     content = [i.strip('\n') for i in content]
@@ -26,7 +23,7 @@ def read_region_from_list(list_filepath, region_data_dir):
     region_list = []
     for i, filename in enumerate(content):
         print('reading region data from: %s (%i of %i)' % (filename, i+1, len(content)))
-        filepath = region_data_dir + '/' + filename + '.sift'
+        filepath = region_dir + '/' + filename + '.sift'
         local_region_list = util.get_region_from_regfile(filepath, clustered=False)
 
         local_region_list_with_id = []
@@ -60,23 +57,22 @@ def write_clustered_region(region_list, clustered_region_dir):
             fo.write(line)
         fo.close()
 
-def main():
+def main(argv):
     # Load
-    list_filepath = '/media/tor/46DAF35ADAF344A9/tor/robotics/prj/011/xprmnt/segment-sorter/meta/msrc-21.sift.list'
-    region_data_dir = '/home/tor/sun4/xprmnt/segment-sorter/region/msrc-21/sift'
+    list_filepath = argv[1]
+    region_dir = argv[2]
 
-    region_list = read_region_from_list(list_filepath, region_data_dir)
+    region_list = read_region_from_list(list_filepath, region_dir)
 
     # Cluster
     # TODO: preprocess?
-    X = [ i['sift'] for i in region_list ]
-    n_word = 2000 # a magic number, see the paper of [Russel, 2006]
+    X = np.asarray( [ i['sift'] for i in region_list ] )
+    print('n_sample= %i' % (X.shape[0]))
+    print('n_feature= %i' % (X.shape[1]))
 
-    print('n_data= %i' % (len(region_list)))
-    print('n_word= %i' % (n_word))
+    kmeans = KMeans(n_clusters=int(argv[5]),max_iter=int(argv[6]),n_init=int(argv[7]),init=argv[8],n_jobs=-1)
 
-    kmeans = KMeans(init='k-means++', n_clusters=n_word, n_init=10, max_iter= 300)
-
+    print('kmeans param: %s' % (kmeans.get_params))
     print('kmeans.fit()...')
     kmeans.fit(X)
 
@@ -85,16 +81,14 @@ def main():
         region['label'] = kmeans.labels_[i]
 
     # 
-    clustered_region_dir = '/home/tor/sun4/xprmnt/segment-sorter/region-clustered/msrc-21'
+    clustered_region_dir = argv[3]
     write_clustered_region(region_list, clustered_region_dir)
     # TODO: Visualize
 
     # Save the k-means model
-    model_dir = '/home/tor/sun4/xprmnt/segment-sorter/kmeans-model'
-    model_filename = 'test.kmeans'
-    model_filepath = model_dir + '/' + model_filename
+    model_filepath = argv[4]
     with open(model_filepath, 'wb') as fid:
         cPickle.dump(kmeans, fid) 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

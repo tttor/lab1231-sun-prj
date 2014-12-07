@@ -1,23 +1,26 @@
-#!/usr/bin/python
+   #!/usr/bin/python
 import numpy as np 
 import csv
 
 def get_segment_from_supfile(filepath):
-    with open(filepath) as f:
-        reader = csv.reader(f)
-        segments = list(reader)
+    segmentation = np.genfromtxt(filepath, delimiter=',')
+    n_segment = len( set(list(segmentation.flatten())) )
 
-    for row in range(len(segments)):
-        for col in range(len(segments[row])):
-            segments[row][col] = int(segments[row][col])
-    max_segment = np.max(segments)+1
-    result = [[] for x in range(max_segment)]
+    #
+    pixels_of_segments = [[] for x in range(n_segment)]
+    for row in range(segmentation.shape[0]):
+        for col in range(segmentation.shape[1]):
+            pixels_of_segments[ int(segmentation[row][col]) ].append( (row,col) )
 
-    for row in range(len(segments)):
-        for col in range(len(segments[row])):
-            result[segments[row][col]].append( (row, col) )  
+    #
+    segments = []
+    for i,pixels in enumerate(pixels_of_segments):
+        segment = {}
+        segment['id'] = i
+        segment['pixels'] = pixels
+        segments.append(segment)
 
-    return result
+    return segments
 
 def get_region_from_regfile(filepath, clustered=False):
     '''
@@ -37,9 +40,10 @@ def get_region_from_regfile(filepath, clustered=False):
     if clustered:
         n_label_param = 1
         n_id_param = 1
+
     n_region = int(content[1])
     
-    content = content[2:]
+    content = content[2:]# have taken element [0] and [1] above
 
     #
     region_list = []
@@ -49,7 +53,7 @@ def get_region_from_regfile(filepath, clustered=False):
 
         region = {}
         region['loc'] = [float(i) for i in region_param[0:n_loc_param]]
-        region['sift'] = [float(i) for i in region_param[n_loc_param:-2]]
+        region['sift'] = [float(i) for i in region_param[n_loc_param:n_loc_param+n_sift_param]]
 
         if clustered:
             region['label'] = region_param[-2]
