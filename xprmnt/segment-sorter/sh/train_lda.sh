@@ -14,7 +14,7 @@ cp $tr_data_filepath $model_dir #as the LDAexe put the resulted model in the sam
 cp $tr_metadata_filepath $model_dir
 
 #
-dfile=$model_dir/$tr_data_filename
+dfile=$model_dir/$corpus_name.data
 ntopics=21
 
 alpha=0.5 #from [Russel, 2006]
