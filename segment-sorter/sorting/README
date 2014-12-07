@@ -1,15 +1,19 @@
 README
 
 Goal:
-Given a test image $img$, produce a set of good segments.
-We hypothesize that good segments contain a single topic (= object class) with high probability/confidence.
+Given a test image $img$, produce a rank of good segments.
+We hypothesize that good segments contain a topic (= object class) with high probability/confidence.
 Eventually, those good segments are used in MRF-based (hi-order) semantic segmentation.
 
 Steps:
-> extract Affine Covariant Regions of $img$, see http://www.robots.ox.ac.uk/~vgg/research/affine/
-> for each region, compute the region descriptor, see http://www.robots.ox.ac.uk/~vgg/research/affine/
-> for each region, determine which word it belongs based on the raw-word quantization performed in the topic-discovery phase
+> extract Affine Covariant Regions and their descritor of $img$, see http://www.robots.ox.ac.uk/~vgg/research/affine/
+> for each region (=(noisy)word), determine which word-cluster it belongs based on the clustering model trained in the topic-discovery phase
 > do multiple segmentation on $img$
+
 > for each segment on $img$, compute P(w|d), i.e. a histogram that indicates the (normalized) frequency of each word contained in this segment
-> for each segment, determine its goodness score $s$, i.e. $s = min_z diff( P(w|z),P*(w|z) )$, where $P*(w|t)$ is obtained in the topic-discovery phase
+> for each segment, determine its goodness score $s$, i.e. $s = min_z diff( P(w|z),P*(w|z) )$, where $P*(w|t)$ is from the learnt LDA model
+
+> alternatively, do inference with the learnt LDA model on the corpus extracted from test image 
+> compute the goodness score $s = max_t P(t|d) $
+
 > rank segments based on their goodness score
