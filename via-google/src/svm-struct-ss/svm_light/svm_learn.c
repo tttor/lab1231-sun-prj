@@ -980,7 +980,7 @@ void svm_learn_optimization(DOC **docs, double *rhs, long int
             pointer. The new alpha values are returned after
      optimization if not NULL. Array must be of size totdoc. */
 {
-    printf("SVM 5\n");
+    
     long i, *label;
     long misclassified, upsupvecnum;
     double loss, model_length, alphasum, example_length;
@@ -992,7 +992,7 @@ void svm_learn_optimization(DOC **docs, double *rhs, long int
     long *index, *index2dnum;
     double *weights, *slack, *alphaslack;
     CFLOAT *aicache;  /* buffer to keep one row of hessian */
-    printf("SVM 4\n");
+    
 
     TIMING timing_profile;
     SHRINK_STATE shrink_state;
@@ -1008,7 +1008,7 @@ void svm_learn_optimization(DOC **docs, double *rhs, long int
     kernel_cache_statistic = 0;
 
     learn_parm->totwords = totwords;
-    printf("SVM 3\n");
+    
 
     /* make sure -n value is reasonable */
     if ((learn_parm->svm_newvarsinqp < 2)
@@ -1018,7 +1018,6 @@ void svm_learn_optimization(DOC **docs, double *rhs, long int
     }
 
     init_shrink_state(&shrink_state, totdoc, (long)MAXSHRINK);
-    printf("SVM 1\n");
 
     label = (long *)my_malloc(sizeof(long) * totdoc);
     unlabeled = (long *)my_malloc(sizeof(long) * totdoc);
@@ -1030,7 +1029,7 @@ void svm_learn_optimization(DOC **docs, double *rhs, long int
     model->supvec = (DOC **)my_malloc(sizeof(DOC *) * (totdoc + 2));
     model->alpha = (double *)my_malloc(sizeof(double) * (totdoc + 2));
     model->index = (long *)my_malloc(sizeof(long) * (totdoc + 2));
-    printf("SVM 2\n");
+    
 
     model->at_upper_bound = 0;
     model->b = 0;
@@ -1047,7 +1046,7 @@ void svm_learn_optimization(DOC **docs, double *rhs, long int
     model->xa_error = -1;
     model->xa_recall = -1;
     model->xa_precision = -1;
-    printf("SVM 3\n");
+    
 
     r_delta_avg = estimate_r_delta_average(docs, totdoc, kernel_parm);
 
@@ -1058,13 +1057,13 @@ void svm_learn_optimization(DOC **docs, double *rhs, long int
             printf("Setting default regularization parameter C=%.4f\n",
                    learn_parm->svm_c);
     }
-    printf("SVM 7\n");
+    
     learn_parm->biased_hyperplane = 0; /* learn an unbiased hyperplane */
 
     learn_parm->eps = 0.0;      /* No margin, unless explicitly handcoded
                                in the right-hand side in the training
                                set.  */
-    printf("SVM 8\n");
+    
     for (i = 0; i < totdoc; i++) /* various inits */
     {
         docs[i]->docnum = i;
@@ -3679,7 +3678,6 @@ void select_top_n(double *selcrit, long int range, long int *select,
 void init_shrink_state(SHRINK_STATE *shrink_state, long int totdoc,
                        long int maxhistory)
 {
-  printf("shrink1 \n");
     long i;
 
     shrink_state->deactnum = 0;
@@ -3689,7 +3687,6 @@ void init_shrink_state(SHRINK_STATE *shrink_state, long int totdoc,
     shrink_state->maxhistory = maxhistory;
     shrink_state->last_lin = (double *)my_malloc(sizeof(double) * totdoc);
     shrink_state->last_a = (double *)my_malloc(sizeof(double) * totdoc);
-    printf("shrink2 \n");
 
     for (i = 0; i < totdoc; i++)
     {
@@ -4645,11 +4642,9 @@ double estimate_r_delta_average(DOC **docs, long int totdoc,
     double avgxlen;
     DOC *nulldoc;           /* assumes that the center of the ball is at the */
     WORD nullword;          /* origin of the space. */
-    printf("estimate 1\n");
 
     nullword.wnum = 0;
     nulldoc = create_example(-2, 0, 0, 0.0, create_svector(&nullword, "", 1.0));
-    printf("estimate 2\n");
 
     avgxlen = 0;
     for (i = 0; i < totdoc; i++)

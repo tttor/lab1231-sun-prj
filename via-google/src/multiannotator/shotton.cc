@@ -28,17 +28,11 @@ Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const strin
   ///read unary
   ProbImage unary_mat;
 
-  printf("ok3\n");
   unary_mat.load( unary_dir.c_str() );
 
-  printf("ok2\n");
   const size_t n_var = img_mat.rows * img_mat.cols;
 
-  printf("ok1\n");
   GraphicalModel gm( opengm::SimpleDiscreteSpace<size_t, size_t>(n_var, n_label) );
-
-
-  //printf("%d\n",n_label);
 
   set_1st_order(img_mat, unary_mat, n_label, gm);
   set_2nd_order(img_mat, n_label, energy_param, gm);
@@ -65,17 +59,11 @@ void annotate(size_t n_label, cv::Mat image_matrix, ProbImage unary_matrix, doub
 
     EnergyParam energy_param;
     train("VOC",&energy_param);
-    printf("ok 1\n");
     size_t n_var = png_matrix.height() * png_matrix.width();
-    printf("ok 2\n");
     GraphicalModel gm( opengm::SimpleDiscreteSpace<size_t, size_t>(n_var, n_label) );
-    printf("ok 3\n");
     set_1st_order( image_matrix , unary_matrix, unary_weights, n_label, gm);
-        printf("ok 6\n");
     set_2nd_order( image_matrix , n_label, energy_param, pair_weights, gm);
-    printf("ok 4\n");
     Eigen::MatrixXi ann(image_matrix.rows, image_matrix.cols);
-    printf("ok 5\n");
     infer("ICM", gm, n_var, ann);
     for(size_t xx = 0; xx < ann.cols();xx++)
       for(size_t yy = 0; yy < ann.rows();yy++)
@@ -161,7 +149,6 @@ void set_1st_order(const cv::Mat img_mat, ProbImage unary_mat, const size_t n_la
 
       for(size_t i = 0; i < n_label; i++) 
         energy(i) = -unary_mat(x,y,i);  
-
       GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
       
       // add a factor
@@ -173,8 +160,7 @@ void set_1st_order(const cv::Mat img_mat, ProbImage unary_mat, const size_t n_la
 
 void set_1st_order(cv::Mat img_mat, ProbImage unary_mat,double* unary_weights, const size_t n_label, GraphicalModel& gm) {
   using namespace std;
-  printf("width: %d %d\n",unary_mat.width(),img_mat.cols);
-  printf("height: %d %d\n",unary_mat.height(),img_mat.rows);
+  
   assert(unary_mat.width()==img_mat.cols && "err");
   assert(unary_mat.height()==img_mat.rows && "err");
   //assert(sizeof(unary_weights)/sizeof(double) == unary_mat.width()*unary_mat.height());
@@ -182,14 +168,11 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_mat,double* unary_weights, c
 
   for (size_t x=0; x<img_mat.cols; ++x) {
     for (size_t y=0; y<img_mat.rows; ++y) {
-      // add a function
-      // printf("%d\n",n_label);
       const size_t shape[] = {n_label};
       opengm::ExplicitFunction<float> energy(shape, shape+1);
 
       for(size_t i = 0; i < n_label; i++) 
       {
-        // printf("doing %d %d %d\n",x,y,i);
         energy(i) = max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)] *-unary_mat(x,y,i));  
       }
         
@@ -203,7 +186,6 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_mat,double* unary_weights, c
       gm.addFactor(fid, var_idxes, var_idxes+1);
     }
   }
-  printf("finish\n");
 }
 
 void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_param, GraphicalModel& gm) {
@@ -326,13 +308,11 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
 
 void get_2nd_order_psi(cv::Mat img_mat, ProbImage unary_mat,QImage png_matrix,double* psi)
 {
-   __("shotton",9)
+   
   EnergyParam energy_param;
     train("VOC",&energy_param);
  const float equal_pen = 0.0;
- __("shotton",1)
 
-  //
   float beta;
   beta = edge_potential::get_beta(img_mat);
 
@@ -340,11 +320,11 @@ void get_2nd_order_psi(cv::Mat img_mat, ProbImage unary_mat,QImage png_matrix,do
   theta_phi << energy_param["theta_phi_1"], 
                energy_param["theta_phi_2"];
 
-  __("shotton",2)
+  
 
   size_t psioffset = (img_mat.cols-1)*(img_mat.rows-1);
 
-  __("shotton",3)
+  
   for (size_t x=0; x<img_mat.cols-1; ++x) {
     for (size_t y=0; y<img_mat.rows-1; ++y) {
       cv::Point2i p1;   

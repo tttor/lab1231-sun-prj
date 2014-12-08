@@ -71,23 +71,14 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     string tmp;
     ifstream counter(file);
     n_sample = 0;
-    _("OK");
     if (counter.is_open())
         while (getline(counter, tmp)) ++n_sample;
 
-
-    _("OK");
-
-    __("READ", n_sample);
-
-    //n_sample=ssvm_ss::dataset::n_example; /* replace by appropriate number of examples */
     examples = (EXAMPLE *) malloc(sizeof(EXAMPLE) * n_sample);
-    //EXAMPLE  examples[n_sample];
 
     string id;
     int exampleIndex = 0;
     ifstream reader(file);
-    __("PART ", 4);
     if (reader.is_open())
     {
         while (getline(reader, id))
@@ -103,17 +94,14 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
             examples[exampleIndex].x.width = png_matrix.width();
             examples[exampleIndex].y.height = png_matrix.height();
             examples[exampleIndex].y.width = png_matrix.width();
-            __("PART ", 6);
 
             strcpy(examples[exampleIndex].x.image_path, image_path.c_str());
             strcpy(examples[exampleIndex].x.unary_path, unary_path.c_str());
-            __(examples[exampleIndex].x.image_path, 7);
             examples[exampleIndex].y.png_matrix = png_matrix;
             examples[exampleIndex].y.n_label = ssvm_ss::image_constraint::n_label;
             examples[exampleIndex].x.bypass = png_matrix;
             exampleIndex++;
 
-            __("PART ", 5);
         }
     }
     else
@@ -125,7 +113,6 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     sample.examples = examples;
     if (struct_verbosity >= 0)
         printf(" (%d examples) ", sample.n);
-    __("END ", 1);
     return (sample);
 }
 void set_unary_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
@@ -148,7 +135,6 @@ void set_unary_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
         {
 
             weights[xx + (yy * x.width)] = model->lin_weights[(windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
-            // printf("bobot %f \n",weights[xx + (yy * x.width)]);
         }
     }
 }
@@ -171,8 +157,7 @@ void set_pair_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
         for (int yy = 0; yy < x.height - 1; yy++)
         {
             weights[xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
-            // printf("%f ",weights[xx + (yy * (x.width - 1))]);
-          }
+        }
 }
 
 void set_color(QImage png_matrix)
@@ -209,8 +194,7 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
     y.height = x.height;
     y.width = x.width;
     y.n_label = ssvm_ss::image_constraint::n_label;
-    printf("start infer\n");
-
+    printf("Start Infering %s\n", x.image_path);
 
 
 
@@ -229,17 +213,11 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
 
     size_t n_label = y.n_label;
-    printf("label terdeteksi : %d\n", n_label);
-    printf("image_size %d %d\n", image_matrix.cols, image_matrix.rows);
 
     lab1231_sun_prj::shotton::annotate(n_label, image_matrix, unary_matrix, unary_weights, pair_weights, y.png_matrix);
 
 
     // y.png_matrix = x.bypass;
-
-
-    //set up inferer
-
 }
 
 void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
@@ -270,7 +248,6 @@ CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
     long     sizePsi = sm->sizePsi;
     long     i;
     WORD     words[2];
-    _("init constraints");
 
     if (1)  /* normal case: start with empty set of constraints */
     {
@@ -297,7 +274,6 @@ CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
         }
         c.m = sizePsi;
     }
-    _("end constraints");
     return (c);
 }
 
@@ -327,7 +303,6 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
         STRUCTMODEL *sm,
         STRUCT_LEARN_PARM *sparm)
 {
-    _("start init slack");
     /* Finds the label ybar for pattern x that that is responsible for
        the most violated constraint for the slack rescaling
        formulation. For linear slack variables, this is that label ybar
@@ -353,7 +328,6 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
 
     /* insert your code for computing the label ybar here */
     LABEL ybar;
-    _("end slack");
     return (ybar);
 }
 
@@ -382,7 +356,6 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
        Psi(x,ybar)>Psi(x,y)-1. If the function cannot find a label, it
        shall return an empty label as recognized by the function
        empty_label(y). */
-    printf("Finding most violated constraint");
     LABEL ybar = classify_struct_example(x, sm, sparm);
 
     /* insert your code for computing the label ybar here */
@@ -422,23 +395,20 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
        that ybar!=y that maximizes psi(x,ybar,sm)*sm.w (where * is the
        inner vector product) and the appropriate function of the
        loss + margin/slack rescaling method. See that paper for details. */
-    _("start init psi\n");
+
+    /* insert code for computing the feature vector for x and y here */
     SVECTOR *fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));
     fvec->words = (WORD *) my_malloc(sizeof(WORD) * (sm->sizePsi + 1));
     fvec->next = NULL;
     fvec->factor = 1.0;
     fvec->kernel_id = 0;
     fvec->userdefined = NULL;
-    // __("PSI",1);
-    printf("ukuran sizePsi: %d\n", sm->sizePsi);
     for (size_t indexPsi = 0 ; indexPsi < sm->sizePsi; indexPsi++)
     {
         fvec->words[indexPsi].wnum = indexPsi + 1;
         fvec->words[indexPsi].weight = 0.0;
     }
     fvec->words[sm->sizePsi].wnum = 0;
-    // fvec->words[sm->sizePsi-1].wnum = 0;
-    // __("PSI SO SO",((words+1))->wnum);
     size_t windowheight = ssvm_ss::image_constraint::height;
     size_t windowwidth = ssvm_ss::image_constraint::width;
     size_t windowmiddlex = windowwidth / 2;
@@ -450,37 +420,29 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     size_t windowboundaryx = windowoffsetx + x.width;
     size_t windowboundaryy = windowoffsety + x.height;
     size_t windowoffset = windowheight * windowwidth;
-    //assert(sizeof(words)/sizeof(WORD) == sm->sizePsi );
-    // assert(x.height==y.png_matrix.height() && x.width==y.png_matrix.width());
-    // __("PSI",3);
+
     ProbImage unary_matrix;
     unary_matrix.load(x.unary_path);
 
     cv::Mat image_matrix;
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
 
-    _(x.image_path);
+
 
     for (size_t xx = 0; xx < x.width; xx++)
         for (size_t yy = 0; yy < x.height; yy++)
         {
             assert((windowoffsetx + xx) + (windowoffsety + yy)*windowwidth < sm->sizePsi);
             fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -unary_matrix(xx, yy, y.png_matrix.pixelIndex(xx, yy));
-            // printf("%f %d \n",fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight,y.png_matrix.pixelIndex(xx, yy));
         }
 
-    // __("PSI",4);
     assert(sm->sizePsi - windowoffset > 0);
-    // __("size spsi",sm->sizePsi - windowoffset);
+
     double *pair_psi = (double *)malloc(sizeof(double) * (sm->sizePsi - windowoffset));
-    // __("PSI",7);
-
-
 
     lab1231_sun_prj::shotton::get_2nd_order_psi(image_matrix, unary_matrix, y.png_matrix, pair_psi);
-    // __("PSI",8);
-    size_t type1psioffset = (x.width - 1) * (x.height - 1);
 
+    size_t type1psioffset = (x.width - 1) * (x.height - 1);
 
     for (size_t xx = 0; xx < x.width - 1; xx++)
         for (size_t yy = 0; yy < x.height - 1; yy++)
@@ -490,27 +452,18 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
             fvec->words[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = pair_psi[xx + (yy * (x.width - 1))];
             fvec->words[windowoffset + type1psioffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = pair_psi[type1psioffset + xx + (yy * (x.width - 1))];
         }
-    __("PSI", 6);
-
-    //padding
 
 
-
-
-
-    /* insert code for computing the feature vector for x and y here */
-    _("end init psi");
     return (fvec);
 }
 
-double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
+double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
 {
     /* loss for correct label y and predicted label ybar. The loss for
        y==ybar has to be zero. sparm->loss_function is set with the -l option. */
     if (sparm->loss_function == 0)  /* type 0 loss: 0/1 loss */
     {
         /* return 0, if y==ybar. return 1 else */
-        // LABEL y;
         y.png_matrix.save("temp_output", "png", 0);
         ybar.png_matrix.save("temp_output_bar", "png", 0);
         double sum = 0.0;
@@ -519,7 +472,7 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
             {
                 sum += (y.png_matrix.pixelIndex(xx, yy) != ybar.png_matrix.pixelIndex(xx, yy)) ? 1.0 : 0.0;
             }
-        printf("loss : %f\n", sum);
+        printf("Loss : %f\n", sum);
         return sum;
     }
     else
@@ -527,17 +480,15 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
         /* Put your code for different loss functions here. But then
            find_most_violated_constraint_???(x, y, sm) has to return the
            highest scoring label with the largest loss. */
-        y.png_matrix.save("temp_output", "png", 0);
-        ybar.png_matrix.save("temp_output_bar", "png", 0);
         double sum = 0.0;
         for (int xx = 0; xx < y.width; xx++)
             for (int yy = 0; yy < y.height; yy++)
             {
+              if(y.png_matrix.pixelIndex(xx, yy)!=255)
                 sum += (y.png_matrix.pixelIndex(xx, yy) != ybar.png_matrix.pixelIndex(xx, yy)) ? 1.0 : 0.0;
             }
-        printf("loss : %f\n", sum);
+        printf("Loss : %f\n", sum);
         return sum * sum;
-        // printf("Unkown loss function\n");
         // exit(1);
     }
 }
