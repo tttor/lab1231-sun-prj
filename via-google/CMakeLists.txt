@@ -21,7 +21,7 @@ include_directories (${ProbImageDir})
 include_directories (../util/include)
 
 include_directories (${EigenIncludeDir})
-include_directories (include)
+include_directories (./include)
 include_directories (${ExternalLibrary})
 include_directories(${QT_INCLUDES} external/include)
 

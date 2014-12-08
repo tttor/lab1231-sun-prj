@@ -12,12 +12,14 @@ namespace edge_potential {
 /*!
  * @brief
  */
-float get_beta(cv::Mat image_rgb);
+float get_beta(cv::Mat &image_rgb);
+// float get_beta(cv::Mat *image_rgb);
 
 /*!
  * @brief
  */
 double potential(const cv::Vec3b& x1, const cv::Vec3b& xj, const double& beta, const Eigen::MatrixXd& theta_phi);
+
 
 }// namespace edge_potential
 }// namespace shotton

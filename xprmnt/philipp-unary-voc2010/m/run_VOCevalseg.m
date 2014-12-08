@@ -7,19 +7,22 @@ addpath(VOCcode_dir);
 
 %% initialize VOC options
 % experiment id, becomes part of the prediction dirname
-id = 'merged';
+id = 'split_voc2010_philipp';
 
 % The list_filename without any extension, e.g.: 'val'
 VOCopts.testset = 'Test';
 
 % The dirpath of target list: /home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/ImageSets/Segmentation/%s.txt
-VOCopts.seg.imgsetpath = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/meta/split_voc2010_philipp/%s.txt';
+test_data_list_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/meta/split_voc2010_philipp';
+VOCopts.seg.imgsetpath = strcat(test_data_list_dir, '/%s.txt');%<VOCopts.testset>.txt
 
 % The dirpath of .png predictions: /home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/results/VOC2012/Segmentation/%s_%s_cls/%s.png
-VOCopts.seg.clsrespath = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/result/%s_%s_cls/%s.png';
+predicted_annotation_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010/annotation';
+VOCopts.seg.clsrespath = strcat(predicted_annotation_dir,'/%s_%s_cls/%s.png');% <id>_<VOCopts.testset>_cls
 
 % The dirpath of .png GT: /home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass/%s.png
-VOCopts.seg.clsimgpath = '/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass/%s.png';
+gt_annotation_dir = '/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass';
+VOCopts.seg.clsimgpath = strcat(gt_annotation_dir,'/%s.png');
 
 % This does not include the class of 'background'
 VOCopts.nclasses = 20;
