@@ -126,10 +126,10 @@ void infer(const string method, GraphicalModel gm, const size_t n_var, Eigen::Ma
   }*/
   else if (method=="ICM") {
     typedef opengm::ICM<GraphicalModel, opengm::Minimizer> IcmType;
-    IcmType::VerboseVisitorType visitor;
+    // IcmType::VerboseVisitorType visitor;
 
     IcmType inf_engine(gm);
-    inf_engine.infer(visitor);
+    inf_engine.infer();
   }
   else {
     assert(false && "Unknown inference method");
@@ -178,7 +178,6 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_mat,double* unary_weights, c
   assert(unary_mat.width()==img_mat.cols && "err");
   assert(unary_mat.height()==img_mat.rows && "err");
   //assert(sizeof(unary_weights)/sizeof(double) == unary_mat.width()*unary_mat.height());
-
 
 
   for (size_t x=0; x<img_mat.cols; ++x) {
