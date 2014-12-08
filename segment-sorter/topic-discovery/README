@@ -1,13 +1,17 @@
 README
 
 Goal:
-> construct $P(w|z)$ using training data, where $w$ is a word, $z$ is a topic
-> construct a set of words from a set of raw-words, this step is called word quantization
+> construct an LDA model from a given corpus (as training data)
 
 Steps:
-> determine the training image set: $D_{tr} = {img_i}$
+> determine a set of training data $D_{tr} = {img_i}$
+> extract Affine Covariant Regions and their descriptor of all images in $D_{tr}$, see http://www.robots.ox.ac.uk/~vgg/research/affine/
+
+> determine the number of word clusters K
+> cluster/quantize the noisy-words into a set of K word clusters
+
 > determine the set of topics $Z$; a topic is an object-class
-> extract Affine Covariant Regions of $img$, see http://www.robots.ox.ac.uk/~vgg/research/affine/
-> for each region, compute the region descriptor, see http://www.robots.ox.ac.uk/~vgg/research/affine/
-> quantize the raw-words into a set of K words; K is predetermined; a word is an affine covariant region thar is described by, for example, SIFT
-> run pLSA or LSA to obtain $P(w|z)$
+> determine the alpha, beta params for LDA
+> run the LDA model generator, e.g. GibbsLDA++
+
+> evaluate the learnt LDA model: to segments(=docs) for a topic, segment ranking w.r.t to a topic from multiple segmentation on an image

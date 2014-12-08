@@ -5,16 +5,16 @@ cd build
 make
 cd ..
 
-cd src/textonboost/build
-make
-cd ../../..
-
 cd src/executables
 source config
-`cp config $current_exp`
-`cp $settings_path $current_exp`
 
-logpath="$current_exp/log$RANDOM"
+
+rand=$RANDOM
+
+logpath="$current_exp/log$rand"
+`cp config $current_exp/$randconfig`
+filename=$(basename "$settings_path")
+`cp $settings_path $current_exp/$rand$filename`
 
 
 echo "START TRANSFORM" > $logpath

@@ -64,3 +64,24 @@ http://sourceforge.net/projects/rapidxml/files/latest/download
 VOCdevkit
 http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2012/VOCdevkit_18-May-2011.tar
 
+===
+Region Detector - Harris-Affine & Hessian-Affine
+http://www.robots.ox.ac.uk/~vgg/research/affine/det_eval_files/h_affine.ln.gz
+
+===
+Region Descriptor
+http://www.robots.ox.ac.uk/~vgg/research/affine/det_eval_files/compute_descriptors.ln.gz
+
+h_affine
+http://www.robots.ox.ac.uk/~vgg/research/affine/det_eval_files/h_affine.ln.gz
+
+===
+GibbsLDA++-0.2
+http://sourceforge.net/projects/gibbslda
+
+Modifications:
+> utils.h
+#include <cstdlib>
+
+> lda.cpp
+#include<cstdio>
