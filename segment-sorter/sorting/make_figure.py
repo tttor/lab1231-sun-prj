@@ -120,22 +120,22 @@ def main():
     sup_param_dir = '/home/jogie/sun4/exp/overlap-segment/meta/segment-param.list'
     list_path = '/home/jogie/sun4/exp/overlap-segment/meta/test591.list'
     theta_final_path = '/home/jogie/sorter_exp/lda-model/training.20141208.194731/model-final.theta'
+    corpus_meta_path = '/home/jogie/sorter_exp/lda-model/training.20141208.194731/corpus.20141208.165442.meta'
+    
     prob_topic_doc = [ line.strip().split(' ') for line in open(theta_final_path)]
     
     for row in range(len(prob_topic_doc)):
         for col in range(len(prob_topic_doc[row])):
             prob_topic_doc[row][col] = float(prob_topic_doc[row][col])
 
-    corpus_meta_path = '/home/jogie/sorter_exp/lda-model/training.20141208.194731/corpus.20141208.165442.meta'
     corpus_meta = [ line.strip().split(' ') for line in open(corpus_meta_path)]
     
-    # createFigure5(prob_topic_doc, corpus_meta, segment_dir, 25 ,output_dir+'figure5/')
+    createFigure5(prob_topic_doc, corpus_meta, segment_dir, 25 ,output_dir+'figure5/')
     
     list_file = [ line.strip('\n') for line in open(list_path)]
-    list_sudah = ['10_10_s', '10_11_s', '10_12_s', '10_13_s', '10_14_s', '10_15_s', '10_16_s', '10_17_s', '10_18_s', '10_19_s', '10_1_s', '10_20_s', '10_21_s', '10_22_s', '10_23_s', '10_24_s', '10_25_s', '10_26_s', '10_27_s', '10_28_s', '10_29_s', '10_2_s', '10_30_s', '10_31_s', '10_32_s', '10_3_s', '10_4_s', '10_5_s', '10_6_s', '10_7_s', '10_8_s', '10_9_s', '1_10_s']
-    list_file_new = [file_ for file_ in list_file if file_ not in list_sudah]
     list_param = [ line.strip('\n') for line in open(sup_param_dir)]
-    # createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_dir, 25, output_dir+'figure4/')
+    
+    createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_dir, 25, output_dir+'figure4/')
 
     plot_top_N_segment_in_topic(list_file_new, segment_dir, corpus_meta, prob_topic_doc, 25, 10, output_dir+'figureNew')
 

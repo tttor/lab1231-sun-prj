@@ -9,7 +9,7 @@ import pickle
 
 from util_region import detect_region
 from util_region import compute_description_region
-from util_region import csv2ListOfSegment
+from util_region import csvToListOfSegment
 
 from sklearn.cluster import KMeans
 from skimage.util import img_as_float
@@ -17,11 +17,13 @@ from skimage.segmentation import mark_boundaries
 from skimage import io
 
 img_dir = '/home/jogie/sun3/dataset/msrc/unmix/Images/ppm/'
-haraff_dir = '/home/jogie/sorter_exp/haraff/'
-sift_dir = '/home/jogie/sorter_exp/sift/'
+haraff_dir = '/home/jogie/sorter_exp/descriptor/msrc/haraff'
+sift_dir = '/home/jogie/sorter_exp/descriptor/msrc/sift/'
 param_segment_dir = '/home/jogie/sun4/exp/overlap-segment/superpixel-3'
 kmeans_file = "/home/jogie/sorter_exp/kmeans-model/kmeans.20141207.1326.model"
 model_LDA_file = '/home/jogie/sorter_exp/lda-model/training.20141208.194731/model-final.phi'
+sup_param_dir = '/home/jogie/sun4/exp/overlap-segment/meta/segment-param.list'
+list_path = '/home/jogie/sun4/exp/overlap-segment/meta/test591.list'
 
 def sift_file2list(sift_file):
     with open(sift_file) as f:
@@ -111,12 +113,12 @@ def prob_topic_segments(param):
 
     prob_word_segments = calculate_prob_word_given_segment(list_word, center_region, segments) #dict key : index segment
     
-    result = rank_segment(prob_word_segments, param['model_LDA_file'], 21)
+    result = rank_segment(prob_word_segments, param['model_LDA_file'], param['n_topic'])
     return result
 
 def main():
-    list_target = ['3_12_s']
-    list_param_segment = ['slic-7-10-1', 'slic-3-10-1', 'slic-5-10-1', 'slic-7-10-1', 'slic-9-10-1', 'slic-11-10-1', 'slic-13-10-1', 'slic-3-20-1', 'slic-5-20-1', 'slic-7-20-1', 'slic-9-20-1', 'slic-11-20-1', 'slic-13-20-1']
+    list_target = [ line.strip('\n') for line in open(list_path)]
+    list_param_segment = [ line.strip('\n') for line in open(sup_param_dir)]
     all_result = {}
     for target in list_target:
         all_result[target] = {}
@@ -128,6 +130,7 @@ def main():
             param['superpixel_file'] = param_segment_dir+'/'+target+'/'+target+'-'+param_segment+'.csv'
             param['kmeans_file'] = kmeans_file
             param['model_LDA_file'] = model_LDA_file
+            param['n_topic'] = 25
             all_result[target][param_segment] = prob_topic_segments(param)
     print all_result
 
