@@ -133,6 +133,7 @@ def main():
     createFigure5(prob_topic_doc, corpus_meta, segment_dir, 25 ,output_dir+'figure5/')
     
     list_file = [ line.strip('\n') for line in open(list_path)]
+    list_file = [ item for item in list_file if item not in ['1_4_s','1_6_s', '1_7_s']]
     list_param = [ line.strip('\n') for line in open(sup_param_dir)]
     
     createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_dir, 25, output_dir+'figure4/')
