@@ -9,7 +9,6 @@ import shutil
 import random
 
 import sys
-sys.path.append('../util/src-py')
 
 from skimage.util import img_as_float
 from skimage.segmentation import slic
@@ -182,7 +181,7 @@ def write_prob_map(prob_map, out_dir):
             # if c is not 'grass': # TODO remove me
             #     continue
 
-            mat_filepath = cprime_dir + '/' + c + '.csv'
+            mat_filepath = cprime_dir + '/' + c + '_wrt_' + '.csv'
             np.savetxt(mat_filepath, relative_location_mat, delimiter=",")
 
             mat_img_filepath = cprime_dir + '/' + c + '_wrt_' + cprime + '.png'
