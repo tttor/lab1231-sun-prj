@@ -53,3 +53,7 @@ class_name_map = {
 	22: "horse",
 	255: "void"
 }
+
+class_id2name_map = class_name_map
+
+class_name2id_map = {v: k for k, v in class_name_map.items()}
