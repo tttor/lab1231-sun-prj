@@ -232,22 +232,22 @@ SVECTOR *copy_svector_shallow(SVECTOR *vec)
 
 void free_svector(SVECTOR *vec)
 {
-    printf("GAGAL 1\n");
+    
     SVECTOR *next;
     while (vec)
     {
-        printf("GAGAL 2\n");
+        
         if (vec->words)
             free(vec->words);
-        printf("GAGAL 3\n");
+        
         if (vec->userdefined)
             free(vec->userdefined);
-        printf("GAGAL 4\n");
+        
         next = vec->next;
 
-        printf("GAGAL 5\n");
+        
         free(vec);
-        printf("GAGAL 6\n");
+        
         vec = next;
     }
 }
@@ -529,36 +529,24 @@ than min_non_zero to zero. */
         WORD *g;
         ss = a;
         g = ss->words;
-        printf("See words: %d\n", g->wnum);
-        printf("See location: %d\n", a);
 
         length = 0;
-        printf("add 3 ok\n");
         for (f = a; f; f = f->next)
         {
-            //   printf("add 1 ok\n");
-            printf("See location: %d\n", a);
 
             SVECTOR *ss;
             WORD *g;
             ss = a;
             g = ss->words;
-            printf("See words: %d\n", g->wnum);
-            printf("See location: %d\n", a);
+            
 
             ai = f->words;
 
-
-            printf("wnum ai %d\n", ai->wnum);
-            printf("add 4 ok\n");
             while (ai->wnum)
             {
-                // printf("add 5 ok\n");
                 length++;
                 ai++;
-                // printf("add 2 ok\n");
             }
-            printf("add %d times ok\n", length);
         }
 
         /* write all entries into one long array and sort by feature number */
@@ -685,7 +673,6 @@ list */
 void add_list_n_ns(double *vec_n, SVECTOR *vec_s, double faktor)
 {
     SVECTOR *f;
-    printf("HURAY HAHA\n");
     for (f = vec_s; f; f = f->next)
         add_vector_ns(vec_n, f, f->factor * faktor);
 }
@@ -892,18 +879,11 @@ void add_vector_ns(double *vec_n, SVECTOR *vec_s, double faktor)
              SVECTOR is used */
     register WORD *ai;
     ai = vec_s->words;
-    printf("HURRAY 24\n");
-    printf("Test 1 %d\n", ai->wnum);
-    // printf("Test vec_n %d\n", ai->wnum);
     while (ai->wnum)
     {
-        // printf("Test xx %d\n", ai->wnum);
         vec_n[ai->wnum] += (faktor * (double)ai->weight);
-        // printf("Test 2 %d\n", ai->wnum);
         ai++;
     }
-    printf("Test 3 %d\n", ai->wnum);
-    printf("Test 4 %d\n", (ai-1)->wnum);
 }
 
 double sprod_ns(double *vec_n, SVECTOR *vec_s)

@@ -22,7 +22,6 @@
 #include "svm_struct_common.h"
 #include "../svm_struct_api.h"
 #include <assert.h>
-#define _(x) printf("%s \n",x)
 
 #define MAX(x,y)      ((x) < (y) ? (y) : (x))
 #define MIN(x,y)      ((x) > (y) ? (y) : (x))
@@ -246,7 +245,7 @@ void svm_learn_struct(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 
                         /**** scale feature vector and margin by loss ****/
                         lossval = loss(ex[i].y, ybar, sparm);
-                        _("FINISH LOSS1 ");
+                        
                         if (sparm->slack_norm == 2)
                             lossval = sqrt(lossval);
                         if (sparm->loss_type == SLACK_RESCALING)
@@ -601,7 +600,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
                      from the constraint cache */
 
     cset = init_struct_constraints(sample, sm, sparm);
-    _("OK HERE 2");
+    
     if (cset.m > 0)
     {
         alpha = (double *)realloc(alpha, sizeof(double) * cset.m);
@@ -612,26 +611,26 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
             alphahist[i] = -1; /* -1 makes sure these constraints are never removed */
         }
     }
-    _("OK HERE 1");
+    
     kparm->gram_matrix = NULL;
     if ((alg_type == ONESLACK_DUAL_ALG) || (alg_type == ONESLACK_DUAL_CACHE_ALG))
         kparm->gram_matrix = init_kernel_matrix(&cset, kparm);
 
     /* set initial model and slack variables */
-    _("OK HERE 3");
+    
     svmModel = (MODEL *)my_malloc(sizeof(MODEL));
-    _("OK HERE 6");
+    
     lparm->epsilon_crit = epsilon;
-    _("OK HERE 7");
+    
     svm_learn_optimization(cset.lhs, cset.rhs, cset.m, sizePsi,
                            lparm, kparm, NULL, svmModel, alpha);
-    _("OK HERE 8");
+    
     add_weight_vector_to_linear_model(svmModel);
-    _("OK HERE 9");
+    
     sm->svm_model = svmModel;
-    _("OK HERE 10");
+    
     sm->w = svmModel->lin_weights; /* short cut to weight vector */
-    _("OK HERE 4");
+    
     /* create a cache of the feature vectors for the correct labels */
     fycache = (SVECTOR **)my_malloc(n * sizeof(SVECTOR *));
     for (i = 0; i < n; i++)
@@ -642,17 +641,16 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
             LABEL y = ex[i].y;
             printf("line: %d\n", x.height);
 
-            _("OK HERE 7");
+            
             fy = psi(ex[i].x, ex[i].y, sm, sparm);
-            __("psi", fy->words[0].wnum);
-            _("OK HERE 6");
+            
             if (kparm->kernel_type == LINEAR)  /* store difference vector directly */
             {
-                _("OK HERE 8");
+                
                 diff = add_list_sort_ss_r(fy, COMPACT_ROUNDING_THRESH);
-                _("OK HERE 10");
+                
                 free_svector(fy);
-                _("OK HERE 11");
+                
                 fy = diff;
 
             }
@@ -660,11 +658,11 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
         else
             fy = NULL;
         fycache[i] = fy;
-        _("OK HERE 9");
+        
     }
 
     
-    _("OK HERE 5");
+    
     /* initialize the constraint cache */
     if (alg_type == ONESLACK_DUAL_CACHE_ALG)
     {
@@ -680,7 +678,6 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
     }
 
     if (kparm->kernel_type == LINEAR)
-        printf("lhs_n : %d\n",sm->sizePsi+1);
         lhs_n = create_nvector(sm->sizePsi);
 
     /* randomize order or training examples */
@@ -712,7 +709,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
             if (alpha[j] > alphasum / cset.m)
                 slack = MAX(0, cset.rhs[j] - classify_example(svmModel, cset.lhs[j]));
         slack = MAX(0, slack);
-        _("FINISH CLASSIFY");
+        
 
         rt_total += MAX(get_runtime() - rt1, 0);
 
@@ -761,21 +758,20 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
                                                   &rt_viol, &rt_psi, &argmax_count);
                     /* add current fy-fybar and loss to cache */
 
-                    _("HURAY 11");
+                    
                     if (struct_verbosity >= 2) rt2 = get_runtime();
 
-                    _("HURAY 12");
                     viol += add_constraint_to_constraint_cache(ccache, sm->svm_model,
                             i, fydelta, rhs_i, 0.0001 * sparm->epsilon / n,
                             sparm->ccache_size, &rt_cachesum);
 
-                    _("HURAY 13");
+                    
                     if (struct_verbosity >= 2) rt_cacheadd += MAX(get_runtime() - rt2, 0);
 
-                    _("HURAY 14");
+                    
                     viol_est += ccache->constlist[i]->viol;
 
-                    _("HURAY 15");
+                    
                     uptr++;
                 }
                 cached_constraint = (j < n);
@@ -788,11 +784,11 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
                             &lhs, &rhs);
                 if (struct_verbosity >= 2) rt_cacheconst += MAX(get_runtime() - rt2, 0);
 
-                _("HURAY 16");
+
                 viol_est *= ((double)n / j);
                 epsilon_est = (1 - (double)j / n) * epsilon_est + (double)j / n * (viol_est - slack);
 
-                _("HURAY 17");
+                
                 if ((struct_verbosity >= 1) && (j != n))
                     printf("(upd=%5.1f%%,eps^=%.4f,eps*=%.4f)",
                            100.0 * j / n, viol_est - slack, epsilon_est);
@@ -806,14 +802,14 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
             /* do not use constraint from cache */
             rt1 = get_runtime();
 
-            _("HURAY 17");
+            
             cached_constraint = 0;
             if (kparm->kernel_type == LINEAR)
                 clear_nvector(lhs_n, sm->sizePsi);
             progress = 0;
             rt_total += MAX(get_runtime() - rt1, 0);
 
-            _("HURAY 18");
+            
             for (i = 0; i < n; i++)
             {
                 rt1 = get_runtime();
@@ -825,19 +821,18 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
                 find_most_violated_constraint(&fydelta, &rhs_i, &ex[i], fycache[i], n,
                                               sm, sparm, &rt_viol, &rt_psi, &argmax_count);
 
-                _("HURAY 19");
+                
                 /* add current fy-fybar to lhs of constraint */
                 if (kparm->kernel_type == LINEAR)
                 {
 
-                    _("HURAY 21");
-                    // printf("Besarlhs_n %d",sizeof(lhs_n)/sizeof(double));
-                    // printf("Besar fydelta %d",sizeof(fydelta)/sizeof(SVECTOR));
+                    
+                    
                     add_list_n_ns(lhs_n, fydelta, 1.0); /* add fy-fybar to sum */
 
-                    _("HURAY 24");
+                    
                     free_svector(fydelta);
-                    _("HURAY GG");
+                    
                 }
                 else
                 {
@@ -847,7 +842,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
                     lhs = fydelta;
                 }
 
-                _("HURAY 20");
+                
                 rhs += rhs_i;                       /* add loss to rhs */
 
                 rt_total += MAX(get_runtime() - rt1, 0);
@@ -1085,31 +1080,24 @@ to the most violated constraint for example ex */
     /**** get psi(x,y) and psi(x,ybar) ****/
     if (struct_verbosity >= 2) rt2 = get_runtime();
     
-    int count = 0;
-    WORD *ai = fycached->words;
-    while (ai->wnum) {
-      ai++;
-      count++;
-    }
-    count++;
-    printf("Hitung fycache: %d\n",count);
+    
 
     if (fycached)
     {
-      _("HURAY IF");
+      
         fy = copy_svector(fycached);
       }
     else
     {
-      _("HURAY ELSE");
+      
         fy = psi(ex->x, ex->y, sm, sparm);
       }
     fybar = psi(ex->x, ybar, sm, sparm);
     if (struct_verbosity >= 2) (*rt_psi) += MAX(get_runtime() - rt2, 0);
     lossval = loss(ex->y, ybar, sparm);
-    _("FINISH LOSS2");
+    
     free_label(ybar);
-    _("HURAY 1");
+    
 
     /**** scale feature vector and margin by loss ****/
     if (sparm->loss_type == SLACK_RESCALING)
@@ -1118,31 +1106,18 @@ to the most violated constraint for example ex */
         factor = 1.0 / n;  /* margin rescaling loss type */
     mult_svector_list(fy, factor);
 
-    _("HURAY 2");
+    
     mult_svector_list(fybar, -factor);
 
-    _("HURAY 5");
-
-        //hitung
-    
-
-    count = 0;
-    ai = fy->words;
-    while (ai->wnum){
-      count++;
-      ai++;
-    }
-    count++;
-    printf("Hitung fy: %d\n",count);
 
     append_svector_list(fybar, fy);  /* compute fy-fybar */
-    _("HURAY 3");
+    
 
 
 
     (*fydelta) = fybar;
     (*rhs) = lossval / n;
-    _("HURAY 4");
+    
 }
 
 
@@ -1270,7 +1245,7 @@ CCACHE *create_constraint_cache(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
         ccache->constlist[i] = (CCACHEELEM *)my_malloc(sizeof(CCACHEELEM));
         ccache->constlist[i]->fydelta = create_svector_n(NULL, 0, NULL, 1);
         ccache->constlist[i]->rhs = loss(ex[i].y, ex[i].y, sparm) / n;
-        _("FINISH LOSS 3");
+        
         ccache->constlist[i]->viol = 0;
         ccache->constlist[i]->next = NULL;
         ccache->avg_viol_gain[i] = 0;
