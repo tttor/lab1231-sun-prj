@@ -27,7 +27,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#define __(x,y) printf("%s %d\n",x,y)
 # include "svm_struct_learn.h"
 # include "svm_struct_common.h"
 # include "../svm_struct_api.h"
@@ -71,7 +70,6 @@ int main (int argc, char* argv[])
     printf("done\n"); fflush(stdout);
   }
 
-  __("type",alg_type);
   
   /* Do the learning and return structmodel. */
   if(alg_type == 0)
@@ -90,7 +88,6 @@ int main (int argc, char* argv[])
   else
     exit(1);
   
-  _("HURAY 10");
 
   /* Warning: The model contains references to the original data 'docs'.
      If you want to free the original data, and only keep the model, you 
@@ -99,14 +96,12 @@ int main (int argc, char* argv[])
     printf("Writing learned model...");fflush(stdout);
   }
 
-  _("HURAY 8");
   write_struct_model(modelfile,&structmodel,&struct_parm);
   if(struct_verbosity>=1) {
     printf("done\n");fflush(stdout);
   }
 
 
-  _("HURAY 9");
   free_struct_sample(sample);
   free_struct_model(structmodel);
 
