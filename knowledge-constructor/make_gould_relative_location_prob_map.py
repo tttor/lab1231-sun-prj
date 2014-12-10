@@ -3,11 +3,15 @@ Goal:
 Implement the relative location probability map proposed in
 Gould, 2008, IJCV: Multi-Class Segmentation with Relative Location Prior
 '''
+import matplotlib
+matplotlib.use('pdf')# see http://stackoverflow.com/questions/19518352/tkinter-tclerror-couldnt-connect-to-display-localhost18-0
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 import numpy as np
 import os
 import shutil
 import random
-
 import sys
 
 from skimage.util import img_as_float
@@ -15,11 +19,6 @@ from skimage.segmentation import slic
 from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
-
-import matplotlib
-matplotlib.use('pdf')# see http://stackoverflow.com/questions/19518352/tkinter-tclerror-couldnt-connect-to-display-localhost18-0
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 import msrc
 
