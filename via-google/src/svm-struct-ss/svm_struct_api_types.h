@@ -68,6 +68,7 @@ typedef struct pattern
     int width;
     char unary_path[100];
     char image_path[100];
+    char dumping_path[100];
     //ProbImage unary_matrix;
     //cv::Mat *image_matrix;
     QImage bypass;
@@ -79,6 +80,7 @@ typedef struct label
        e.g. the parse tree of the corresponding sentence. */
     // A row-wise flatten version of 2D label
     QImage png_matrix;
+    char dumping_path[100];
     int height;
     int width;
     int n_label;
