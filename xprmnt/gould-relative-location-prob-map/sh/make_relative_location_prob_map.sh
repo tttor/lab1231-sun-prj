@@ -14,7 +14,8 @@ img_list_filepath=/home/tor/dataset/msrc/meta/gtbmp_1_9_s.list
 gt_csv_dir=/home/tor/dataset/msrc/unmix/GroundTruth-csv
 img_dir=/home/tor/dataset/msrc/unmix/Images
 
-prob_map_out_dir=$root_dir/prob-map.$timestamp
+prob_map_out_id=prob-map-dirichlet-off #prob-map.$timestamp
+prob_map_out_dir=$root_dir/$prob_map_out_id
 
 #
 export PYTHONPATH=$PYTHONPATH:/home/tor/ws/lab1231-sun-prj/util/src-py

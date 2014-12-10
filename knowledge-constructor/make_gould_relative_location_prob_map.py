@@ -184,7 +184,7 @@ def write_prob_map(prob_map, out_dir):
             mat_filepath = cprime_dir + '/' + c + '_given_' + cprime + '.csv'
             np.savetxt(mat_filepath, relative_location_mat, delimiter=",")
 
-            mat_img_filepath = cprime_dir + '/' + c + '_given_' + cprime + '.png'
+            mat_img_filepath = cprime_dir + '/' + c + '_given_' + cprime + '.pdf'
             plt.imshow(relative_location_mat, cmap = cm.Greys_r)
             plt.axis('off') # clear x- and y-axes
             plt.savefig(mat_img_filepath)
