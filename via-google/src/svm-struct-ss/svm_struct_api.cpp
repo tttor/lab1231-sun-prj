@@ -76,6 +76,8 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 
     examples = (EXAMPLE *) malloc(sizeof(EXAMPLE) * n_sample);
 
+    printf("Psi Dimension: width %d  height %d\n",ssvm_ss::image_constraint::width,ssvm_ss::image_constraint::height);
+
     string id;
     int exampleIndex = 0;
     ifstream reader(file);
@@ -83,7 +85,7 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     {
         while (getline(reader, id))
         {
-            string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".unary";
+            string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".c_unary";
             string png_path = ssvm_ss::dataset::png_directory + "/" + id + ".png";
             string image_path = ssvm_ss::dataset::jpg_directory + "/" + id + ".jpg";
 
@@ -135,6 +137,7 @@ void set_unary_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
         {
 
             weights[xx + (yy * x.width)] = model->lin_weights[(windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
+            // weights[xx + (yy * x.width)] = 1.0;
         }
     }
 }
@@ -153,10 +156,17 @@ void set_pair_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
     size_t windowboundaryx = windowoffsetx + x.width;
     size_t windowboundaryy = windowoffsety + x.height;
     size_t windowoffset = windowheight * windowwidth;
+
+    size_t windowoffsetpair = ssvm_ss::image_constraint::pair_size;//skip horizontal pair on target
+    size_t targetoffsetpair = (x.width-1) * (x.height-1);//skip horizontal pair on target
+
     for (int xx = 0; xx < x.width - 1; xx++)
         for (int yy = 0; yy < x.height - 1; yy++)
         {
-            weights[xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
+            weights[xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth-1)];
+            weights[targetoffsetpair+xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + windowoffsetpair + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth-1)];
+            // weights[xx + (yy * (x.width - 1))] = 1.0;
+            // weights[targetoffsetpair+xx + (yy * (x.width - 1))] = 1.0;
         }
 }
 
@@ -181,25 +191,25 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
 
 
     y.png_matrix = QImage(x.width, x.height, QImage::Format_Indexed8);
-    QString colorfile = "VOC2010.ct";
-    QVector<QRgb> colorTable;
-    QFile file(colorfile);
-    if (!file.open(QFile::ReadOnly))
-        qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
-    QDataStream s(&file);
-    s >> colorTable;
-    file.close();
-    y.png_matrix.setColorTable(colorTable);
+    // QString colorfile = "VOC2010.ct";
+    // QVector<QRgb> colorTable;
+    // QFile file(colorfile);
+    // if (!file.open(QFile::ReadOnly))
+    //     qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
+    // QDataStream s(&file);
+    // s >> colorTable;
+    // file.close();
+    // y.png_matrix.setColorTable(colorTable);
 
     y.height = x.height;
     y.width = x.width;
     y.n_label = ssvm_ss::image_constraint::n_label;
-    printf("Start Infering %s\n", x.image_path);
+    printf("Infering %s\n", x.image_path);
 
 
 
     double *unary_weights = (double *) malloc(sizeof(double) * x.width * x.height);
-    double *pair_weights = (double *) malloc(sizeof(double) * (x.width - 1) * (x.height - 1));
+    double *pair_weights = (double *) malloc(2*sizeof(double) * (x.width - 1) * (x.height - 1));
 
 
 
@@ -207,7 +217,7 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
     set_pair_weights(sm, x, pair_weights);
 
     ProbImage unary_matrix;
-    unary_matrix.load(x.unary_path);
+    unary_matrix.decompress(x.unary_path);
 
     cv::Mat image_matrix;
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
@@ -218,6 +228,7 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
 
 
     // y.png_matrix = x.bypass;
+    x.bypass.save("temp_output","png",0);
 }
 
 void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
@@ -249,7 +260,7 @@ CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
     long     i;
     WORD     words[2];
 
-    if (1)  /* normal case: start with empty set of constraints */
+    if (0)  /* normal case: start with empty set of constraints */
     {
         c.lhs = NULL;
         c.rhs = NULL;
@@ -422,7 +433,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     size_t windowoffset = windowheight * windowwidth;
 
     ProbImage unary_matrix;
-    unary_matrix.load(x.unary_path);
+    unary_matrix.decompress(x.unary_path);
 
     cv::Mat image_matrix;
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
@@ -432,25 +443,29 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     for (size_t xx = 0; xx < x.width; xx++)
         for (size_t yy = 0; yy < x.height; yy++)
         {
-            assert((windowoffsetx + xx) + (windowoffsety + yy)*windowwidth < sm->sizePsi);
-            fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -unary_matrix(xx, yy, y.png_matrix.pixelIndex(xx, yy));
+            //reduce dimensions
+            assert((windowoffsetx + xx) + (windowoffsety + yy)*windowwidth < ssvm_ss::image_constraint::unary_size);
+            fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = unary_matrix(xx*5, yy*5, y.png_matrix.pixelIndex(xx, yy));//make sure it is potential invers
         }
 
     assert(sm->sizePsi - windowoffset > 0);
 
-    double *pair_psi = (double *)malloc(sizeof(double) * (sm->sizePsi - windowoffset));
+    double *pair_psi = (double *)malloc(sizeof(double) * (2*(x.width-1)*(x.height-1)));
 
     lab1231_sun_prj::shotton::get_2nd_order_psi(image_matrix, unary_matrix, y.png_matrix, pair_psi);
 
-    size_t type1psioffset = (x.width - 1) * (x.height - 1);
+    size_t type1psioffset = ssvm_ss::image_constraint::pair_size;//vertical pair offset for window
+
+    size_t targetpsioffset = (x.width-1)*(x.height-1);//vertical pair offset for target
 
     for (size_t xx = 0; xx < x.width - 1; xx++)
         for (size_t yy = 0; yy < x.height - 1; yy++)
         {
-            assert(windowoffset + type1psioffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth <= sm->sizePsi);
-            assert(windowoffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth <= sm->sizePsi);
-            fvec->words[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = pair_psi[xx + (yy * (x.width - 1))];
-            fvec->words[windowoffset + type1psioffset + (windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = pair_psi[type1psioffset + xx + (yy * (x.width - 1))];
+            assert(windowoffset + (windowoffsetx + xx) + (windowoffsety + yy)*(windowwidth-1) <= ssvm_ss::image_constraint::unary_size+ssvm_ss::image_constraint::pair_size);
+            assert(windowoffset + type1psioffset + (windowoffsetx + xx) + (windowoffsety + yy)*(windowwidth-1) <= ssvm_ss::image_constraint::unary_size+ssvm_ss::image_constraint::pair_size+ssvm_ss::image_constraint::pair_size);
+            assert(targetpsioffset + xx + (yy * (x.width - 1)) < 2*targetpsioffset);
+            fvec->words[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy)*(windowwidth-1)].weight = -pair_psi[xx + (yy * (x.width - 1))]; //should be the invers of the potential
+            fvec->words[windowoffset + type1psioffset + (windowoffsetx + xx) + (windowoffsety + yy)*(windowwidth-1)].weight = -pair_psi[targetpsioffset + xx + (yy * (x.width - 1))]; //should be the invers potential
         }
 
 
@@ -464,12 +479,13 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
     if (sparm->loss_function == 0)  /* type 0 loss: 0/1 loss */
     {
         /* return 0, if y==ybar. return 1 else */
-        y.png_matrix.save("temp_output", "png", 0);
-        ybar.png_matrix.save("temp_output_bar", "png", 0);
+        // y.png_matrix.save("temp_output", "png", 0);
+        // ybar.png_matrix.save("temp_output_bar", "png", 0);
         double sum = 0.0;
         for (int xx = 0; xx < y.width; xx++)
             for (int yy = 0; yy < y.height; yy++)
             {
+              if(y.png_matrix.pixelIndex(xx, yy)!=255)
                 sum += (y.png_matrix.pixelIndex(xx, yy) != ybar.png_matrix.pixelIndex(xx, yy)) ? 1.0 : 0.0;
             }
         printf("Loss : %f\n", sum);

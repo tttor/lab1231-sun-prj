@@ -18,13 +18,15 @@ namespace ssvm_ss
 {
 namespace image_constraint
 {
-const size_t height = 500;
-const size_t width = 500;
+const size_t height = 100;
+const size_t width = 100;
 const size_t n_pixel = width *height;
 const size_t n_label = 21;
 const size_t neighbour_size = 2;
+const size_t unary_size = n_pixel;
+const size_t pair_size = (width - 1) *(height - 1);
 
-const size_t feature_size = width *height + neighbour_size *(width - 1) *(height - 1);
+const size_t feature_size = unary_size + neighbour_size*pair_size ;
 const string inferenceMethod = "AlphaExpansion";//: "AlphaExpansion", "ICM"
 
 }

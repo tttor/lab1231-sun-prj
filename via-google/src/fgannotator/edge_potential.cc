@@ -2,7 +2,7 @@
 
 namespace sun = lab1231_sun_prj;
 
-float sun::shotton::edge_potential::get_beta(cv::Mat image_rgb){
+float sun::shotton::edge_potential::get_beta(cv::Mat &image_rgb){
   float total = 0;
   int n_total = 0;
   

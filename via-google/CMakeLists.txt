@@ -7,10 +7,11 @@ find_package( Boost REQUIRED )
 find_package( Qt4 REQUIRED)
 
 #
-set(ExternalLibrary /home/rizkivmaster/ws/lab1231-sun-prj/external)
+set(root ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set(ExternalLibrary ${root}/external)
 set(EigenIncludeDir /usr/include/eigen3)
 set(OpenGMDir ${ExternalLibrary}/opengm)
-set(ProbImageDir ${ExternalLibrary}/prob-image/ProbImage)
+set(ProbImageDir ${ExternalLibrary}/prob-image)
 set(SaliencySource ${ExternalLibrary}/saliencyfilters)
 
 #
@@ -21,7 +22,7 @@ include_directories (${ProbImageDir})
 include_directories (../util/include)
 
 include_directories (${EigenIncludeDir})
-include_directories (./include)
+include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories (${ExternalLibrary})
 include_directories(${QT_INCLUDES} external/include)
 
@@ -32,12 +33,12 @@ add_library(
 
 add_library (
   util
-  ../util/src/util.cc
+  ${root}/util/src/util.cc
 )
 
 add_library (
   color_map
-  ../util/src/color_map.cc
+  ${root}/util/src/color_map.cc
 )
 
 target_link_libraries ( util color_map  )
