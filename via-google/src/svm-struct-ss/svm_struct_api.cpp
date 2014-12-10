@@ -88,8 +88,17 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
             string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".c_unary";
             string png_path = ssvm_ss::dataset::png_directory + "/" + id + ".png";
             string image_path = ssvm_ss::dataset::jpg_directory + "/" + id + ".jpg";
+            string dumping_path = ssvm_ss::dataset::dumping_directory + "/" + id + ".png";
 
+            
             QImage png_matrix;
+            printf("Reading: %s",png_path.c_str());
+            QFile f( png_path.c_str() );
+            if (!f.open(QFile::ReadOnly))
+            {
+              qFatal( "Failed to open file '%s'!",  png_path.c_str());
+              exit(1);
+            }
             png_matrix.load(png_path.c_str(), "png");
 
             examples[exampleIndex].x.height = png_matrix.height();
@@ -99,6 +108,8 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 
             strcpy(examples[exampleIndex].x.image_path, image_path.c_str());
             strcpy(examples[exampleIndex].x.unary_path, unary_path.c_str());
+            strcpy(examples[exampleIndex].x.dumping_path, dumping_path.c_str());
+            strcpy(examples[exampleIndex].y.dumping_path, dumping_path.c_str());
             examples[exampleIndex].y.png_matrix = png_matrix;
             examples[exampleIndex].y.n_label = ssvm_ss::image_constraint::n_label;
             examples[exampleIndex].x.bypass = png_matrix;
