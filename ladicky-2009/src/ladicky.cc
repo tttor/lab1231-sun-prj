@@ -16,11 +16,12 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, const st
 
   // Segmentation for hi-order energy
   vector<sun::util::Superpixel> superpixels;
-  superpixels = sun::util::loadSuperpixel(data_param["superpixel_dir"]+superpixel_filename);
+  superpixels = sun::util::load_superpixel(data_param["superpixel_dir"]+superpixel_filename);
   //inititialize energy 
   const size_t n_var = img.rows * img.cols;
   const size_t n_label = boost::lexical_cast<size_t>(data_param["n_label"]);
   const size_t n_segment = superpixels.size();
+  cout << n_segment << endl;
   const size_t n_pairwise = sun::util::n_pairwise(img.rows, img.cols,"N4");
 
   Energy<double>* energy;
@@ -90,8 +91,8 @@ void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Sup
       energy->higherCost[i * (energy->nlabel + 1) + k] = 0;//get_gamma_k(superpixels[i], k);
 
     //gamma_max
-    energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = sun::ladicky::robustpn::gamma(img, superpixels[i], 0.8, 0.2, 0.5, 12.0);
-    // energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = sun::ladicky::robustpn::gamma_unary(prob_img_filepath, img, n_label, superpixels[i], 0.8, 0.2, 0.5, 12.0);
+    // energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = sun::ladicky::robustpn::gamma(img, superpixels[i], 0.8, 0.2, 0.5, 12.0);
+    energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = 100 * sun::ladicky::robustpn::gamma_unary(prob_img_filepath, img, n_label, superpixels[i], 0.8, 0.2, 0.5, 12.0);
   }
 }
 

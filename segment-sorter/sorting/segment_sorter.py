@@ -132,6 +132,7 @@ def main():
             param['model_LDA_file'] = model_LDA_file
             param['n_topic'] = 25
             all_result[target][param_segment] = prob_topic_segments(param)
+    #get best segment from all_result -> best-superpixel
     print all_result
 
 if __name__ == "__main__":
