@@ -3,11 +3,15 @@ Goal:
 Implement the relative location probability map proposed in
 Gould, 2008, IJCV: Multi-Class Segmentation with Relative Location Prior
 '''
+import matplotlib
+matplotlib.use('pdf')# see http://stackoverflow.com/questions/19518352/tkinter-tclerror-couldnt-connect-to-display-localhost18-0
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 import numpy as np
 import os
 import shutil
 import random
-
 import sys
 
 from skimage.util import img_as_float
@@ -16,10 +20,6 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-
-import scipy
 import msrc
 
 def init_prob_map(cprime_labels, c_labels, size):
@@ -82,7 +82,7 @@ def get_offset(pixel_1, pixel_2):
 
     return (drow,dcol)
 
-def add_diriclet_noise(offset, alpha, relative_location_matrix_shape):
+def add_dirichlet_noise(offset, alpha, relative_location_matrix_shape):
     '''
     Because of the sparsity of training examples in the multi-class scenario, 
     we apply a Dirichlet prior with parameter $\alpha= 5$ to the relative offset count. 
@@ -181,28 +181,28 @@ def write_prob_map(prob_map, out_dir):
             # if c is not 'grass': # TODO remove me
             #     continue
 
-            mat_filepath = cprime_dir + '/' + c + '_wrt_' + '.csv'
+            mat_filepath = cprime_dir + '/' + c + '_given_' + cprime + '.csv'
             np.savetxt(mat_filepath, relative_location_mat, delimiter=",")
 
-            mat_img_filepath = cprime_dir + '/' + c + '_wrt_' + cprime + '.png'
+            mat_img_filepath = cprime_dir + '/' + c + '_given_' + cprime + '.pdf'
             plt.imshow(relative_location_mat, cmap = cm.Greys_r)
             plt.axis('off') # clear x- and y-axes
             plt.savefig(mat_img_filepath)
-            # scipy.misc.imsave(mat_img_filepath, relative_location_mat)
 
 def main(argv):
     #
-    assert len(argv)==6, 'INSUFFICIENT NUMBER OF ARGVs'
+    assert len(argv)==7, 'INSUFFICIENT NUMBER OF ARGVs'
     chosen_cprime = argv[1]
-    img_list_filepath = argv[2]
-    gt_csv_dir = argv[3]
-    img_dir = argv[4]
-    prob_map_out_dir = argv[5]
+    dirichlet_noise = argv[2]
+    img_list_filepath = argv[3]
+    gt_csv_dir = argv[4]
+    img_dir = argv[5]
+    prob_map_out_dir = argv[6]
 
     #
     relative_location_matrix_shape = (200,200) # following [Gould, 2008]
     variance_factor = 0.10 # following [Gould, 2008]
-    diriclet_noise_alpha = (5.0,5.0) # following [Gould, 2008]
+    dirichlet_noise_alpha = (5.0,5.0) # following [Gould, 2008]
 
     #
     c_labels = [{'id':key, 'name':val} for key,val in msrc.class_id2name_map.iteritems() if val is not 'void']
@@ -253,8 +253,9 @@ def main(argv):
                 for pixel in pixels:
                     #
                     offset = get_offset(centroid,pixel)
-                    diriclet_offset = add_diriclet_noise(offset, diriclet_noise_alpha, relative_location_matrix_shape)
-                    norm_offset = normalize_offset(diriclet_offset, relative_location_matrix_shape, gt_annotation.shape)
+                    if dirichlet_noise=='True':
+                        offset = add_dirichlet_noise(offset, dirichlet_noise_alpha, relative_location_matrix_shape)
+                    norm_offset = normalize_offset(offset, relative_location_matrix_shape, gt_annotation.shape)
 
                     #
                     count = prob_map[centroid_label['name']][label['name']][norm_offset[0]][norm_offset[1]]

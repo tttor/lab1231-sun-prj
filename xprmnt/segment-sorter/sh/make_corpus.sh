@@ -1,12 +1,14 @@
 #!/bin/sh
 timestamp="$(date +'%Y%m%d.%H%M%S')"
+dataset=msrc21
+region_desc=sift
 
 #
 root_dir=/home/tor/xprmnt/segment-sorter
 
-list_filepath=$root_dir/meta/msrc-21.sift.list
-segment_dir=$root_dir/segment/msrc-21
-clustered_region_dir=$root_dir/region-clustered/msrc-21/sift
+list_filepath=$root_dir/meta/$dataset.$region_desc.list
+segment_dir=$root_dir/segment/$dataset
+clustered_region_dir=$root_dir/region-clustered/$dataset/$region_desc
 
 corpus_dir=$root_dir/corpus
 corpus_filepath=$corpus_dir/corpus.$timestamp.data

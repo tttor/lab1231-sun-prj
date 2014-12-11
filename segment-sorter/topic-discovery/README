@@ -1,5 +1,6 @@
 README
 
+---
 Goal:
 > construct an LDA model from a given corpus (as training data)
 
@@ -15,3 +16,13 @@ Steps:
 > run the LDA model generator, e.g. GibbsLDA++
 
 > evaluate the learnt LDA model: to segments(=docs) for a topic, segment ranking w.r.t to a topic from multiple segmentation on an image
+
+---
+Do we really need preprocessing on the input data for Kmeans clustering?
+
+http://metaoptimize.com/qa/questions/6843/how-important-is-preprocessing-for-k-means-clustering
+
+---
+Choosing the number of cluster: using the Elbow method
+
+http://stackoverflow.com/questions/6645895/calculating-the-percentage-of-variance-measure-for-k-means

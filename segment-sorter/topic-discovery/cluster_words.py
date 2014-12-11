@@ -61,16 +61,20 @@ def main(argv):
     # Load
     list_filepath = argv[1]
     region_dir = argv[2]
+    clustered_region_dir = argv[3]
+    model_filepath = argv[4]
+    X_filepath = argv[5]
 
     region_list = read_region_from_list(list_filepath, region_dir)
 
     # Cluster
     # TODO: preprocess?
     X = np.asarray( [ i['sift'] for i in region_list ] )
+    np.savetxt(X_filepath, X, delimiter=",")
     print('n_sample= %i' % (X.shape[0]))
     print('n_feature= %i' % (X.shape[1]))
 
-    kmeans = KMeans(n_clusters=int(argv[5]),max_iter=int(argv[6]),n_init=int(argv[7]),init=argv[8],n_jobs=-1)
+    kmeans = KMeans(n_clusters=int(argv[6]),max_iter=int(argv[7]),n_init=int(argv[8]),init=argv[9],n_jobs=-1)
 
     print('kmeans param: %s' % (kmeans.get_params))
     print('kmeans.fit()...')
@@ -81,12 +85,10 @@ def main(argv):
         region['label'] = kmeans.labels_[i]
 
     # 
-    clustered_region_dir = argv[3]
     write_clustered_region(region_list, clustered_region_dir)
     # TODO: Visualize
 
     # Save the k-means model
-    model_filepath = argv[4]
     with open(model_filepath, 'wb') as fid:
         cPickle.dump(kmeans, fid) 
 
