@@ -8,5 +8,5 @@ opengm-2.3.3
 rapidxml-1.13
 VOCdevkit
 GibbsLDA++-0.2
-opengm
-saliencyfilters
+region-descriptor
+region-detector
