@@ -16,7 +16,7 @@ mkdir -p $clustered_region_dir
 kmeans_model_dir=$root_dir/kmeans-model/$dataset
 mkdir -p $kmeans_model_dir
 kmeans_model_filepath=$kmeans_model_dir/kmeans.$timestamp.model
-kmeans_inputdata_filepath=$kmeans_model_dir/kmeans.$timestamp.inputdata
+kmeans_input_filepath=$kmeans_model_dir/kmeans.$timestamp.input
 
 #
 n_word_cluster=2000
@@ -29,5 +29,5 @@ exe=../../../segment-sorter/topic-discovery/cluster_words.py
 
 python  $exe \
 		$list_filepath $region_dir \
-		$clustered_region_dir $kmeans_model_filepath $kmeans_inputdata_filepath\
+		$clustered_region_dir $kmeans_model_filepath $kmeans_input_filepath\
 		$n_word_cluster $max_iter $n_init $init
