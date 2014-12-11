@@ -11,7 +11,7 @@ const string png_directory = "/home/rizkivmaster/ws/datasets/miniVOC2010/Segment
 // const string png_directory = "/home/rizkivmaster/ws/datasets/voc2010/SegmentationClass";
 const string jpg_directory = "/home/rizkivmaster/ws/datasets/miniVOC2010/JPEGImages";
 // const string jpg_directory = "/home/rizkivmaster/ws/datasets/voc2010/JPEGImages";
-const string dumping_directory = "/home/rizkivmaster/ws/results/svm-dump";
+const string dumping_directory = "/home/rizkivmaster/ws/results/svm-dump-normal-test-200";
 }// namespace dataset
 }// namespace ssvm_ss
 

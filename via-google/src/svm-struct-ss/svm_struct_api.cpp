@@ -158,8 +158,8 @@ void set_unary_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
         for (int yy = 0; yy < x.height; yy++)
         {
 
-            weights[xx + (yy * x.width)] = model->lin_weights[(windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
-            // weights[xx + (yy * x.width)] = 1.0;
+            //weights[xx + (yy * x.width)] = model->lin_weights[(windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
+            weights[xx + (yy * x.width)] = 1.0;
         }
     }
 }
@@ -185,10 +185,10 @@ void set_pair_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
     for (int xx = 0; xx < x.width - 1; xx++)
         for (int yy = 0; yy < x.height - 1; yy++)
         {
-            weights[xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
-            weights[targetoffsetpair + xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + windowoffsetpair + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
-            // weights[xx + (yy * (x.width - 1))] = 1.0;
-            // weights[targetoffsetpair + xx + (yy * (x.width - 1))] = 1.0;
+            //weights[xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
+            //weights[targetoffsetpair + xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + windowoffsetpair + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
+            weights[xx + (yy * (x.width - 1))] = 1.0;
+            weights[targetoffsetpair + xx + (yy * (x.width - 1))] = 1.0;
         }
 }
 
