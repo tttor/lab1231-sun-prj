@@ -6,10 +6,12 @@
 namespace ssvm_ss {
 namespace dataset {
 
-const string unary_directory = "/home/rizkivmaster/ws/datasets/smallVOC2010/unaries";
-const string png_directory = "/home/rizkivmaster/ws/datasets/smallVOC2010/SegmentationClass";
-const string jpg_directory = "/home/rizkivmaster/ws/datasets/smallVOC2010/JPEGImages";
-const string dumping_directory = "/home/rizkivmaster/ws/svm-temp/via-google/build2/src/svm-struct-ss/svm_struct/testpngs";
+const string unary_directory = "/home/rizkivmaster/ws/datasets/voc2010/voc2010_compressed";
+const string png_directory = "/home/rizkivmaster/ws/datasets/miniVOC2010/SegmentationClass";
+// const string png_directory = "/home/rizkivmaster/ws/datasets/voc2010/SegmentationClass";
+const string jpg_directory = "/home/rizkivmaster/ws/datasets/miniVOC2010/JPEGImages";
+// const string jpg_directory = "/home/rizkivmaster/ws/datasets/voc2010/JPEGImages";
+const string dumping_directory = "/home/rizkivmaster/ws/results/svm-dump";
 }// namespace dataset
 }// namespace ssvm_ss
 

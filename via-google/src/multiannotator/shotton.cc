@@ -1,8 +1,30 @@
 #include <shotton/shotton.h>
+#include <math.h>
 #define __(x,y) printf("%s %d\n",x,y);
 using namespace std;
 namespace lab1231_sun_prj {
 namespace shotton {
+
+void save_image(char* filename, Eigen::MatrixXi m)
+{
+    QString colorfile = "VOC2010.ct";
+    QVector<QRgb> colorTable;
+    QFile file(colorfile);
+    if (!file.open(QFile::ReadOnly))
+        qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
+    QDataStream s(&file);
+    s >> colorTable;
+    file.close();
+
+    QImage targetPNG(m.cols(),m.rows(),QImage::Format_Indexed8);
+    targetPNG.setColorTable(colorTable);
+    for(int  ii=0; ii<m.rows(); ii++){
+      for(int jj=0; jj<m.cols(); jj++){
+        targetPNG.setPixel(jj,ii,m(ii,jj));
+      }
+    }
+    targetPNG.save(filename,"png",0);
+}
 
 void train(const string datasets_name, EnergyParam* energy_param) {
   // cout << "train(): BEGIN\n";
@@ -18,23 +40,24 @@ void train(const string datasets_name, EnergyParam* energy_param) {
 
   // cout << "train(): END\n";
 }
+/*void set_color(QImage png_matrix)
+{
+
+    
+}*/
 
 Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const string unary_dir,EnergyParam energy_param) {  
-
-  // cout << "annotate(): BEGIN\n";
-
   //read image file
   cv::Mat img_mat = cv::imread(img_dir, CV_LOAD_IMAGE_COLOR);
-  ///read unary
-  ProbImage unary_mat;
-
-  unary_mat.load( unary_dir.c_str() );
+  //read unary
+  ProbImage unary_matrix;
+  unary_matrix.decompress( unary_dir.c_str() );
 
   const size_t n_var = img_mat.rows * img_mat.cols;
 
   GraphicalModel gm( opengm::SimpleDiscreteSpace<size_t, size_t>(n_var, n_label) );
 
-  set_1st_order(img_mat, unary_mat, n_label, gm);
+  set_1st_order(img_mat, unary_matrix, n_label, gm);
   set_2nd_order(img_mat, n_label, energy_param, gm);
 
   Eigen::MatrixXi ann(img_mat.rows, img_mat.cols);
@@ -46,30 +69,34 @@ Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const strin
 }
 
 
-void annotate(size_t n_label, cv::Mat image_matrix, ProbImage unary_matrix, double* unary_weights, double * pair_weights, QImage png_matrix){
-  QString colorfile = "VOC2010.ct";
-  QVector<QRgb> colorTable;
-  QFile file(colorfile);
-  if (!file.open(QFile::ReadOnly))
-              qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
-  QDataStream s(&file);
-  s >> colorTable;
-  file.close();
-  png_matrix.setColorTable(colorTable);
+//svm
+Eigen::MatrixXi annotate(size_t n_label, cv::Mat &image_matrix, ProbImage &unary_matrix, double* unary_weights, double * pair_weights){
 
+    //debug
+    // printf("debug 2\n");fflush(stdout);
+    // assert(image_matrix.cols==annotation_matrix.width() && image_matrix.rows == png_matrix.height());
+
+
+
+    // set_color(png_matrix);  
     EnergyParam energy_param;
     train("VOC",&energy_param);
-    size_t n_var = png_matrix.height() * png_matrix.width();
+    size_t n_var = image_matrix.rows * image_matrix.cols;
     GraphicalModel gm( opengm::SimpleDiscreteSpace<size_t, size_t>(n_var, n_label) );
     set_1st_order( image_matrix , unary_matrix, unary_weights, n_label, gm);
     set_2nd_order( image_matrix , n_label, energy_param, pair_weights, gm);
     Eigen::MatrixXi ann(image_matrix.rows, image_matrix.cols);
     infer("AlphaExpansion", gm, n_var, ann);
-    for(size_t xx = 0; xx < ann.cols();xx++)
-      for(size_t yy = 0; yy < ann.rows();yy++)
-        png_matrix.setPixel(xx,yy,ann(yy,xx));
 
-    png_matrix.save("temp_output_bar","png",0);
+    // for(size_t xx = 0; xx < png_matrix.width();xx++)
+    //   for(size_t yy = 0; yy < png_matrix.height();yy++)
+    //     png_matrix.setPixel(xx,yy,ann(yy,xx));
+
+    // png_matrix.save("temp.png","png",0);
+
+
+    // printf("debug 3\n");fflush(stdout);
+    return ann;
 }
 
 void infer(const string method, GraphicalModel gm, const size_t n_var, Eigen::MatrixXi& ann) {
@@ -133,13 +160,12 @@ void infer(const string method, GraphicalModel gm, const size_t n_var, Eigen::Ma
     }
   }
 
-  cout << "infer(): END\n";
+  // cout << "infer(): END\n";
 }
 
-void set_1st_order(const cv::Mat img_mat, ProbImage unary_mat, const size_t n_label, GraphicalModel& gm) {
+//for regular use
+void set_1st_order(const cv::Mat img_mat, ProbImage unary_matrix, const size_t n_label, GraphicalModel& gm) {
   using namespace std;
-  assert(unary_mat.width()==img_mat.cols && "err");
-  assert(unary_mat.height()==img_mat.rows && "err");
 
   for (size_t x=0; x<img_mat.cols; ++x) {
     for (size_t y=0; y<img_mat.rows; ++y) {
@@ -148,7 +174,7 @@ void set_1st_order(const cv::Mat img_mat, ProbImage unary_mat, const size_t n_la
       opengm::ExplicitFunction<float> energy(shape, shape+1);
 
       for(size_t i = 0; i < n_label; i++) 
-        energy(i) = -unary_mat(x,y,i);  
+        energy(i) = -unary_matrix(x,y,i);
       GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
       
       // add a factor
@@ -158,12 +184,14 @@ void set_1st_order(const cv::Mat img_mat, ProbImage unary_mat, const size_t n_la
   }
 }
 
-void set_1st_order(cv::Mat img_mat, ProbImage unary_mat,double* unary_weights, const size_t n_label, GraphicalModel& gm) {
+
+//for svm
+void set_1st_order(cv::Mat img_mat, ProbImage unary_matrix,double* unary_weights, const size_t n_label, GraphicalModel& gm) {
   using namespace std;
   
-  // assert(unary_mat.width()==img_mat.cols && "err");// debug resize no constraints
-  // assert(unary_mat.height()==img_mat.rows && "err");
-  //assert(sizeof(unary_weights)/sizeof(double) == unary_mat.width()*unary_mat.height());
+  // assert(unary_matrix.width()==img_mat.cols && "err");// debug resize no constraints
+  // assert(unary_matrix.height()==img_mat.rows && "err");
+  //assert(sizeof(unary_weights)/sizeof(double) == unary_matrix.width()*unary_matrix.height());
 
 
   for (size_t x=0; x<img_mat.cols; ++x) {
@@ -173,17 +201,11 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_mat,double* unary_weights, c
 
       for(size_t i = 0; i < n_label; i++) 
       {
-        energy(i) = max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)]) *-unary_mat(x*5,y*5,i);  //in debug resize
 
-        
-        // assert(unary_weights[util::flat_idx(x, y, img_mat.cols)]>0.0);
+        // assert(unary_weights[util::flat_idx(x, y, img_mat.cols)]==1.0);
+        energy(i) = max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)]) *-unary_matrix(x*5,y*5,i);//debug resize
       }
-        
-
-
-
-      GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
-      
+      GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);      
       // add a factor
       size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols)};
       gm.addFactor(fid, var_idxes, var_idxes+1);
@@ -195,9 +217,9 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
   // Params needed by the Pott model
   const float equal_pen = 0.0;
 
-  //
   float beta;
   beta = edge_potential::get_beta(img_mat);
+
 
   Eigen::MatrixXd theta_phi(2, 1);
   theta_phi << energy_param["theta_phi_1"], 
@@ -217,6 +239,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
 
         float unequal_pen;
         unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
+        // printf("%f \n",unequal_pen);
 
         //
         opengm::PottsFunction<float> pott(n_label, n_label, equal_pen, unequal_pen);
@@ -236,6 +259,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
 
         float unequal_pen;
         unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
+        // printf("%f \n",unequal_pen);
 
         //
         opengm::PottsFunction<float> pott(n_label, n_label, equal_pen, unequal_pen);
@@ -250,6 +274,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
   }
 }
 
+//for svm
 void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_param,double* pair_weights, GraphicalModel& gm) {
   // Params needed by the Pott model
   float equal_pen = 0.0;
@@ -264,7 +289,6 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
 
   size_t psioffset = (img_mat.cols-1)*(img_mat.rows-1);
 
-  //
   for (size_t x=0; x<img_mat.cols-1; ++x) {
     for (size_t y=0; y<img_mat.rows-1; ++y) {
       cv::Point2i p1;   
@@ -282,7 +306,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
         unequal_pen *=  max(0.0,pair_weights[util::flat_idx(x,y,img_mat.cols-1)]);
 
         
-        // assert(pair_weights[util::flat_idx(x,y,img_mat.cols-1)]>0.0);
+        // assert(pair_weights[util::flat_idx(x,y,img_mat.cols-1)]==1.0);
 
         opengm::PottsFunction<float> pott(n_label, n_label, equal_pen,unequal_pen);
         GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
@@ -305,7 +329,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
         unequal_pen *= max(0.0,pair_weights[psioffset+util::flat_idx(x,y,img_mat.cols-1)]);
         equal_pen *= max(0.0,pair_weights[psioffset+util::flat_idx(x,y,img_mat.cols-1)]);
 
-        // assert(pair_weights[psioffset+util::flat_idx(x,y,img_mat.cols-1)]>0);
+        // assert(pair_weights[psioffset+util::flat_idx(x,y,img_mat.cols-1)]==1.0);
 
         opengm::PottsFunction<float> pott(n_label, n_label, equal_pen, unequal_pen);
         GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
@@ -319,7 +343,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
   }
 }
 
-void get_2nd_order_psi(cv::Mat img_mat, ProbImage unary_mat,QImage png_matrix,double* psi)
+void get_2nd_order_psi(cv::Mat &img_mat, Eigen::MatrixXi &annotation_matrix, double* psi)
 {
    
   EnergyParam energy_param;
@@ -353,7 +377,7 @@ void get_2nd_order_psi(cv::Mat img_mat, ProbImage unary_mat,QImage png_matrix,do
         float unequal_pen;
         unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
 
-        psi[x+y*(img_mat.cols-1)] = png_matrix.pixelIndex(x,y)==png_matrix.pixelIndex(x+1,y)?equal_pen:unequal_pen;//horizontal psi
+        psi[x+y*(img_mat.cols-1)] = annotation_matrix(y,x)==annotation_matrix(y,x+1)?equal_pen:unequal_pen;//horizontal psi
       }
         
       // }
@@ -368,7 +392,7 @@ void get_2nd_order_psi(cv::Mat img_mat, ProbImage unary_mat,QImage png_matrix,do
         float unequal_pen;
         unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
 
-        psi[psioffset + x+y*(img_mat.cols-1) ] = png_matrix.pixelIndex(x,y)==png_matrix.pixelIndex(x,y+1)?equal_pen:unequal_pen;//vertical psi
+        psi[psioffset + x+y*(img_mat.cols-1) ] = annotation_matrix(y,x)==annotation_matrix(y+1,x)?equal_pen:unequal_pen;//vertical psi
         
       }
     }
