@@ -639,7 +639,6 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
         {
             PATTERN x = ex[i].x;
             LABEL y = ex[i].y;
-            printf("line: %d\n", x.height);
 
             
             fy = psi(ex[i].x, ex[i].y, sm, sparm);

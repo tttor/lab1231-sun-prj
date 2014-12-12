@@ -76,13 +76,14 @@ DataParam;
  * @brief a dummy training: merely hardcode some given params in [Shotton, 2009] and/or [Kohli, 2009]
  */
 void train(const string datasets_name, EnergyParam* energy_param);
+void save_image(char* filename, Eigen::MatrixXi m);
 
 /*!
  * @brief Annotate an image with given data_param, energy_param
  */
 Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const string unary_dir,EnergyParam energy_param,const size_t object_label);
 Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const string unary_dir,EnergyParam energy_param);
-void annotate(size_t n_label, cv::Mat image_matrix, ProbImage unary_matrix, double* unary_weights, double * pair_weights, QImage output);
+Eigen::MatrixXi annotate(size_t n_label, cv::Mat &image_matrix, ProbImage &unary_matrix, double* unary_weights, double * pair_weights);
 
 /*!
  * @brief we use Shotton's unary based on Phillipp's implementation
@@ -99,7 +100,7 @@ void set_1st_order(const cv::Mat img,const cv::Mat_<double> saliency_mat,ProbIma
 void set_2nd_order(cv::Mat img, const size_t n_label, EnergyParam energy_param,double* pair_weights, GraphicalModel& gm);
 void set_2nd_order(const cv::Mat img, const size_t n_label,const size_t object_label, EnergyParam energy_param, GraphicalModel& gm);
 void set_2nd_order(const cv::Mat img, const size_t n_label, EnergyParam energy_param, GraphicalModel& gm);
-void get_2nd_order_psi(cv::Mat img_mat, ProbImage unary_mat,QImage png_matrix,double* psi);
+void get_2nd_order_psi(cv::Mat &img_mat, Eigen::MatrixXi &annotation_matrix,double* psi);
 
 /*!
  * @brief Accomodated method: AlphaExpansion, ICM, ...
