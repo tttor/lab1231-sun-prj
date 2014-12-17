@@ -20,7 +20,7 @@
 #ifndef svm_struct_api_types
 #define svm_struct_api_types
 
-
+#include <Eigen/Dense>
 #include "svm_light/svm_common.h"
 #include "svm_light/svm_learn.h"
 #include "ssvm_ss_image_constraint.h"
@@ -71,7 +71,7 @@ typedef struct pattern
     char dumping_path[100];
     //ProbImage unary_matrix;
     //cv::Mat *image_matrix;
-    QImage bypass;
+    Eigen::MatrixXi bypass;
 } PATTERN;
 
 typedef struct label
@@ -79,7 +79,7 @@ typedef struct label
     /* this defines the y-part (the label) of a training example,
        e.g. the parse tree of the corresponding sentence. */
     // A row-wise flatten version of 2D label
-    QImage png_matrix;
+    Eigen::MatrixXi annotation_matrix;
     char dumping_path[100];
     int height;
     int width;

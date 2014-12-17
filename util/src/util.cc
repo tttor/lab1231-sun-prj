@@ -77,7 +77,8 @@ std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string&
           v_temp.push_back(tmp);
           if (ss.peek() == ',') ss.ignore();
       }
-      vec_sup.push_back(v_temp);
+      if (v_temp.size() > 0)
+        vec_sup.push_back(v_temp);
     }
     superpixel_file.close();
   }

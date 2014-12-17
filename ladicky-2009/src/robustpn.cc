@@ -13,7 +13,6 @@ double sun::ladicky::robustpn::gamma(cv::Mat img_rgb, sun::util::Superpixel supe
 double sun::ladicky::robustpn::gamma_unary(const std::string unary_img_path, cv::Mat img_rgb, int n_label, util::Superpixel superpixel, double theta_alpha, double theta_h_p, double theta_h_v, double theta_h_beta){
   int n_superpixel = superpixel.size();
   double func_g_unary = func_G_unary(unary_img_path, img_rgb, superpixel, theta_h_beta, n_label);
-
   double result = pow(n_superpixel, theta_alpha) * (theta_h_p + theta_h_v * func_g_unary);
   return result;
 }
@@ -59,7 +58,8 @@ double sun::ladicky::robustpn::func_G_unary(const std::string unary_img_path, cv
   for (int i = 0; i < c; i++){
     int row = sun::util::get_row(superpixel[i], n_cols), col = sun::util::get_col(superpixel[i], n_cols);
     for(int j = 0; j < n_label; j++){
-      vector_result.at(j) += pow(mean_unary[j] - (prob_img(col, row, j)*100) , 2);
+      double energy_ = -1 * log(prob_img(col, row, j)+0.0000000001);
+      vector_result.at(j) += pow(mean_unary[j] - energy_, 2);
     }
   }
 
@@ -67,7 +67,9 @@ double sun::ladicky::robustpn::func_G_unary(const std::string unary_img_path, cv
   for (int j = 0; j < n_label; j++) 
     norm_unary += vector_result.at(j);
 
+  // std::cout << "norm_unary " << norm_unary << std::endl;
   double res = -1 * theta_h_beta * ( norm_unary / c );
+  // std::cout << "res " << exp(res) << std::endl;
   return exp(res);
 }
 
@@ -97,22 +99,25 @@ std::vector<double> sun::ladicky::robustpn::get_mean_unary(const std::string una
 
   ProbImage prob_img;
   prob_img.decompress(unary_img_path.c_str());
+  // std::cout << unary_img_path << std::endl;
 
   std::vector<double> vector_unary;
   for (int j = 0; j < n_label; j++){      
       vector_unary.push_back(0.0);
   }
-
+  
+  // std::cout << n_superpixel << std::endl;  
   for (int i = 0; i < n_superpixel; i++){
     int row = sun::util::get_row(superpixel[i], n_col), col = sun::util::get_col(superpixel[i], n_col);
     for (int j = 0; j < n_label; j++){      
-      vector_unary.at(j) += prob_img(col,row,j) * 100;
+      vector_unary.at(j) += -1 * log(prob_img(col,row,j)+0.0000000001);
     }
   }
 
   for (int j = 0; j < n_label; j++){      
       vector_unary.at(j) /= (1.0 * n_superpixel);
+      // std::cout << vector_unary.at(j) << std::endl;    
   }
-
+  // std::cout << vector_unary << std::endl;
   return vector_unary;
 }
