@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
 import sys
+sys.path.append("../../knowledge-compatibility-benchmarker")
+sys.path.append("../../util/src-py")
 import numpy as np
-
 from feature_extractor import extract_fea
-from evaluator_tor import get_average_acc_over_clasess_from_file
+from evaluator_tor import get_class_avg_acc_from_file
 
 def main():
     assert len(sys.argv)==5, 'INSUFFICENT NUMBER OF ARGUMENTS'
@@ -24,7 +25,7 @@ def main():
     # Extract regression outputs
     print('Extract regression outputs ...')
     evl_filepaths = [ann_dir+'/'+target+'.evl' for target in target_list]
-    out_list = [get_average_acc_over_clasess_from_file(filepath) for filepath in evl_filepaths]
+    out_list = [get_class_avg_acc_from_file(filepath) for filepath in evl_filepaths]
 
     # Write the D = {(X,y)}
     assert len(out_list)==len(fea_list), 'len(out_list)!=len(fea_list)'

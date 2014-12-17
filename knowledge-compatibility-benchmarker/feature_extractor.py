@@ -1,12 +1,16 @@
 #!/usr/bin/python
 
 import numpy as np 
+import json
 from lxml import etree
 from knowledge_loader import load_knowledge
 import sys
 sys.path.append("../util/src-py")
 from pascal_voc_2012 import translate
 from pascal_voc_2012 import class_name_map
+from positionSearcher import PositionSearcher
+
+
 
 def get_spatial(i, height, param):
     top_height = int( round(param['ratio_top']*height) )
@@ -45,7 +49,7 @@ def extract_fea_c(ann, knowledge):
 
     probs = [knowledge[classes[i]][classes[j]] for i in range(len(classes)-1) for j in range(i+1,len(classes))]
     probs = np.asarray(probs)
-	print(probs)
+    #print(probs)
     c = []
     if len(probs) != 0:
         c = [np.mean(probs), 
@@ -88,33 +92,70 @@ def extract_fea_s(ann, knowledge):
     
     return s
 
-def extract_fea_r(ann, knowledge):
-    numeric_classes=list(set(ann.flatten()))
-    raw_classes = translate(numeric_classes)
-    classes = [i for i in raw_classes if i != 'background' and i!='void']
-    position = ['is_below','is_beside','is_around']
+#def extract_fea_r(ann, knowledge):
+def extract_fea_r(filename, knowledge):
     
-    
-    #for now, try to read each segments in annotation images
-    '''
-		for every images in dataset
-			for every object segment in images
-				check that segment position to another segment
-				see it's probability in constructed knowledge r
-				add the value to probs
-    '''
-    probs = [knowledge[classes[i]][position[j]][classes[k]]] for i in range(len(classes)-1) for j in range(len(position)-1) for k in range (i+1,len(classes))]
+    below_th = 20
+    around_th = 60
+    philip_bbox_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/knowledge/philip_voc2010_boundingbox/boundingbox_data'
+
+    file_to_process = philip_bbox_dir + filename + '.json'
+    probs = []
+
+    with open(file_to_process, 'r') as f2p:
+        keyval = json.load(f2p)
+    bbox = keyval['pa_bbox']
+
+    bounding_box_amount = len(bbox)
+    for x in range (0, bounding_box_amount):
+        for y in range (x, bounding_box_amount):
+            if x == y :
+                continue
+            else :
+                obj1 = bbox[x]
+                obj2 = bbox[y]
+                obj1_classname = class_name_map[obj1[4]]
+                obj2_classname = class_name_map[obj1[4]]
+                prob_below = 0
+                prob_beside = 0
+                prob_around = 0
+                #below
+                if PositionSearcher.isBelow(obj1, obj2,below_th):
+                    prob_below = knowledge[obj1_classname]['is_below'][obj2_classname]
+
+                #beside
+                if PositionSearcher.isBeside(obj1, obj2):
+                    prob_beside = knowledge[obj1_classname]['is_beside'][obj2_classname]
+
+                #inside
+                if PositionSearcher.isInside(obj1, obj2):
+                    prob_around = knowledge[obj1_classname]['is_around'][obj2_classname]
+
+                #if not inside, maybe it is around
+                elif PositionSearcher.isAround(obj1, obj2, around_th):
+                    prob_around = knowledge[obj1_classname]['is_around'][obj2_classname]
+                
+                prob_highest = max(prob_below, prob_beside, prob_around)
+                probs.append(prob_highest)
+                
+                '''
+                print("bawah : " + str(prob_below))
+                print("samping : " + str(prob_beside))
+                print("sekitar : " + str(prob_around))
+                print("yang paling tinggi : " + str(prob_highest))
+                print(probs)
+                '''
+                
     probs = np.asarray(probs)
-    print(probs)
     r = []
-    
     if len(probs) != 0:
-		r = [np.mean(probs), 
+        r = [np.mean(probs),
              np.percentile(probs, 25), 
              np.percentile(probs, 50), 
              np.percentile(probs, 75)]
-    else:	
-		r = [0.0] * 4
+    else:
+        r = [0.0] * 4
+
     return r
 
 def extract_fea_p(ann, knowledge, filename):
@@ -157,17 +198,17 @@ def extract_fea(ann_filepaths, knowledge_dir):
 
     for i, ann_filepath in enumerate(ann_filepaths):
         print 'Extracting feature:', str(i+1), 'of', str(len(ann_filepaths))
-
         ann = np.loadtxt(ann_filepath, delimiter=',')
+        dirpath_to_reduce = len(ann_filepath[:-16])
+        filename = (ann_filepath[dirpath_to_reduce:-4])
 
         c = extract_fea_c(ann, knowledge['c'])
         s = extract_fea_s(ann, knowledge['s'])
-        r = extract_fea_r(ann, knowledge['r'])
         p = extract_fea_p(ann, knowledge['p'], ann_filepath.split('/')[-1][0:-4])
-
-        fea = c + s + p #TODO include r
+        r = extract_fea_r(filename, knowledge['r'])
+        fea = c + s + p + r
         fea_list.append(fea)
-
+        
     return fea_list
 
 def main():
