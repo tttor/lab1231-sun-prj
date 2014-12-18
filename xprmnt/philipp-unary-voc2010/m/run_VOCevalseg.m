@@ -17,8 +17,8 @@ test_data_list_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/meta/split_voc
 VOCopts.seg.imgsetpath = strcat(test_data_list_dir, '/%s.txt');%<VOCopts.testset>.txt
 
 % The dirpath of .png predictions: /home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/results/VOC2012/Segmentation/%s_%s_cls/%s.png
-predicted_annotation_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010/annotation';
-VOCopts.seg.clsrespath = strcat(predicted_annotation_dir,'/%s_%s_cls/%s.png');% <id>_<VOCopts.testset>_cls
+predicted_annotation_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010/annotation/with-own-unaries-20141218';
+VOCopts.seg.clsrespath = strcat(predicted_annotation_dir,'/%s_%s_cls/%s.png');% <id>_<VOCopts.testset>_cls/<filename>.png
 
 % The dirpath of .png GT: /home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass/%s.png
 gt_annotation_dir = '/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2012/SegmentationClass';
