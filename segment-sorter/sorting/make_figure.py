@@ -38,7 +38,7 @@ def csv2Array(csv_path):
             arr[row][col] = int(arr[row][col])
     return np.asarray(arr)
 
-def createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_dir, n_topic, output_dir):
+def createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_dir, n_topic, output_dir):    
     for file_item in list_file:
         print file_item
         for topic in range(n_topic):
@@ -46,19 +46,20 @@ def createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_di
             fig = plt.figure()
             index=1
             for param in list_param:
-                segment_in_file = [item_corpus for item_corpus in corpus_meta if str(file_item+'-'+param) == item_corpus[1].split('-')[0]]
-                segments_res = csv2Array(segment_dir+'/'+file_item+'/'+file_item+'-'+param+'.sup')
-                img = img_as_float(io.imread(img_dir+file_item+'.ppm'))
-                output = np.zeros( (len(img), len(img[0])) )
-                for segment in segment_in_file:
-                    output[segments_res == int(segment[2])] = prob_topic_doc[int(segment[0])][topic] 
-                output = mark_boundaries(output, segments_res)
-                ax1 = fig.add_subplot(5,10, index, axisbg='grey')
-                ax1.set_xticks(()), ax1.set_yticks(())
-                ax1.imshow(output)
-                index += 1 
+                if 'slic' in param:                    
+                    segment_in_file = [item_corpus for item_corpus in corpus_meta if str(file_item+'-'+param+'.sup') == item_corpus[1]]
+                    segments_res = csv2Array(segment_dir+'/'+file_item+'/'+file_item+'-'+param+'.sup')
+                    img = img_as_float(io.imread(img_dir+file_item+'.ppm'))
+                    output = np.zeros( (len(img), len(img[0])) )
+                    for segment in segment_in_file:
+                        output[segments_res == int(segment[2])] = prob_topic_doc[int(segment[0])][topic] 
+                    output = mark_boundaries(output, segments_res)
+                    ax1 = fig.add_subplot(4,4, index, axisbg='grey')
+                    ax1.set_xticks(()), ax1.set_yticks(())
+                    ax1.imshow(output)
+                    index += 1
             ensure_path(output_dir+'/'+file_item+'/')
-            plt.savefig(output_dir+'/'+file_item+'/topic-'+str(topic)+'-'+file_item)
+            plt.savefig(output_dir+'/'+file_item+'/topic-'+str(topic)+'-'+file_item+'.pdf')
             plt.clf()
             plt.close()
 
@@ -83,20 +84,21 @@ def createFigure5(prob_topic_doc, corpus_meta, segment_dir, n_topic, output_dir)
             ax1.set_xticks(()), ax1.set_yticks(())
             ax1.imshow(img)
             index += 1    
-        plt.savefig(output_dir+'/topic-'+str(i))
+        plt.savefig(output_dir+'/topic-'+str(i)+'.pdf')
         plt.clf()
         plt.close()
 
 def plot_top_N_segment_in_topic(list_file, segment_dir, corpus_meta, prob_topic_doc, n_topic, N, output_dir):
+    index = 0
     for name_file in list_file:
-        print name_file
-        for topic in range(n_topic):
-            print topic
+        index += 1
+        print name_file, index
+        for topic in range(n_topic):            
             fig = plt.figure()
             index_plt = 1
             ind_segment = [int(item_corpus[0]) for item_corpus in corpus_meta if name_file == item_corpus[1].split('-')[0]]
             val_segment = [prob_topic_doc[ind][topic] for ind in ind_segment]
-            ind_of_ind_segment = get_index_bestdoc(val_segment, 10)
+            ind_of_ind_segment = get_index_bestdoc(val_segment, 12)
             for index in ind_of_ind_segment:
                 segments_res = csv2Array(segment_dir+'/'+name_file+'/'+ corpus_meta[ind_segment[index]][1])
                 no_segment = int(corpus_meta[ind_segment[index]][2])
@@ -108,9 +110,20 @@ def plot_top_N_segment_in_topic(list_file, segment_dir, corpus_meta, prob_topic_
                 ax1.imshow(output)
                 index_plt += 1
             ensure_path(output_dir+'/'+name_file+'/')
-            plt.savefig(output_dir+'/'+name_file+'/'+str(topic))
+            plt.savefig(output_dir+'/'+name_file+'/'+str(topic)+'.pdf')
             plt.clf()
             plt.close()            
+
+def give_best_7(list_file, segment_dir, corpus_meta, prob_topic_doc, n_topic, N, output_dir):    
+    for name_file in list_file:        
+        result = []
+        for topic in range(n_topic):
+            ind_segment = [int(item_corpus[0]) for item_corpus in corpus_meta if name_file == item_corpus[1].split('-')[0]]
+            val_segment = [prob_topic_doc[ind][topic] for ind in ind_segment]
+            best_res = np.max(val_segment)
+            result.append(best_res)
+        result = sorted(result, reverse=True)
+        print result[0:5]
 
 def writeCsv(buff, output_path):
     with open(output_path, 'w') as csvfile:
@@ -148,12 +161,12 @@ def create_best_segment_image(list_file, segment_dir, corpus_meta, prob_topic_do
 
 def main():
     #to do -> call with args
-    output_dir = '/home/jogie/sorter_exp/exp_result/msrc/141209-500K/'
+    output_dir = '/home/jogie/sorter_exp/exp_result/msrc/141215-500K/'
     segment_dir = '/home/jogie/sun4/exp/segment-sorter/superpixel/msrc/'
     sup_param_dir = '/home/jogie/sun4/exp/segment-sorter/meta/segment-param.list'
-    list_path = '/home/jogie/sun4/exp/segment-sorter/meta/test591.list'
-    theta_final_path = '/home/jogie/sorter_exp/lda-model/training.20141209.140223/model-final.theta'
-    corpus_meta_path = '/home/jogie/sorter_exp/lda-model/training.20141209.140223/corpus.20141208.165442.meta'
+    list_path = '/home/jogie/sun4/exp/segment-sorter/meta/test93.list'
+    theta_final_path = '/home/jogie/sorter_exp/lda-model/training.20141210.010751/model-final.theta'
+    corpus_meta_path = '/home/jogie/sorter_exp/lda-model/training.20141210.010751/corpus.20141208.165442.meta'
     
     print 'craete prob_topic_doc...'
     prob_topic_doc = [ line.strip().split(' ') for line in open(theta_final_path)]
@@ -162,23 +175,25 @@ def main():
         for col in range(len(prob_topic_doc[row])):
             prob_topic_doc[row][col] = float(prob_topic_doc[row][col])
 
-    print 'craete corpus_meta...'
+    print 'create corpus_meta...'
     corpus_meta = [ line.strip().split(' ') for line in open(corpus_meta_path)]
-    
-    print 'craete list file and param...'
+    print len(corpus_meta), 'len corpus_meta'
+
+    print 'create list file and param...'
     list_file = [ line.strip('\n') for line in open(list_path)]
     list_file = [ item for item in list_file if item not in ['1_4_s','1_6_s', '1_7_s']]
+    list_file = ['1_21_s', '14_20_s', '14_15_s', '15_16_s', '2_14_s', '2_18_s', '3_12_s', '9_19_s', '11_15_s', '19_7_s']
 
     list_param = [ line.strip('\n') for line in open(sup_param_dir)]
     
-    print 'craete best segment...'
-    list_file = ['1_21_s']
-    create_best_segment_image(list_file, segment_dir, corpus_meta, prob_topic_doc, 21, 30, output_dir+'/best-superpixel/')
+    # give_best_7(list_file, segment_dir, corpus_meta, prob_topic_doc, 21, 10, output_dir+'figureNew')
+    # list_file = ['1_21_s']
+    # create_best_segment_image(list_file, segment_dir, corpus_meta, prob_topic_doc, 21, 30, output_dir+'/best-superpixel/')
 
-    # createFigure5(prob_topic_doc, corpus_meta, segment_dir, 25 ,output_dir+'figure5/')
+    # createFigure5(prob_topic_doc, corpus_meta, segment_dir, 21,output_dir+'figure5/')
 
-    # createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_dir, 25, output_dir+'figure4/')
-    # plot_top_N_segment_in_topic(list_file, segment_dir, corpus_meta, prob_topic_doc, 21, 10, output_dir+'figureNew')
+    createFigure4(list_file, list_param, corpus_meta, prob_topic_doc, segment_dir, 21, output_dir+'figure4/')
+    # plot_top_N_segment_in_topic(list_file, segment_dir, corpus_meta, prob_topic_doc, 21, 12, output_dir+'figureNew')
 
 if __name__ == "__main__":
     main();
