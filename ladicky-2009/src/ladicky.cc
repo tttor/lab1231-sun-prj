@@ -8,6 +8,9 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, const st
   cout << "annotate(): BEGIN\n";
   #endif
 
+  struct timeval start, end;
+  long mtime, seconds, useconds;
+
   //
   const string img_path = string(data_param["ori_img_dir"]+img_filename);
   cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
@@ -16,12 +19,21 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, const st
 
   // Segmentation for hi-order energy
   vector<sun::util::Superpixel> superpixels;
+
+  gettimeofday(&start, NULL);
   superpixels = sun::util::load_superpixel(data_param["superpixel_dir"]+superpixel_filename);
+  gettimeofday(&end, NULL);
+
+  seconds  = end.tv_sec  - start.tv_sec;
+  useconds = end.tv_usec - start.tv_usec;
+  mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+
+  cout << "Elapsed time load " << superpixel_filename << " : " << mtime <<" milliseconds\n";
+
   //inititialize energy 
   const size_t n_var = img.rows * img.cols;
   const size_t n_label = boost::lexical_cast<size_t>(data_param["n_label"]);
   const size_t n_segment = superpixels.size();
-  cout << n_segment << endl;
   const size_t n_pairwise = sun::util::n_pairwise(img.rows, img.cols,"N4");
 
   Energy<double>* energy;
@@ -84,8 +96,9 @@ void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Sup
   for(int i = 0; i < energy->nhigher; i++)
   {
     //truncation ratio 30%
-    energy->higherTruncation[i] = 0.3;
-
+    energy->higherTruncation[i] = 0.3 * (energy->higherElements[i]);
+    // cout << "n_segment" << (energy->higherElements[i]) << endl;
+    // cout << "higher truncation" << energy->higherTruncation[i] << endl;
     //gamma_k
     for(int k = 0; k < energy->nlabel; k++) 
       energy->higherCost[i * (energy->nlabel + 1) + k] = 0;//get_gamma_k(superpixels[i], k);
