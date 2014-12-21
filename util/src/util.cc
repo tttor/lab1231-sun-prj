@@ -82,6 +82,7 @@ std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string&
     }
     superpixel_file.close();
   }
+  cout << "load_superpixel" <<  vec_sup.size() << endl;
   return vec_sup;
 }
 
