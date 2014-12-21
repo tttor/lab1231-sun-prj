@@ -23,7 +23,8 @@ def generate_map_segment(name_file, param):
         no_segment = int(param['corpus_meta'][index][2])
         pixel_in_segment = [row*n_col+col for row, col in list_of_segment[no_segment]]
         max_prob_topic = max([prob_topic for prob_topic in param['prob_topic_doc'][index]])
-        map_segment_init[index] = (max_prob_topic, pixel_in_segment)    
+        if len(pixel_in_segment) >= 1000:
+            map_segment_init[index] = (max_prob_topic, pixel_in_segment)
     map_segment_for_GA[name_file] = map_segment_init
     return map_segment_for_GA
 
