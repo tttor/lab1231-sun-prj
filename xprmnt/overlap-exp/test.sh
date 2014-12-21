@@ -5,13 +5,10 @@ num=$1
 result_dir=/home/jogie/sun4/exp/overlap-segment/ann-result/test-$num/
 final_result_dir=/home/jogie/sun4/exp/overlap-segment/final-result/test-$num/
 test_img_list_filepath=/home/jogie/sun4/exp/overlap-segment/meta/test$num.list
-param_superpixel=/home/jogie/sun4/exp/overlap-segment/meta/segment-param.list
+param_superpixel=/home/jogie/sun4/exp/overlap-segment/meta/segment-param-test.list
 # Constant params across num
 exe=../../overlap-exp/build/main 
 
-SLIC_region=25
-SLIC_regularization=70
-SLIC_min_region=15
 dataset_name=msrc
 n_label=21
 ori_img_dir=/home/jogie/sun3/dataset/msrc/unmix/Images/

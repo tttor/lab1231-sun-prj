@@ -47,6 +47,8 @@ def main():
     assert False, "INSUFFICIENT ARGUMENTS!"
     
   filenames = [line.strip() for line in open(sys.argv[1])]
+  not_include = ['1_12_s.bmp', '1_13_s.bmp', '1_14_s.bmp', '11_4_s.bmp', '11_5_s.bmp', '1_16_s.bmp', '11_8_s.bmp', '12_31_s.bmp', '12_33_s.bmp', '12_3_s.bmp', '1_26_s.bmp', '1_27_s.bmp', '12_7_s.bmp', '12_8_s.bmp', '14_13_s.bmp', '14_14_s.bmp', '14_15_s.bmp', '14_16_s.bmp', '14_17_s.bmp', '14_20_s.bmp', '14_5_s.bmp', '15_13_s.bmp', '15_19_s.bmp', '15_5_s.bmp', '15_6_s.bmp', '15_7_s.bmp', '16_16_s.bmp', '16_23_s.bmp', '16_27_s.bmp', '16_8_s.bmp', '17_15_s.bmp', '17_17_s.bmp', '17_19_s.bmp', '17_23_s.bmp', '17_26_s.bmp', '17_30_s.bmp', '17_5_s.bmp', '17_8_s.bmp', '19_15_s.bmp', '19_30_s.bmp', '19_7_s.bmp', '1_9_s.bmp', '20_6_s.bmp', '2_13_s.bmp', '2_14_s.bmp', '2_17_s.bmp', '2_18_s.bmp', '2_22_s.bmp', '2_25_s.bmp', '2_26_s.bmp', '2_28_s.bmp', '2_7_s.bmp', '2_8_s.bmp', '3_12_s.bmp', '3_16_s.bmp', '3_22_s.bmp', '3_26_s.bmp', '3_29_s.bmp', '3_5_s.bmp', '4_16_s.bmp', '4_20_s.bmp', '4_23_s.bmp', '4_26_s.bmp', '4_28_s.bmp', '4_30_s.bmp', '4_3_s.bmp', '5_11_s.bmp', '5_13_s.bmp', '5_14_s.bmp', '5_23_s.bmp', '5_27_s.bmp', '5_28_s.bmp', '5_2_s.bmp', '5_3_s.bmp', '6_15_s.bmp', '6_16_s.bmp', '6_22_s.bmp', '7_10_s.bmp', '7_12_s.bmp', '7_14_s.bmp', '7_15_s.bmp', '7_21_s.bmp', '7_22_s.bmp', '7_25_s.bmp', '8_10_s.bmp', '8_18_s.bmp', '8_19_s.bmp', '9_13_s.bmp', '9_17_s.bmp', '9_18_s.bmp', '9_19_s.bmp', '9_20_s.bmp', '9_24_s.bmp', '9_26_s.bmp', '9_5_s.bmp']
+  filenames = [ filename for filename in filenames if filename not in not_include]
 
   count = 1;
   for filename in filenames:
