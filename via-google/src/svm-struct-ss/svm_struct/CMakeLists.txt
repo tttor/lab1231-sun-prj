@@ -4,7 +4,7 @@ add_library(struct_learn svm_struct_learn.cpp)
 add_library(struct_common svm_struct_common.cpp)
 
 add_executable(do_learn svm_struct_main.cpp)
-add_executable(do_classify svm_struct_main.cpp)
+add_executable(do_classify svm_struct_classify.cpp)
 
 target_link_libraries(struct_common svm_common struct_api)
 target_link_libraries(struct_classify struct_common)

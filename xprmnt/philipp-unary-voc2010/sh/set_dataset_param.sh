@@ -14,7 +14,7 @@ echo $ori_img_dir
 gt_img_dir=/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2010/SegmentationClass-csv/
 echo $gt_img_dir
 
-unary_philipp_dir=/home/tor/sun3/dataset/pascal/VOC2010/unary-philipp/voc2010_compressed/
+unary_philipp_dir=/home/tor/sun4/xprmnt/own-unary-voc2010/own-unaries-20141218-compressed/
 echo $unary_philipp_dir
 
 echo "-----------------------------------------------------------"
