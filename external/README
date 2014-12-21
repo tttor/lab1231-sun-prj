@@ -79,7 +79,7 @@ http://www.robots.ox.ac.uk/~vgg/research/affine/det_eval_files/h_affine.ln.gz
 GibbsLDA++-0.2
 http://sourceforge.net/projects/gibbslda
 
-Modifications:
+Add these lines in the corresponding files:
 > utils.h
 #include <cstdlib>
 
