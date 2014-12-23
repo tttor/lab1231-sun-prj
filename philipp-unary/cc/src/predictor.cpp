@@ -113,7 +113,6 @@
       qDebug("WELCOME TO OUR WORLD. GET HIGH!");
 
       QSharedPointer<Feature> filter[4] = {QSharedPointer<Feature>( new FilterBank( filterbank_size ) ),QSharedPointer<Feature>( new ColorFeature() ),QSharedPointer<Feature>( new LocationFeature() ), QSharedPointer<Feature>( new HogFeature(type) )};
-      qDebug("Hello");
       QVector< ColorImage > images;
       QVector< Image<float> > lab_images;
       QVector< LabelImage > labels;
@@ -126,7 +125,7 @@
         QVector< QString > cur_names;
         for( int ii=nn; ii<nn+blockSize && ii<filenames.count(); ii++ )
           cur_names.append( filenames[ii] );
-        qDebug(QString("Generating unaries for first %1th images").arg(nn+blockSize).toStdString().c_str());
+        qDebug(QString("Generating unaries for first %1 images").arg(nn+blockSize).toStdString().c_str());
 
         loadImagesbyNames(images, labels, names, cur_names,img_folder);
         qDebug("Converting to Lab");
@@ -166,7 +165,7 @@
           dir.mkpath( dir.absolutePath() );
 
         evaluate_all( booster, textons, names, save_dir );
-        qDebug(QString("Successfully produced unaries for first %1th images").arg(nn+blockSize).toStdString().c_str());
+        qDebug(QString("Successfully produced unaries for first %1 images").arg(nn+blockSize).toStdString().c_str());
       }
       qDebug("ALL FINISHED, HAVE A NICE DAY BABY!");
     }
