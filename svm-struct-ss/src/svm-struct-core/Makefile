@@ -5,7 +5,7 @@
 
 #Use the following to compile under unix or cygwin
 CC = gcc
-LD = g++
+LD = gcc
 
 CFLAGS =   $(SFLAGS) -O3 -fomit-frame-pointer -ffast-math -Wall 
 LDFLAGS =  $(SFLAGS) -O3 -lm -Wall

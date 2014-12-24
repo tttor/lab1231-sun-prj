@@ -23,11 +23,9 @@
 # include "svm_light/svm_common.h"
 # include "svm_light/svm_learn.h"
 
-# include "ssvm_ss_image_constraint.h"
-
-# define INST_NAME          "SemanticSegmentation"
+# define INST_NAME          "SVM Struct for Semantic Segmentation"
 # define INST_VERSION       "V0.10"
-# define INST_VERSION_DATE  "01.12.14"
+# define INST_VERSION_DATE  "2014.12.24"
 
 /* default precision for solving the optimization problem */
 # define DEFAULT_EPS         0.1 
@@ -58,17 +56,24 @@
 typedef struct pattern {
   /* this defines the x-part of a training example, e.g. the structure
      for storing a natural language sentence in NLP parsing */
-
-  // A row-wise flatten version of 2D image matrix
-  int flatten_image[ssvm_ss_image_constraint::n_pixel];
+  int add_your_variables_here;
 } PATTERN;
 
 typedef struct label {
   /* this defines the y-part (the label) of a training example,
      e.g. the parse tree of the corresponding sentence. */
-  // A row-wise flatten version of 2D label
-  int flatten_label[ssvm_ss_image_constraint::n_pixel];
+  int add_your_variables_here;
 } LABEL;
+
+typedef struct structmodel {
+  double *w;          /* pointer to the learned weights */
+  MODEL  *svm_model;  /* the learned SVM model */
+  long   sizePsi;     /* maximum number of weights in w */
+  double walpha;
+  /* other information that is needed for the stuctural model can be
+     added here, e.g. the grammar rules for NLP parsing */
+  int add_your_variables_here;
+} STRUCTMODEL;
 
 typedef struct struct_learn_parm {
   double epsilon;              /* precision for which to solve
@@ -98,17 +103,6 @@ typedef struct struct_learn_parm {
   /* further parameters that are passed to init_struct_model() */
   int add_your_variables_here;
 } STRUCT_LEARN_PARM;
-
-typedef struct structmodel {
-  double *w;          /* pointer to the learned weights */
-  MODEL  *svm_model;  /* the learned SVM model */
-  long   sizePsi;     /* maximum number of weights in w */
-  double walpha;
-  /* other information that is needed for the stuctural model can be
-     added here, e.g. the grammar rules for NLP parsing */
-  int add_your_variables_here;
-  STRUCT_LEARN_PARM *learned_param;
-} STRUCTMODEL;
 
 typedef struct struct_test_stats {
   /* you can add variables for keeping statistics when evaluating the
