@@ -10,3 +10,5 @@ VOCdevkit
 GibbsLDA++-0.2
 region-descriptor
 region-detector
+opengm
+saliencyfilters
