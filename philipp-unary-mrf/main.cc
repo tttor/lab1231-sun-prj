@@ -32,8 +32,8 @@ int main(int argc, char* argv[]) {
     Eigen::MatrixXi ann;
     ann = annotate(img_filename, data_param);
 
-    const string ann_csv_filepath = string(data_param["result_dir"]+"/"+img_filename.substr(0,img_filename.size()-4)+".csv");
-    // const string ann_img_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".bmp");
+    const string ann_csv_filepath = string(data_param["result_dir"]+"/"+img_filename+".csv");
+    // const string ann_img_filepath = string(data_param["result_dir"]+img_filename+".bmp");
     sun::util::csv_write<Eigen::MatrixXi>(ann, ann_csv_filepath);
     // cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
   }
@@ -45,7 +45,7 @@ Eigen::MatrixXi annotate(const std::string& img_filename, sun::util::DataParam d
   using namespace std;
   // std::cout << "annotate(): BEGIN\n";
 
-  const string img_path = string(data_param["ori_img_dir"]+"/"+img_filename);
+  const string img_path = string(data_param["ori_img_dir"]+"/"+img_filename+".jpg");
   cout << "img_path= " << img_path << endl;
 
   cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
@@ -69,7 +69,7 @@ Eigen::MatrixXi annotate(const std::string& img_filename, sun::util::DataParam d
 void set_1st_order(const std::string& img_filename, const size_t& n_label, const std::string& unary_prob_img_dir, GraphicalModel* gm) {
   using namespace std;
 
-  const string unary_prob_img_path = string( unary_prob_img_dir+"/"+img_filename.substr(0,img_filename.size()-4)+".c_unary" );// -4 for replacing the file extension, e.g. .bmp
+  const string unary_prob_img_path = string( unary_prob_img_dir+"/"+img_filename+".c_unary" );
   cout << "unary_prob_img_path= " << unary_prob_img_path << endl;
 
   ProbImage unary_prob_img;
@@ -86,6 +86,7 @@ void set_1st_order(const std::string& img_filename, const size_t& n_label, const
       opengm::ExplicitFunction<double> energy(shape, shape+1);
 
       for(int i = 0; i < n_label; i++) 
+        // energy(i) = -1 * log( unary_prob_img(x,y,i) );
         energy(i) = -1 * unary_prob_img(x,y,i);
 
       GraphicalModel::FunctionIdentifier fid = gm->addFunction(energy);
