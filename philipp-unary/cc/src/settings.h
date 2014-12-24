@@ -48,10 +48,6 @@ static const char VOC2010_TEST_FILE  [] = "/declared_but_not_used/path_to_non_ex
 // VOC Cache
 static const char VOC2010_BBOX_DIRECTORY [] = "/declared_but_not_used/path_to_non_existence_dir";
 
-static const int N_TEXTONS = 400;//: 50, see Shotton, 2007: TextonBoost for Image Understanding: ...
-
-static const float FILTER_BANK_SIZE = 1.0;
-
 // Boosting parameters
 static const int N_BOOSTING_ROUNDS  = 3000; // Number of boosting rounds: 10000, 3000
 static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]: 750, 200
@@ -63,8 +59,12 @@ static const int BOOSTING_SUBSAMPLE = 5  ; // Subsampling factor (tradeoff betwe
 static const int BOOSTING_SUBSAMPLE = 7  ; // Subsampling factor (tradeoff between memory/computation and accuracy)
 #endif
 
+// Feature extraction params
+// NOTE: depend on the size of images, to some extent
 static const int MIN_RECT_SIZE      = BOOSTING_SUBSAMPLE; // Minimum size of texton rectangle
 static const int MAX_RECT_SIZE      = 200; // Maximum size of texton rectangle
+static const int N_TEXTONS = 400;//: 50, see Shotton, 2007: TextonBoost for Image Understanding: ...
+static const float FILTER_BANK_SIZE = 1.0;
 
 // Other parameters
 // #define AREA_SAMPLING   // Sample the rect size proportional to the area of the rectangle (uniform in w*h instead of uniform in w and h)
