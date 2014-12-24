@@ -32,6 +32,12 @@
 #pragma once
 const int CACHE_SIZE = 100;// The number of loaded images to the memory when testing for process parallelization
 
+// #define AREA_SAMPLING   // Sample the rect size proportional to the area of the rectangle (uniform in w*h instead of uniform in w and h)
+#define GAUSSIAN_OFFSET // Use Sample the offset from a gaussian centered at 0
+
+// Shall we return the raw boosting results H or P = 1/Z * exp(-H)
+//#define RAW_BOOSTING_OUTPUT
+
 // Dataset parameters
 //#define USE_MSRC
 static const char MSRC_DIRECTORY  [] = "/declared_but_not_used/path_to_non_existence_dir";
@@ -53,22 +59,18 @@ static const int N_BOOSTING_ROUNDS  = 3000; // Number of boosting rounds: 10000,
 static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]: 750, 200
 static const int N_THRESHOLDS       = 100; // Number of thresholds to test [per round]: 100, 150
 
-#ifdef USE_MSRC
-static const int BOOSTING_SUBSAMPLE = 5  ; // Subsampling factor (tradeoff between memory/computation and accuracy)
-#else
-static const int BOOSTING_SUBSAMPLE = 7  ; // Subsampling factor (tradeoff between memory/computation and accuracy)
-#endif
-
 // Feature extraction params
-// NOTE: depend on the size of images, to some extent
+// NOTE: to some extent, depend on the size of images
+static const float voc_img_scale = 0.25;
+
+// #ifdef USE_MSRC
+// static const int BOOSTING_SUBSAMPLE = 5  ; // Subsampling factor (tradeoff between memory/computation and accuracy)
+// #else
+static const int BOOSTING_SUBSAMPLE = 7 * voc_img_scale  ; // Subsampling factor (tradeoff between memory/computation and accuracy)
+// #endif
+
+// TODO: what is the unit of rect_size?
 static const int MIN_RECT_SIZE      = BOOSTING_SUBSAMPLE; // Minimum size of texton rectangle
-static const int MAX_RECT_SIZE      = 200; // Maximum size of texton rectangle
-static const int N_TEXTONS = 400;//: 50, see Shotton, 2007: TextonBoost for Image Understanding: ...
-static const float FILTER_BANK_SIZE = 1.0;
-
-// Other parameters
-// #define AREA_SAMPLING   // Sample the rect size proportional to the area of the rectangle (uniform in w*h instead of uniform in w and h)
-#define GAUSSIAN_OFFSET // Use Sample the offset from a gaussian centered at 0
-
-// Shall we return the raw boosting results H or P = 1/Z * exp(-H)
-//#define RAW_BOOSTING_OUTPUT
+static const int MAX_RECT_SIZE      = 200 * voc_img_scale; // Maximum size of texton rectangle
+static const float FILTER_BANK_SIZE = 1.0 * voc_img_scale;// TODO unit of this size?
+static const int N_TEXTONS = 400 * voc_img_scale;//: 50, see Shotton, 2007: TextonBoost for Image Understanding: ...
