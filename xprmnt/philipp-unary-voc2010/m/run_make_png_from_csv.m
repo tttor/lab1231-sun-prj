@@ -9,8 +9,15 @@ VOCcode_dir = '../../../external/VOCdevkit/VOCcode';
 addpath(VOCcode_dir);
 
 %%
-csv_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010/annotation/with-own-unaries-20141218/split_voc2010_philipp_Test_csv';
-png_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010/annotation/with-own-unaries-20141218/split_voc2010_philipp_Test_cls';
+csv_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010-scaled/annotation/split_voc2010_philipp_Test_csv';
+png_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010-scaled/annotation/split_voc2010_philipp_Test_cls';
+mkdir(png_dir);
+
+%%
+%cmap = VOClabelcolormap(256);
+
+cmap_filepath = '/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-scaled-0.25/color_map.csv';
+cmap = csvread(cmap_filepath);
 
 %%
 listing = dir(csv_dir);
@@ -31,6 +38,5 @@ for i=1:numel(listing)
 	png_filepath = strcat(png_dir, '/', png_filename);
 
 	% The size of the color map is given by N, which should generally be set to 256 to include a color for the 'void' label.
-	cmap = VOClabelcolormap(256);
-	make_png_from_csv_voc(csv_filepath, png_filepath, cmap)
+	make_png_from_csv_voc(csv_filepath, png_filepath, cmap)    
 end

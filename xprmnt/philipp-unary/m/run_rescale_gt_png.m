@@ -25,7 +25,7 @@ for i=1:numel(listing)
 	png_filepath = strcat(gt_png_dir, '/', png_filename);
     
     [gt_png, map] = imread(png_filepath);
-    [rescaled_gt_png, rescaled_map] = imresize(gt_png, map, scale,interpolation_method);
+    [rescaled_gt_png, rescaled_map] = imresize(gt_png, map, scale,interpolation_method,'Colormap','original');
 
 	rescaled_png_filename = png_filename;
 	rescaled_png_filepath = strcat(rescaled_gt_png_dir, '/', rescaled_png_filename);
@@ -38,5 +38,5 @@ for i=1:numel(listing)
 	imwrite(rescaled_gt_png, rescaled_map, rescaled_png_filepath)    
 end
 
-color_map_filepath = strcat(rescaled_gt_png_dir,'/color_map.csv');
-csvwrite(color_map_filepath, old_rescaled_map);
+%color_map_filepath = strcat(rescaled_gt_png_dir,'/color_map.csv');
+%csvwrite(color_map_filepath, old_rescaled_map);
