@@ -11,7 +11,7 @@ double zero_one_loss(const LABEL& y, const LABEL& ybar) {
   assert(y.size==ybar.size && "y.size!=ybar.size");
 
   double loss = 0.0; // optimistic init
-  for (long i=0; i<y.size; ++i) {
+  for (size_t i=0; i<y.size; ++i) {
     if (y.flatten_label[i]==svm_struct_ss::data_param::void_label) 
       continue;
 

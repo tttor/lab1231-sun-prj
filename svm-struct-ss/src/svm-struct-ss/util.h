@@ -34,7 +34,7 @@ struct MRFWeight {
   Eigen::MatrixXd vertical_pairwise_weight;
 };
 
-MRFWeight get_weight(const STRUCTMODEL& mrf_model, const long& label_width, const long& label_height) {
+MRFWeight get_weight(const STRUCTMODEL& mrf_model, const size_t& label_width, const size_t& label_height) {
   // Eigen::MatrixXd unary_weight();
   // unary_weight = 
 
@@ -48,7 +48,7 @@ MRFWeight get_weight(const STRUCTMODEL& mrf_model, const long& label_width, cons
 }
 
 // row-wise idx flattening
-long flat_idx_rowcol(long row, long col, long n_col) {
+size_t flat_idx_rowcol(size_t row, size_t col, size_t n_col) {
   return  col + (row * n_col);
 }
 
@@ -59,7 +59,7 @@ LABEL get_LABEL(const LabelMatrix& label_mat) {
   label.height = label_mat.rows();
   label.size = label.height*label.width;
   label.max_size = sizeof(label.flatten_label)/sizeof(label.flatten_label[0]);
-  for (long j=0; j<label.size; ++j) label.flatten_label[j] = label_mat.data()[j];// row-wise flattening
+  for (size_t j=0; j<label.size; ++j) label.flatten_label[j] = label_mat.data()[j];// row-wise flattening
 
   return label;
 }
@@ -71,13 +71,13 @@ SAMPLE get_set_of_examples(const std::string& list_filepath) {
   list = svm_struct_ss::io::read_list(list_filepath);
 
   //
-  const long n_example = list.size();
+  const size_t n_example = list.size();
   debug_var("n_example=",n_example);
 
   EXAMPLE* examples;
   examples = (EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n_example);
 
-  for(long i=0; i<n_example; ++i) {
+  for(size_t i=0; i<n_example; ++i) {
     cout << "Reading example= " << i+1 << " of " << n_example << endl;
 
     //
@@ -104,9 +104,9 @@ SAMPLE get_set_of_examples(const std::string& list_filepath) {
   return set_of_examples;
 }
 
-long get_n_feature() {
-  const long n_unary_fea = SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PIXEL;
-  const long n_pairwise_fea = SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PAIRWISE_POTENTIAL;
+size_t get_n_feature() {
+  const size_t n_unary_fea = SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PIXEL;
+  const size_t n_pairwise_fea = SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PAIRWISE_POTENTIAL;
 
   // return n_unary_fea+n_pairwise_fea;
   return n_unary_fea;

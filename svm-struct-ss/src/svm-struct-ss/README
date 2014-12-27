@@ -1,6 +1,8 @@
 ===
 The flow of learning via learn.cc
 
+svm_struct_learn_api_init
+read_input_parameters
 Reading training examples
 svm_learn_struct_joint(...ONESLACK_DUAL_ALG)
 	init_struct_model()
@@ -11,10 +13,33 @@ svm_learn_struct_joint(...ONESLACK_DUAL_ALG)
 			api::psi():
 	initialize the constraint cache
 	main learning loop:
-		find_most_violated_constraint_marginrescaling(): 
+		find a violated joint constraint
+		looping over example
+			find_most_violated_constraint_marginrescaling():
+				loss augmented inference 
+				get psi(x,y) and psi(x,ybar)
+				scale feature vector and margin by loss 
+			add current fy-fybar to lhs of constraint:begin
+			kparm->kernel_type == LINEAR
+			add current fy-fybar to lhs of constraint: end
+		get psi(x,y) and psi(x,ybar)
 		api::psi()
 		loss()
-		Segmentation fault (core dumped)
+	Final epsilon on KKT-Conditions: 0.00000
+	Upper bound on duality gap: -0.00000
+	Dual objective value: dval=0.00006
+	Primal objective value: pval=0.00006
+	Total number of constraints in final working set: 1 (of 1)
+	Number of iterations: 2
+	Number of calls to 'find_most_violated_constraint': 6
+	Number of SV: 1 
+	Norm of weight vector: |w|=0.01058
+	Value of slack variable (on working set): xi=0.00000
+	Value of slack variable (global): xi=-0.00000
+	Norm of longest difference vector: ||Psi(x,y)-Psi(x,ybar)||=94.52398
+	Runtime in cpu-seconds: 12.06
 
 ===
 The flow of prediction via predict.cc
+
+...

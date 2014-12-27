@@ -44,14 +44,14 @@ typedef struct label {
   int flatten_label[SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PIXEL];
 
   // max number of element in flatten label
-  long max_size;
+  size_t max_size;
 
   // the number of used elements in flatten_label;
-  long size;
+  size_t size;
 
   // the shape of the labeled image
-  long width;
-  long height;
+  size_t width;
+  size_t height;
 } LABEL;
 
 typedef struct struct_learn_parm {
@@ -86,7 +86,7 @@ typedef struct struct_learn_parm {
 typedef struct structmodel {
   double *w;          /* pointer to the learned weights */
   MODEL  *svm_model;  /* the learned SVM model */
-  long   sizePsi;     /* maximum number of weights in w */
+  size_t   sizePsi;     /* maximum number of weights in w */
   double walpha;
   /* other information that is needed for the stuctural model can be
      added here, e.g. the grammar rules for NLP parsing */

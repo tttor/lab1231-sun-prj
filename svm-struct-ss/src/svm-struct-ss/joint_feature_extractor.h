@@ -11,7 +11,7 @@
 namespace svm_struct_ss {
 namespace joint_feature_extractor {
 
-void psi(const PATTERN& x, const LABEL& y,const long& n_word, SVECTOR* fvec) {
+void psi(const PATTERN& x, const LABEL& y,const size_t& n_word, SVECTOR* fvec) {
   debug_in_msg("joint_feature_extractor::psi");
   using namespace std;
 
@@ -25,9 +25,9 @@ void psi(const PATTERN& x, const LABEL& y,const long& n_word, SVECTOR* fvec) {
 
   // get unary joint feature
   svm_struct_ss::util::FeatureMatrix local_unary_fea_mat(unary_prob_img.height(), unary_prob_img.width());
-  for (long r=0; r<local_unary_fea_mat.rows(); ++r) 
-    for (long c=0; c<local_unary_fea_mat.cols(); ++c) { 
-      long flat_idx = svm_struct_ss::util::flat_idx_rowcol( r,c,unary_prob_img.width() );
+  for (size_t r=0; r<local_unary_fea_mat.rows(); ++r) 
+    for (size_t c=0; c<local_unary_fea_mat.cols(); ++c) { 
+      size_t flat_idx = svm_struct_ss::util::flat_idx_rowcol( r,c,unary_prob_img.width() );
       local_unary_fea_mat(r,c) = unary_prob_img( c,r,y.flatten_label[flat_idx] ); 
     }
 
@@ -63,7 +63,7 @@ void psi(const PATTERN& x, const LABEL& y,const long& n_word, SVECTOR* fvec) {
   //   ++word_idx;
   // }
 
-  // for (long i=0; i<10; ++i) {
+  // for (size_t i=0; i<10; ++i) {
   //   debug_var("fvec->words[i].wnum",fvec->words[i].wnum);
   //   debug_var("fvec->words[i].weight",fvec->words[i].weight);
   // }
