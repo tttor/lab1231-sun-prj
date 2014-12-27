@@ -13,13 +13,12 @@ It is equivalent to minimize the negative loss.
 Thus:
 y_star = argmin E(.) + (-loss)
 
-Notice that due to OPENGM implementation limitation (cannot accomodate a factor having all pixels (the highest term)),
-the operator() always returns the minimum loss, i.e. -1.0 for the last node whenever active=true.
-This is a kind of approximations, but we will get it right almost all the time since loss=0 occurs only at once,
-iff y_true[i] == y[i] for all element i.
+Due to the limitation of OPENGM implementation: cannot accomodate a factor connecting all pixels (the highest term),
+the operator() always returns the minimum loss, i.e. -1.0, for the last node whenever active=true.
+It is the case for all the time, except for one occasion when y[i]==ytrue[i] for all element i.
 
-Due to always returning (loss = -1.0), we will get it wrong,
-iff $ E(y_true) + (-1.0) > E(y) + (-1.0), \forall y \in Y\y_true $
+Due to always returning (loss = -1.0), we get y_star _wrong_ at occasions when the inference algorithm _ever_
+(with low probability) _evaluates_ y==ytrue _and_ $E(y==ytrue) + (-1.0) > E(y') + (-1.0), \forall y' \in Y\y$.
 */
 template<typename T>
 class ZeroOneLossFunctor {
