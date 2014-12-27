@@ -8,11 +8,16 @@ void train(DataParam data_param, EnergyParam* energy_param) {
 
   const std::string data_name = data_param["name"];
 
-  if (data_param["name"]=="MSRC") {
-    // From [Shotton, 2009                                                 ]
+  if (data_param["name"]=="msrc21") {
+    std::cout << "Use param from [Shotton,2009]\n";
     (*energy_param)["theta_phi_1"] = 4.5;
-    (*energy_param)["theta_phi_2"] = 1.0;  
+    (*energy_param)["theta_phi_2"] = 1.0;
   } 
+  else if (data_param["name"]=="voc2010") {
+    std::cout << "Use param from [Shotton,2009]\n";
+    (*energy_param)["theta_phi_1"] = 4.5;
+    (*energy_param)["theta_phi_2"] = 1.0;
+  }
   else {
     assert(false && "Unknown dataset!");
   }
