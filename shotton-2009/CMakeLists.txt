@@ -22,30 +22,25 @@ include_directories (${EigenIncludeDir})
 include_directories (include)
 
 #
-add_library( probimage 
-  ../external/prob-image/probimage.cpp 
-)
-
-add_library( util
+add_library( shotton_mrf 
+  src/shotton.cc
+  src/edge_potential.cc
   ../util/src/util.cc
   ../util/src/color_map.cc
 )
-add_library( shotton 
-  src/shotton.cc
-  src/edge_potential.cc
+
+target_link_libraries( shotton_mrf
+  /home/tor/sun/ws/tmp/lab1231-sun-prj.20141226.2053/external/prob-image/build/libprobimage.a
+  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-maxflow.a
+  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-qpbo.a
+  ${OpenCV_LIBS}
 )
 
 # 
-add_executable(main 
+add_executable( main 
   src/main.cc 
 )
 
-#
-target_link_libraries(main 
-  shotton
-  probimage
-  util
-  ${OpenCV_LIBS} 
-  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-maxflow.a
-  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-qpbo.a
+target_link_libraries( main 
+  shotton_mrf
 )
