@@ -28,6 +28,7 @@ add_library( probimage
 
 add_library( util
   ../util/src/util.cc
+  ../util/src/color_map.cc
 )
 add_library( shotton 
   src/shotton.cc
@@ -45,6 +46,6 @@ target_link_libraries(main
   probimage
   util
   ${OpenCV_LIBS} 
-  ${OpenGMDir}/build/src/external/libexternal-library-maxflow.a
-  ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
+  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-maxflow.a
+  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-qpbo.a
 )
