@@ -29,7 +29,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#include "svm_struct_ss_api_types.h"
+#include "../svm_struct_api_types.h"
 
 typedef struct example {  /* an example is a pair of pattern and label */
   PATTERN x;

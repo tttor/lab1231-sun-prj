@@ -1,0 +1,19 @@
+===
+The flow of learning via learn.cc
+
+Reading training examples
+svm_learn_struct_joint(...ONESLACK_DUAL_ALG)
+	init_struct_model()
+	set initial model and slack variables
+	create a cache of the feature vectors for the correct labels
+	if(USE_FYCACHE)
+		for each sample
+			api::psi():
+	initialize the constraint cache
+	main learning loop:
+		find_most_violated_constraint_marginrescaling(): 
+		api::psi()
+		Segmentation fault (core dumped)
+
+===
+The flow of prediction via predict.cc

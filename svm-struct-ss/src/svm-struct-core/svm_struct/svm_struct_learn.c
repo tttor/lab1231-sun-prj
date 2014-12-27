@@ -20,11 +20,15 @@
 
 #include "svm_struct_learn.h"
 #include "svm_struct_common.h"
-#include "svm_struct_ss_api.h"
+#include "../svm_struct_api.h"
 #include <assert.h>
 
 #define MAX(x,y)      ((x) < (y) ? (y) : (x))
 #define MIN(x,y)      ((x) > (y) ? (y) : (x))
+
+#define debug_msg(msg) fprintf(stderr, ">>>>>>>>>> %s\n", msg)
+#define debug_var(id,val) fprintf(stderr, ">>>>>>>>>> %s= %f\n", id, (float)val)
+
 
 
 void svm_learn_struct(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
@@ -473,6 +477,8 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 			    LEARN_PARM *lparm, KERNEL_PARM *kparm, 
 			    STRUCTMODEL *sm, int alg_type)
 {
+	fprintf(stderr, "%s\n", "svm_learn_struct_joint: BEGIN");
+
   int         i,j;
   int         numIt=0;
   long        argmax_count=0;
@@ -511,6 +517,8 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
   long        uptr=0;
   long        *randmapping=NULL;
   long        batch_size=n;
+
+  debug_msg("after init var");
 
   rt1=get_runtime();
 
@@ -556,6 +564,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
     kparm->gram_matrix=init_kernel_matrix(&cset,kparm);
 
   /* set initial model and slack variables */
+  debug_msg("set initial model and slack variables");
   svmModel=(MODEL *)my_malloc(sizeof(MODEL));
   lparm->epsilon_crit=epsilon;
   svm_learn_optimization(cset.lhs,cset.rhs,cset.m,sizePsi,
@@ -565,22 +574,32 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
   sm->w=svmModel->lin_weights; /* short cut to weight vector */
 
   /* create a cache of the feature vectors for the correct labels */
+  debug_msg("create a cache of the feature vectors for the correct labels");
+  debug_var("n",n);
   fycache=(SVECTOR **)my_malloc(n*sizeof(SVECTOR *));
   for(i=0;i<n;i++) {
     if(USE_FYCACHE) {
+      debug_msg("USE_FYCACHE");
+
       fy=psi(ex[i].x,ex[i].y,sm,sparm);
+	  debug_msg("got psi()");
+
       if(kparm->kernel_type == LINEAR) { /* store difference vector directly */
-	diff=add_list_sort_ss_r(fy,COMPACT_ROUNDING_THRESH); 
-	free_svector(fy);
-	fy=diff;
+	  	debug_msg("kparm->kernel_type == LINEAR");
+		diff=add_list_sort_ss_r(fy,COMPACT_ROUNDING_THRESH); 
+		free_svector(fy);
+		fy=diff;
       }
     }
     else
       fy=NULL;
+
+  	debug_msg("will fycache[i]=fy;");
     fycache[i]=fy;
   }
 
   /* initialize the constraint cache */
+  debug_msg("initialize the constraint cache");
   if(alg_type == ONESLACK_DUAL_CACHE_ALG) {
     ccache=create_constraint_cache(sample,sparm,sm);
     /* NOTE:  */
@@ -605,6 +624,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
     /*****************/
    /*** main loop ***/
   /*****************/
+  debug_msg("main loop: BEGIN");
   do { /* iteratively find and add constraints to working set */
 
       if(struct_verbosity>=1) { 

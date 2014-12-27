@@ -24,6 +24,9 @@
 #define MIN(x,y)      ((x) > (y) ? (y) : (x))
 #define SIGN(x)       ((x) > (0) ? (1) : (((x) < (0) ? (-1) : (0))))
 
+#define debug_msg(msg) fprintf(stderr, "xxxxxxxx %s\n", msg)
+#define debug_var(id,val) fprintf(stderr, "xxxxxxx %s= %f\n", id, (float)val)
+
 long   verbosity;              /* verbosity level (0-4) */
 long   kernel_cache_statistic;
 
@@ -470,6 +473,7 @@ SVECTOR* add_list_sort_ss_r(SVECTOR *a, double min_non_zero)
      /* Like add_list_sort_ss(SVECTOR *a), but rounds values smaller
 	than min_non_zero to zero. */
 {
+  debug_msg("add_list_sort_ss_r:begin");
   SVECTOR *sum,*f;
   WORD    empty[2],*ai,*concat,*concati,*concat_read,*concat_write;
   long    length,i;
@@ -477,17 +481,24 @@ SVECTOR* add_list_sort_ss_r(SVECTOR *a, double min_non_zero)
     
   if(a){
     /* count number or entries over all vectors */
+    debug_msg("count number or entries over all vectors");
     length=0;
     for(f=a;f;f=f->next) {
-
+      debug_msg("iter: begin");
+      if (f->words==NULL) debug_msg("null");
+      else debug_msg("not null");
       ai=f->words;
+      debug_msg("bfr while");
       while (ai->wnum) {
-	length++;
-	ai++;
+        debug_msg("iter while: begin");
+	      length++;
+	      ai++;
       }
+      debug_msg("iter: end");
     }
 
     /* write all entries into one long array and sort by feature number */
+    debug_msg("write all entries into one long array and sort by feature number");
     concat=(WORD *)my_malloc(sizeof(WORD)*(length+1));
     concati=concat;
     for(f=a;f;f=f->next) {
@@ -541,6 +552,8 @@ SVECTOR* add_list_sort_ss_r(SVECTOR *a, double min_non_zero)
     empty[0].wnum=0;
     sum=create_svector(empty,NULL,1.0);
   }
+
+  debug_msg("add_list_sort_ss_r:end");
   return(sum);
 }
 
@@ -568,6 +581,7 @@ SVECTOR* add_list_ns_r(SVECTOR *a, double min_non_zero)
 	features is small compared to the number of elements in the
 	list */
 {
+    debug_msg("add_list_ns_r: begin");
     SVECTOR *vec,*f;
     register WORD *ai;
     long totwords;
@@ -592,6 +606,7 @@ SVECTOR* add_list_ns_r(SVECTOR *a, double min_non_zero)
     vec=create_svector_n_r(sum,totwords,NULL,1.0,min_non_zero);
     free(sum);
 
+  debug_msg("add_list_ns_r: end");
     return(vec);
 }
 
