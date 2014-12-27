@@ -1,4 +1,0 @@
-#ifndef SVM_STRUCT_SS_LOSS_FUNCTION_H
-#define SVM_STRUCT_SS_LOSS_FUNCTION_H
-
-#endif
