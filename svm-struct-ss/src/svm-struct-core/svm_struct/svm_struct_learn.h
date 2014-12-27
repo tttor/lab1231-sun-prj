@@ -30,7 +30,7 @@ extern "C" {
 }
 #endif
 #include "svm_struct_common.h" 
-#include "svm_struct_ss_api_types.h"
+#include "../svm_struct_api_types.h" 
 
 #define  SLACK_RESCALING    1
 #define  MARGIN_RESCALING   2

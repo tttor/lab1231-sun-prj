@@ -24,6 +24,9 @@
 #define MIN(x,y)      ((x) > (y) ? (y) : (x))
 #define SIGN(x)       ((x) > (0) ? (1) : (((x) < (0) ? (-1) : (0))))
 
+#define debug_msg(msg) fprintf(stderr, "--------------------------AT svm_common.c: %s\n", msg)
+#define debug_var(id,val) fprintf(stderr, "--------------------------AT svm_common.c: %s= %f\n", id, (float)val)
+
 long   verbosity;              /* verbosity level (0-4) */
 long   kernel_cache_statistic;
 
@@ -597,9 +600,11 @@ SVECTOR* add_list_ns_r(SVECTOR *a, double min_non_zero)
 
 void add_list_n_ns(double *vec_n, SVECTOR *vec_s, double faktor)
 {
+  debug_msg("add_list_n_ns:begin");
   SVECTOR *f;
   for(f=vec_s;f;f=f->next)  
     add_vector_ns(vec_n,f,f->factor*faktor);
+  debug_msg("add_list_n_ns:end");
 }
 
 void append_svector_list(SVECTOR *a, SVECTOR *b) 
@@ -784,14 +789,17 @@ void mult_vector_ns(double *vec_n, SVECTOR *vec_s, double faktor)
 
 void add_vector_ns(double *vec_n, SVECTOR *vec_s, double faktor)
 {
+  debug_msg("add_vector_ns:begin");
   /* Note: SVECTOR lists are not followed, but only the first
            SVECTOR is used */
   register WORD *ai;
   ai=vec_s->words;
   while (ai->wnum) {
+    // debug_var("ai->wnum",ai->wnum);// BUG IS HERE
     vec_n[ai->wnum]+=(faktor*(double)ai->weight);
     ai++;
   }
+  debug_msg("add_vector_ns:end");
 }
 
 double sprod_ns(double *vec_n, SVECTOR *vec_s)

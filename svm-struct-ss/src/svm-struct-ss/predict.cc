@@ -25,7 +25,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#include "svm_struct_ss_api.h"
+#include "api.h"
 
 char testfile[200];
 char modelfile[200];
