@@ -121,7 +121,7 @@ MatType csv_read(const std::string& csv_path) {
 /*!
  * @brief get the one dim vector idx
  */
- size_t flat_idx(const size_t& x, const size_t& y, const size_t& n_col);
+ size_t flat_idx_xy(const size_t& x, const size_t& y, const size_t& n_col);
 
 /*!
  * @brief

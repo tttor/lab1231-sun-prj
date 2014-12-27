@@ -14,7 +14,7 @@ size_t sun::util::n_pairwise(const size_t& n_row, const size_t& n_col, const std
   }
 }
 
-size_t sun::util::flat_idx(const size_t& x, const size_t& y, const size_t& n_col) {
+size_t sun::util::flat_idx_xy(const size_t& x, const size_t& y, const size_t& n_col) {
   return x + n_col * y;
 }
 
