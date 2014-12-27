@@ -18,8 +18,8 @@ int main(int argc, char* argv[]) {
   data_param["test_img_list_filepath"] = argv[4];
 
   // Train
-  shotton::EnergyParam energy_param;
-  shotton::train(data_param, &energy_param);
+  shotton::EnergyParam internal_energy_param;
+  shotton::train(data_param, &internal_energy_param);
 
   // Annotate
   vector<string> test_img_filenames;
@@ -40,10 +40,14 @@ int main(int argc, char* argv[]) {
     const string img_filename = test_img_filenames.at(i);
     cout << "ANNOTATING img_filename" << img_filename << endl;
 
-    Eigen::MatrixXi ann;
-    ann = shotton::annotate(img_filename, data_param, energy_param);
+    Eigen::MatrixXd unary_weight = Eigen::MatrixXd::Ones(0,0);// a dummy empty weight matrix;
+    bool used_as_loss_augmented_inference = false;
 
-    const string ann_filepath = string(ann_results_dir+img_filename.substr(0,img_filename.size()-4)+".ann");
+    Eigen::MatrixXi ann;
+    ann = shotton::annotate(img_filename, data_param, internal_energy_param, 
+                            unary_weight, used_as_loss_augmented_inference);
+
+    const string ann_filepath = string(ann_results_dir+img_filename+".ann");
     util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
     
     // ann_results.push_back(ann);
