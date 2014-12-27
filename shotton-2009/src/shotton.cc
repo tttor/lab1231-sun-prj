@@ -69,21 +69,6 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
     inf_engine.infer();
     inf_engine.arg(ann_vec);
   }
-  else if (method=="AlphaExpansionFusion") {
-    typedef 
-    opengm::external::MinSTCutKolmogorov<size_t, double> 
-    MinStCutType;
-
-    typedef 
-    opengm::GraphCut<GraphicalModel, opengm::Minimizer, MinStCutType> 
-    MinGraphCut;
-    
-    typedef 
-    opengm::AlphaExpansionFusion<GraphicalModel, MinGraphCut> 
-    MinAlphaExpansionFusion;
-
-    MinAlphaExpansionFusion inf_engine(gm);
-  }
   else if (method=="ICM") {
     typedef opengm::ICM<GraphicalModel, opengm::Minimizer> IcmType;
     IcmType::VerboseVisitorType visitor;
@@ -132,7 +117,7 @@ void set_1st_order(const cv::Mat& img, const std::string& img_filename, const si
       GraphicalModel::FunctionIdentifier fid = gm->addFunction(energy);
       
       // add a factor
-      size_t var_idxes[] = {util::var_idx(x, y, img.cols)};
+      size_t var_idxes[] = {util::flat_idx(x, y, img.cols)};
       gm->addFactor(fid, var_idxes, var_idxes+1);
     }
   }
@@ -170,7 +155,7 @@ void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy
         GraphicalModel::FunctionIdentifier fid = gm->addFunction(pott);
 
         // add a factor
-        size_t var_idxes[] = {util::var_idx(x,y,img.cols), util::var_idx(x+1,y,img.cols)};
+        size_t var_idxes[] = {util::flat_idx(x,y,img.cols), util::flat_idx(x+1,y,img.cols)};
         std::sort(var_idxes, var_idxes + 2);
         gm->addFactor(fid, var_idxes, var_idxes + 2);
       }
@@ -189,7 +174,7 @@ void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy
         GraphicalModel::FunctionIdentifier fid = gm->addFunction(pott);
 
         // add a factor
-        size_t var_idxes[] = {util::var_idx(x,y,img.cols), util::var_idx(x,y+1,img.cols)};
+        size_t var_idxes[] = {util::flat_idx(x,y,img.cols), util::flat_idx(x,y+1,img.cols)};
         std::sort(var_idxes, var_idxes + 2);
         gm->addFactor(fid, var_idxes, var_idxes + 2);
       }
