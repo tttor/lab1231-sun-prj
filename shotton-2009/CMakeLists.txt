@@ -8,13 +8,11 @@ find_package( Boost REQUIRED )
 #
 set(EigenIncludeDir /usr/local/include/eigen3)
 set(OpenGMDir ../external/opengm-2.3.3)
-set(PhilippProbImageDir ../external/prob-image)
 
 #
 include_directories (${OpenGMDir}/include)
 include_directories (${OpenGMDir}/src/external/MaxFlow-v3.02.src-patched)
 include_directories (${OpenGMDir}/src/external/QPBO-v1.3.src-patched)
-include_directories (${PhilippProbImageDir})
 include_directories (../util/include)
 include_directories (../external)
 
@@ -31,9 +29,6 @@ add_library( shotton_mrf
 
 target_link_libraries( shotton_mrf
   /home/tor/sun/ws/tmp/lab1231-sun-prj.20141226.2053/external/prob-image/build/libprobimage.a
-  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-maxflow.a
-  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-qpbo.a
-  ${OpenCV_LIBS}
 )
 
 # 
@@ -43,4 +38,7 @@ add_executable( main
 
 target_link_libraries( main 
   shotton_mrf
+  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-maxflow.a
+  /home/tor/sun/ws/lab1231-sun-prj/external/opengm-2.3.3/build/src/external/libexternal-library-qpbo.a
+  ${OpenCV_LIBS}
 )

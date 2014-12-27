@@ -4,10 +4,12 @@
 #include <iostream>
 #include <map>
 #include <algorithm> // std::sort
-
-#include <probimage.h>
-
 #include <boost/lexical_cast.hpp>
+#include <Eigen/Dense>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <opengm/graphicalmodel/graphicalmodel.hxx>
 #include <opengm/graphicalmodel/space/simplediscretespace.hxx>
@@ -29,18 +31,11 @@
 #include <opengm/functions/absolute_difference.hxx>
 #include <opengm/operations/minimizer.hxx>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
-#include <Eigen/Dense>
-
+#include <prob-image/probimage.h>
 #include <util/util.h>
-
 #include <shotton/edge_potential.h>
 
 namespace lab1231_sun_prj {
-
 namespace shotton {
 
 typedef 
@@ -85,7 +80,6 @@ void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy
 void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_var, Eigen::MatrixXi* ann);
 
 }// namespace shotton
-
 } // namespace lab1231_sun_prj
 
 #endif
