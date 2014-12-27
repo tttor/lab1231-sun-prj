@@ -62,14 +62,10 @@ int main (int argc, char* argv[])
 			&struct_verbosity,&struct_parm,&learn_parm,
 			&kernel_parm,&alg_type);
 
-  if(struct_verbosity>=1) {
-    printf("Reading training examples..."); fflush(stdout);
-  }
   /* read the training examples */
-  sample=read_struct_examples(trainfile,&struct_parm);
-  if(struct_verbosity>=1) {
-    printf("done\n"); fflush(stdout);
-  }
+  // if(struct_verbosity>=1) printf("Reading training examples...\n"); fflush(stdout);
+  sample = read_struct_examples(trainfile,&struct_parm);
+  // if(struct_verbosity>=1) printf("done\n"); fflush(stdout);
   // HAPPY_STOP;
 
   /* Do the learning and return structmodel. */
@@ -87,8 +83,9 @@ int main (int argc, char* argv[])
     svm_learn_struct_joint(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,ONESLACK_DUAL_CACHE_ALG);
   // else if(alg_type == 9)
   //   svm_learn_struct_joint_custom(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel);
-  else
-    exit(1);
+  else {
+    assert(false && "fatal: unknown alg_type!");
+  }
   HAPPY_STOP;
 
   /* Warning: The model contains references to the original data 'docs'.
