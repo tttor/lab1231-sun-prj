@@ -12,11 +12,10 @@ int main(int argc, char* argv[]) {
 
   // Set the dataset param
   shotton::DataParam data_param;
-  data_param["name"] = argv[1];//string("MSRC");
-  data_param["n_label"] = argv[2];//string("21");// inc. the background
-  // data_param["gt_img_dir"] = "/home/tor/sun3/dataset/msrc/spt/GroundTruth/";
-  data_param["ori_img_dir"] = argv[3];//"/home/tor/sun3/dataset/msrc/spt/Images/";  
-  data_param["test_img_list_filepath"] = argv[4];// "/home/tor/sun3/dataset/msrc/meta/test.list";
+  data_param["name"] = argv[1];
+  data_param["n_label"] = argv[2];
+  data_param["ori_img_dir"] = argv[3];
+  data_param["test_img_list_filepath"] = argv[4];
 
   // Train
   shotton::EnergyParam energy_param;
@@ -34,7 +33,7 @@ int main(int argc, char* argv[]) {
     test_img_list_file.close();
   }
 
-  const string ann_results_dir = argv[5];//"/home/tor/sun4/exp/rep-shotton-msrc/ann-csv/";
+  const string ann_results_dir = argv[5];
   std::vector<Eigen::MatrixXi> ann_results;
 
   for (size_t i=0; i<test_img_filenames.size(); ++i) {
