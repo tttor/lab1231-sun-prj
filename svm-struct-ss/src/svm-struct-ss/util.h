@@ -1,6 +1,8 @@
 #ifndef SVM_STRUCT_SS_UTIL_H
 #define SVM_STRUCT_SS_UTIL_H
 
+#include <svm_light/svm_common.h>
+
 #include "api_types.h"
 #include "data_param.h"
 #include "io.h"
@@ -18,9 +20,48 @@
 namespace svm_struct_ss {
 namespace util {
 
+typedef 
+Eigen::Matrix<int,Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor> 
+LabelMatrix;
+
+typedef 
+Eigen::Matrix<FVAL, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> 
+FeatureMatrix;
+
+struct MRFWeight {
+  Eigen::MatrixXd unary_weight;
+  Eigen::MatrixXd horizontal_pairwise_weight;
+  Eigen::MatrixXd vertical_pairwise_weight;
+};
+
+MRFWeight get_weight(const STRUCTMODEL& mrf_model, const long& label_width, const long& label_height) {
+  // Eigen::MatrixXd unary_weight();
+  // unary_weight = 
+
+  // Eigen unary_weight;
+  // unary_weight()
+
+  MRFWeight mrf_w;
+  // mrf_w.unary_weight = 
+
+  return mrf_w;
+}
+
 // row-wise idx flattening
-long flat_idx(long row, long col, long n_col) {
+long flat_idx_rowcol(long row, long col, long n_col) {
   return  col + (row * n_col);
+}
+
+LABEL get_LABEL(const LabelMatrix& label_mat) {
+  LABEL label;
+
+  label.width = label_mat.cols();
+  label.height = label_mat.rows();
+  label.size = label.height*label.width;
+  label.max_size = sizeof(label.flatten_label)/sizeof(label.flatten_label[0]);
+  for (long j=0; j<label.size; ++j) label.flatten_label[j] = label_mat.data()[j];// row-wise flattening
+
+  return label;
 }
 
 SAMPLE get_set_of_examples(const std::string& list_filepath) {
@@ -45,18 +86,10 @@ SAMPLE get_set_of_examples(const std::string& list_filepath) {
 
     //
     LABEL label;
-    label.max_size = sizeof(label.flatten_label)/sizeof(label.flatten_label[0]);
 
     string gt_csv_filepath = string(svm_struct_ss::data_param::gt_csv_dir+"/"+list.at(i)+".csv");
-    Eigen::MatrixXi label_mat = svm_struct_ss::io::read_csv<Eigen::MatrixXi>(gt_csv_filepath);
-
-    // row-wise flattening
-    label_mat.transposeInPlace();
-    Eigen::VectorXi label_vec(Eigen::Map<Eigen::VectorXi>(label_mat.data(), label_mat.cols()*label_mat.rows()));
-    for (long j=0; j<label_vec.size(); ++j) label.flatten_label[j] = label_vec(j);
-
-    label.size = label_vec.size();
-    debug_var("label_vec.size()",label_vec.size());
+    LabelMatrix label_mat = svm_struct_ss::io::read_csv<LabelMatrix>(gt_csv_filepath);
+    label = get_LABEL(label_mat);
 
     //
     examples[i].x = pattern;

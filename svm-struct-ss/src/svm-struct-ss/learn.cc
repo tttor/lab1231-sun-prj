@@ -34,7 +34,7 @@ extern "C" {
 #include <assert.h>
 #include <iostream>
 
-#define HAPPY_STOP assert(false&&"EXPECTED-STOP:))")
+#define HAPPY_STOP assert(false&&"EXPECTED-STOP:))_and_HAPPY-STOP:))")
 
 char trainfile[200];           /* file with training examples */
 char modelfile[200];           /* file for resulting classifier */

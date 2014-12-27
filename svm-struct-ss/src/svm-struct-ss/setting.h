@@ -10,7 +10,14 @@
 /* default loss function: */
 # define DEFAULT_LOSS_FCT    0
 
-/* default optimization algorithm to use: */
+/* default optimization algorithm to use: 
+@svm_struct_learn.h
+#define  NSLACK_ALG               0
+#define  NSLACK_SHRINK_ALG        1
+#define  ONESLACK_PRIMAL_ALG      2
+#define  ONESLACK_DUAL_ALG        3
+#define  ONESLACK_DUAL_CACHE_ALG  4
+*/
 # define DEFAULT_ALG_TYPE    3
 
 /* store Psi(x,y) (for ALG_TYPE 1) instead of recomputing it every time: */

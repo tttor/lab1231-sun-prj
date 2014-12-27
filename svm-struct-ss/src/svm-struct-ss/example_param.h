@@ -1,3 +1,5 @@
+// Specify properties of an example given to a supervised learning machine, e.g. SVM-STRUCT-SS
+
 #ifndef SVM_STRUCT_SS_EXAMPLE_PARAM_H
 #define SVM_STRUCT_SS_EXAMPLE_PARAM_H
 

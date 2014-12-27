@@ -141,7 +141,8 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
   LABEL ybar;
 
   /* insert your code for computing the label ybar here */
-  ybar = svm_struct_ss::find_most_violated_constraint::margin_rescaling(x, y, sm, sparm);
+  STRUCTMODEL model = *sm;
+  ybar = svm_struct_ss::find_most_violated_constraint::margin_rescaling(x, y, model);
 
   debug_out_msg("find_most_violated_constraint_marginrescaling");
   return(ybar);
@@ -174,18 +175,19 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
   /* insert code for computing the feature vector for x and y here */
   debug_in_msg("api::psi");
 
+  const long n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
   SVECTOR* fvec;
   fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));
-  fvec->words = (WORD *) my_malloc( sizeof(WORD)*svm_struct_ss::util::get_n_feature() );
+  fvec->words = (WORD *) my_malloc( sizeof(WORD)*n_word );
   fvec->next = NULL;
   fvec->userdefined = NULL;
   fvec->factor = 1.0;
   fvec->kernel_id = 0;
 
-  svm_struct_ss::joint_feature_extractor::psi(x, y, fvec);
+  svm_struct_ss::joint_feature_extractor::psi(x, y, n_word, fvec);
 
-  WORD *tmp;
-  tmp = fvec->words;
+  // set the termination sign
+  fvec->words[n_word-1].wnum = 0;
 
   debug_out_msg("api::psi");
   return(fvec);
@@ -194,18 +196,23 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
 // MODIFIED:
 double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
 {
-  debug_in_msg("loss");
   /* loss for correct label y and predicted label ybar. The loss for
      y==ybar has to be zero. sparm->loss_function is set with the -l option. */
+  debug_in_msg("loss");
+
+  double loss = 0.0;
   if(sparm->loss_function == 0) { /* type 0 loss: 0/1 loss */
                                   /* return 0, if y==ybar. return 1 else */
+    loss = svm_struct_ss::loss_function::zero_one_loss(y,ybar);
   }
   else {
     /* Put your code for different loss functions here. But then
        find_most_violated_constraint_???(x, y, sm) has to return the
        highest scoring label with the largest loss. */
   }
+  
   debug_out_msg("loss");
+  return loss;
 }
 
 // MODIFIED:

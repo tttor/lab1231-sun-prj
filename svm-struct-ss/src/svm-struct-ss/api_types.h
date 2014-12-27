@@ -48,6 +48,10 @@ typedef struct label {
 
   // the number of used elements in flatten_label;
   long size;
+
+  // the shape of the labeled image
+  long width;
+  long height;
 } LABEL;
 
 typedef struct struct_learn_parm {

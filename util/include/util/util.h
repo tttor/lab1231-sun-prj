@@ -13,7 +13,6 @@
 #include <boost/tokenizer.hpp>
 #include <Eigen/Dense>
 
-
 namespace lab1231_sun_prj {
   namespace util {
 

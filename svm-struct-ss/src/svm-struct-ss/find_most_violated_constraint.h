@@ -1,20 +1,42 @@
 #ifndef SVM_STRUCT_SS_FIND_MOST_VIOLATED_CONSTRAINT_H
 #define SVM_STRUCT_SS_FIND_MOST_VIOLATED_CONSTRAINT_H
 
-using namespace svm_struct_ss {
-using namespace find_most_violated_constraint {
+#include <shotton/shotton.h>
+#include <shotton/edge_potential.h>
+
+#include "data_param.h"
+
+namespace svm_struct_ss {
+namespace find_most_violated_constraint {
 
 // Compute: argmax_{ybar} loss(y,ybar)+psi(x,ybar)
-LABEL margin_rescaling(PATTERN x, LABEL y, STRUCTMODEL* model, STRUCT_LEARN_PARM* hyperparam) {
-  namespace sun = lab1231-sun-prj;
+LABEL margin_rescaling(PATTERN x, LABEL y, const STRUCTMODEL& mrf_model) {
+  namespace sun = lab1231_sun_prj;
 
   //
-  Eigen::MatrixXi label_mat;
-  label_mat = sun::shotton::annotate(img_filename, data_param, energy_param);
+  sun::shotton::DataParam data_param;
+  data_param["name"] = svm_struct_ss::data_param::dataset;
+  data_param["n_label"] = svm_struct_ss::data_param::n_label;
+  data_param["ori_img_dir"] = svm_struct_ss::data_param::ori_jpg_dir;
+  data_param["unary_potential_dir"] = svm_struct_ss::data_param::unary_potential_dir;
 
+  sun::shotton::EnergyParam energy_internal_param;
+  sun::shotton::train(data_param, &energy_internal_param);
 
+  //
+  svm_struct_ss::util::MRFWeight energy_external_param;
+  energy_external_param = svm_struct_ss::util::get_weight(mrf_model, y.width, y.height);
+
+  bool used_as_loss_augmented_inference = true;
+  svm_struct_ss::util::LabelMatrix label_mat;
+  label_mat = sun::shotton::annotate(x.id, data_param, energy_internal_param, 
+                                    energy_external_param.unary_weight,
+                                    used_as_loss_augmented_inference);
+  
   //
   LABEL y_star;
+  y_star = svm_struct_ss::util::get_LABEL(label_mat);
+
   return y_star;
 } 
 

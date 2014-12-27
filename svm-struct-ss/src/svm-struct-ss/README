@@ -13,6 +13,7 @@ svm_learn_struct_joint(...ONESLACK_DUAL_ALG)
 	main learning loop:
 		find_most_violated_constraint_marginrescaling(): 
 		api::psi()
+		loss()
 		Segmentation fault (core dumped)
 
 ===
