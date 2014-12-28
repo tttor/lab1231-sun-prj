@@ -28,7 +28,7 @@ add_library( shotton_mrf
 )
 
 target_link_libraries( shotton_mrf
-  /home/tor/sun/ws/tmp/lab1231-sun-prj.20141226.2053/external/prob-image/build/libprobimage.a
+  /home/tor/sun/ws/lab1231-sun-prj/external/prob-image/build/libprobimage.a
 )
 
 # 
