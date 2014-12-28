@@ -72,17 +72,24 @@ void train(DataParam data_param, EnergyParam* energy_param);
  * @brief Annotate an image with given data_param, energy_param
  */
 Eigen::MatrixXi annotate(const std::string& img_filename, DataParam data_param, EnergyParam energy_param, 
-                         const Eigen::MatrixXd& unary_weight, const bool& used_as_loss_augmented_inference=false);
+                         const Eigen::MatrixXd& unary_weight, 
+                         const Eigen::MatrixXd& given_horizontal_pairwise_weight, 
+                         const Eigen::MatrixXd& given_vertical_pairwise_weight,
+                         const bool& used_as_loss_augmented_inference=false);
 
 /*!
  * @brief we use Shotton's unary based on Phillipp's implementation
  */
-void set_1st_order(const cv::Mat& img, const std::string& img_filename, DataParam data_param, const Eigen::MatrixXd& weight, GraphicalModel* gm);
+void set_1st_order(const cv::Mat& img, const std::string& img_filename, DataParam data_param, 
+                   const Eigen::MatrixXd& weight, 
+                   GraphicalModel* gm);
 
 /*!
  * @brief Use the edge potential of [Shotton, 2009], which follows the Pott model
  */
-void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy_param, GraphicalModel* gm);
+void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy_param, 
+                   const Eigen::MatrixXd& horizontal_weight, const Eigen::MatrixXd& vertical_weight,
+                   GraphicalModel* gm);
 
 /*!
  * @brief Accomodated method: AlphaExpansion, ICM, ...

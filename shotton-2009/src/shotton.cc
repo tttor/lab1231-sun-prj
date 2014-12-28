@@ -22,7 +22,10 @@ void train(DataParam data_param, EnergyParam* energy_param) {
 }
 
 Eigen::MatrixXi annotate(const std::string& img_filename, DataParam data_param, EnergyParam energy_param, 
-                         const Eigen::MatrixXd& given_unary_weight, const bool& used_as_loss_augmented_inference) {
+                         const Eigen::MatrixXd& given_unary_weight, 
+                         const Eigen::MatrixXd& given_horizontal_pairwise_weight, 
+                         const Eigen::MatrixXd& given_vertical_pairwise_weight, 
+                         const bool& used_as_loss_augmented_inference) {
   using namespace std;
   // debug_in_msg("shotton::annotate");
 
@@ -38,8 +41,16 @@ Eigen::MatrixXi annotate(const std::string& img_filename, DataParam data_param, 
   if (unary_weight.size()==0) unary_weight = Eigen::MatrixXd::Ones(img.rows,img.cols);
   else unary_weight = given_unary_weight;
 
+  Eigen::MatrixXd horizontal_pairwise_weight;
+  if (horizontal_pairwise_weight.size()==0) horizontal_pairwise_weight = Eigen::MatrixXd::Ones(img.rows,img.cols);
+  else horizontal_pairwise_weight = given_horizontal_pairwise_weight;
+
+  Eigen::MatrixXd vertical_pairwise_weight;
+  if (vertical_pairwise_weight.size()==0) vertical_pairwise_weight = Eigen::MatrixXd::Ones(img.rows,img.cols);
+  else vertical_pairwise_weight = given_vertical_pairwise_weight;
+
   set_1st_order(img, img_filename, data_param, unary_weight, &gm);
-  set_2nd_order(img, n_label, energy_param, &gm);
+  set_2nd_order(img, n_label, energy_param, horizontal_pairwise_weight, vertical_pairwise_weight, &gm);
   set_zero_one_loss(img.rows, img.cols, used_as_loss_augmented_inference, &gm);
 
   Eigen::MatrixXi ann(img.rows, img.cols);
@@ -105,7 +116,9 @@ void set_1st_order(const cv::Mat& img, const std::string& img_filename, DataPara
   }
 }
 
-void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy_param, GraphicalModel* gm) {
+void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy_param, 
+                   const Eigen::MatrixXd& horizontal_weight, const Eigen::MatrixXd& vertical_weight, 
+                   GraphicalModel* gm) {
   // Params needed by the Pott model
   const float equal_pen = 0.0;
 
@@ -132,7 +145,7 @@ void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy
 
         float unequal_pen;
         unequal_pen = edge_potential::potential(img.at<cv::Vec3b>(p1), img.at<cv::Vec3b>(p2), beta, theta_phi);
-        // unequal_pen = unequal_pen * horizontal_weight(y,x);
+        unequal_pen = unequal_pen * horizontal_weight(y,x);
 
         //
         opengm::PottsFunction<float> pott(n_label, n_label, equal_pen, unequal_pen);
@@ -153,7 +166,7 @@ void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy
 
         float unequal_pen;
         unequal_pen = edge_potential::potential(img.at<cv::Vec3b>(p1), img.at<cv::Vec3b>(p2), beta, theta_phi);
-        // unequal_pen = unequal_pen * vertical_weight(y,x);
+        unequal_pen = unequal_pen * vertical_weight(y,x);
 
         //
         opengm::PottsFunction<float> pott(n_label, n_label, equal_pen, unequal_pen);
