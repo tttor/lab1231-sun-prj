@@ -91,13 +91,9 @@ int main (int argc, char* argv[])
   /* Warning: The model contains references to the original data 'docs'.
      If you want to free the original data, and only keep the model, you 
      have to make a deep copy of 'model'. */
-  if(struct_verbosity>=1) {
-    printf("Writing learned model...");fflush(stdout);
-  }
+  if(struct_verbosity>=1) printf("Writing learned model...");fflush(stdout);
   write_struct_model(modelfile,&structmodel,&struct_parm);
-  if(struct_verbosity>=1) {
-    printf("done\n");fflush(stdout);
-  }
+  if(struct_verbosity>=1) printf("done\n");fflush(stdout);
 
   free_struct_sample(sample);
   free_struct_model(structmodel);
