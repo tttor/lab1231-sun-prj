@@ -33,7 +33,16 @@ typedef
 Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> 
 WeightMatrix;
 
-struct MRFWeight {
+class MRFWeight {
+ public:
+  MRFWeight(size_t height, size_t width) {
+    unary_weight = WeightMatrix::Ones(height,width);
+    horizontal_pairwise_weight = WeightMatrix::Ones(height,width-1);
+    vertical_pairwise_weight = WeightMatrix::Ones(height-1,width);
+  }
+
+  ~MRFWeight() {};
+
   WeightMatrix unary_weight;
   WeightMatrix horizontal_pairwise_weight;
   WeightMatrix vertical_pairwise_weight;
@@ -79,7 +88,6 @@ inline size_t get_n_pairwise_feature() {
 }
 
 inline size_t get_n_feature() {
-  return get_n_unary_feature();
   return get_n_unary_feature() + get_n_pairwise_feature();
 } 
 
@@ -90,26 +98,26 @@ inline size_t get_n_feature() {
 // Following the feature array, the weight array is set with the following order: 
 // (1) unary, (2) horizontal pairwise, (3) vertical pairwise, subsequently
 // TODO should we use sm.w _or_ sm.svm_model.lin_weights ( weights for linear case using folding)? Are they are always equal?
-void get_weight(const STRUCTMODEL& mrf_model, 
-                const size_t& label_width, const size_t& label_height,
-                MRFWeight* mrf_w) {
+void get_weight(const STRUCTMODEL& mrf_model, MRFWeight* mrf_w) {
   debug_in_msg("get_weight");
 
-  size_t w_idx = 1;// index begins at 1 to sm->sizePsi
+  size_t w_idx = 1;// The weights in sm.w range from index 1 to index sm->sizePsi.
 
-  //
+  // unary
   WeightMatrix unary_weight(example_max_height(), example_max_width());
   for (size_t i=0; i<unary_weight.size(); ++i, ++w_idx) unary_weight.data()[i] = mrf_model.w[w_idx];
-  mrf_w->unary_weight = unary_weight.topLeftCorner(label_width, label_height);
+  mrf_w->unary_weight = unary_weight.topLeftCorner(mrf_w->unary_weight.rows(),mrf_w->unary_weight.cols());
   
-  // //  
-  // WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
-  // for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
-  // mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
+  // pairwise
+  WeightMatrix horizontal_pairwise_weight(example_max_height(), (example_max_width()-1));
+  for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(mrf_w->horizontal_pairwise_weight.rows(), 
+                                                                               mrf_w->horizontal_pairwise_weight.cols());
 
-  // WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
-  // for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
-  // mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
+  WeightMatrix vertical_pairwise_weight(example_max_height()-1, example_max_width());
+  for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(mrf_w->vertical_pairwise_weight.rows(), 
+                                                                           mrf_w->vertical_pairwise_weight.cols());
 
   //
   assert(w_idx==mrf_model.sizePsi+1 && "FATAL:w_idx!=mrf_model.sizePsi+1");

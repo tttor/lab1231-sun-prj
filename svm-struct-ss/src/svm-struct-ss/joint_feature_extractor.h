@@ -22,9 +22,10 @@ void set_unary_fea_mat(const PATTERN& x, const LABEL& y, util::FeatureMatrix* un
   debug_msg("computing unary fea:...");
   ProbImage unary_prob_img;
   const string prob_img_filepath = string(data_param::unary_potential_dir+"/"+x.id+".unary");
-  // debug_var("prob_img_filepath",prob_img_filepath);
   unary_prob_img.load(prob_img_filepath.c_str());
-  // debug_msg("got unary_prob_img");
+  assert(unary_prob_img.width()<=util::example_max_width() && "unary_prob_img.width()>util::example_max_width()" );
+  assert(unary_prob_img.height()<=util::example_max_height() && "unary_prob_img.height()>util::example_max_height()");
+  assert((unary_prob_img.height()*unary_prob_img.width())==y.size && "(unary_prob_img.height()*unary_prob_img.width())!=y.size");
 
   // get unary joint feature
   util::FeatureMatrix local_unary_fea_mat(unary_prob_img.height(), unary_prob_img.width());
@@ -38,8 +39,6 @@ void set_unary_fea_mat(const PATTERN& x, const LABEL& y, util::FeatureMatrix* un
   // the top left corner of this feature matrix always coincides with the top left corner of max feature matrix
   // the uncovered area is where the feature values are missing, for which we use the initial values
   // TODO @tttor should we apply log to the unary prob?
-  // TODO @tttor: how to handle missing features: make them zero-valued?
-  // util::FeatureMatrix unary_fea_mat;
   unary_fea_mat->topLeftCorner(local_unary_fea_mat.rows(),local_unary_fea_mat.cols()) = local_unary_fea_mat;
   debug_msg("got unary fea");
 }
@@ -58,8 +57,9 @@ void set_pairwise_fea_mat(const PATTERN& pattern, const LABEL& label,
                           util::FeatureMatrix* vertical_pairwise_fea_mat) {
   namespace sun = lab1231_sun_prj;
   using namespace std;
+  debug_in_msg("set_pairwise_fea_mat");
 
-  assert(SVM_STRUCT_SS_EXAMPLE_PARAM_PAIRWISE_POTENTIAL_FUNCTION=="Pott" && "FATAL: unsupporter pairwise potential funct");
+  assert(SVM_STRUCT_SS_EXAMPLE_PARAM_PAIRWISE_POTENTIAL_FUNCTION=="Pott" && "FATAL: unsupported pairwise potential function.");
 
   //
   sun::shotton::DataParam data_param;
@@ -72,6 +72,9 @@ void set_pairwise_fea_mat(const PATTERN& pattern, const LABEL& label,
   const string img_filename = pattern.id;
   const string img_path = string(data_param["ori_img_dir"]+"/"+img_filename+".jpg");
   cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
+  assert(img.cols<=util::example_max_width() && "img.cols>util::example_max_width()");
+  assert(img.rows<=util::example_max_height() && "img.rows>util::example_max_height()");
+  assert((img.rows*img.cols)==label.size && "(img.rows*img.cols)!=label.size");
 
   // TODO @tttor: may pre-compute this beta
   float beta;
@@ -88,8 +91,8 @@ void set_pairwise_fea_mat(const PATTERN& pattern, const LABEL& label,
   const float pott_equal_pen = 0.0;  
 
   //
-  util::FeatureMatrix local_horizontal_pairwise_fea_mat(label.height, label.width);
-  util::FeatureMatrix local_vertical_pairwise_fea_mat(label.height, label.width);
+  util::FeatureMatrix local_horizontal_pairwise_fea_mat(label.height, label.width-1);
+  util::FeatureMatrix local_vertical_pairwise_fea_mat(label.height-1, label.width);
 
   for (size_t x=0; x<img.cols; ++x) {
     for (size_t y=0; y<img.rows; ++y) {
@@ -141,49 +144,52 @@ void set_pairwise_fea_mat(const PATTERN& pattern, const LABEL& label,
                                            local_vertical_pairwise_fea_mat.cols()) 
                                            = local_vertical_pairwise_fea_mat;
 
+  debug_out_msg("set_pairwise_fea_mat");
 }
 
 void extract_feature(const PATTERN& x, const LABEL& y,const size_t& n_word, SVECTOR* fvec) {
+  // TODO @tttor: how to handle missing features: make them zero-valued?
   debug_in_msg("joint_feature_extractor::psi");
   using namespace std;
 
-  //
-  util::FeatureMatrix unary_fea_mat;
-  unary_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width());
-  set_unary_fea_mat(x,y, &unary_fea_mat);
-
-  // //
-  // util::FeatureMatrix horizontal_pairwise_fea_mat;
-  // horizontal_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width()-1);
-
-  // util::FeatureMatrix vertical_pairwise_fea_mat;
-  // vertical_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height()-1,util::example_max_width());
-
-  // set_pairwise_fea_mat(x,y,&horizontal_pairwise_fea_mat,&vertical_pairwise_fea_mat);
-
-  // fill in the SVECTOR
   // Note: WORD's wnum begin at 1, therefore: wnum = word_idx + 1
   // TODO make the words sparse (?)
   FNUM word_idx = 0;
-  for (FNUM i=0; i<unary_fea_mat.size(); ++i) {
+
+  // unary fea
+  util::FeatureMatrix unary_fea_mat;
+  unary_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width());
+  set_unary_fea_mat(x,y, &unary_fea_mat);
+  
+  for (size_t i=0; i<unary_fea_mat.size(); ++i) {
     fvec->words[word_idx].wnum = word_idx + 1;
     fvec->words[word_idx].weight = unary_fea_mat.data()[i];
     ++word_idx;
   }
 
-  // for (FNUM i=0; i<horizontal_pairwise_fea_mat.size(); ++i) {
-  //   fvec->words[word_idx].wnum = word_idx + 1;
-  //   fvec->words[word_idx].weight = horizontal_pairwise_fea_mat.data()[i];
-  //   ++word_idx;
-  // }
+  // pairwise fea
+  util::FeatureMatrix horizontal_pairwise_fea_mat;
+  horizontal_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width()-1);
 
-  // for (FNUM i=0; i<vertical_pairwise_fea_mat.size(); ++i) {
-  //   fvec->words[word_idx].wnum = word_idx + 1;
-  //   fvec->words[word_idx].weight = vertical_pairwise_fea_mat.data()[i];
-  //   ++word_idx;
-  // }
+  util::FeatureMatrix vertical_pairwise_fea_mat;
+  vertical_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height()-1,util::example_max_width());
 
-  assert(word_idx==(n_word-1) && "err: word_idx must node to the last element");
+  set_pairwise_fea_mat(x,y,&horizontal_pairwise_fea_mat,&vertical_pairwise_fea_mat);
+
+  for (size_t i=0; i<horizontal_pairwise_fea_mat.size(); ++i) {
+    fvec->words[word_idx].wnum = word_idx + 1;
+    fvec->words[word_idx].weight = horizontal_pairwise_fea_mat.data()[i];
+    ++word_idx;
+  }
+
+  for (size_t i=0; i<vertical_pairwise_fea_mat.size(); ++i) {
+    fvec->words[word_idx].wnum = word_idx + 1;
+    fvec->words[word_idx].weight = vertical_pairwise_fea_mat.data()[i];
+    ++word_idx;
+  }
+
+  //
+  assert(word_idx==(n_word-1) && "err: word_idx must point to the last element");
   debug_out_msg("joint_feature_extractor::psi");
 }
 
