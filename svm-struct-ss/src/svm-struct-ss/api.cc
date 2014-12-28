@@ -52,7 +52,10 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
      weights that can be learned. Later, the weight vector w will
      contain the learned weights for the model. */
   debug_in_msg("init_struct_model");
+
   sm->sizePsi = svm_struct_ss::util::get_n_feature();
+  debug_var("sm->sizePsi",sm->sizePsi);
+
   debug_out_msg("init_struct_model");
 }
 
@@ -106,6 +109,7 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
   LABEL ybar;
 
   /* insert your code for computing the label ybar here */
+  assert(false && "NOT IMPLEMENTED YET: find_most_violated_constraint_slackrescaling");
 
   debug_out_msg("find_most_violated_constraint_slackrescaling");
   return(ybar);
@@ -175,7 +179,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
   /* insert code for computing the feature vector for x and y here */
   debug_in_msg("api::psi");
 
-  const long n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
+  const size_t n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
   SVECTOR* fvec;
   fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));
   fvec->words = (WORD *) my_malloc( sizeof(WORD)*n_word );
@@ -184,7 +188,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
   fvec->factor = 1.0;
   fvec->kernel_id = 0;
 
-  svm_struct_ss::joint_feature_extractor::psi(x, y, n_word, fvec);
+  svm_struct_ss::joint_feature_extractor::extract_feature(x, y, n_word, fvec);
 
   // set the termination sign
   fvec->words[n_word-1].wnum = 0;

@@ -40,12 +40,17 @@ int main(int argc, char* argv[]) {
     const string img_filename = test_img_filenames.at(i);
     cout << "ANNOTATING img_filename" << img_filename << endl;
 
-    Eigen::MatrixXd unary_weight = Eigen::MatrixXd::Ones(0,0);// a dummy empty weight matrix;
+    // Dummy empty weight matrices
+    Eigen::MatrixXd unary_weight = Eigen::MatrixXd::Ones(0,0);
+    Eigen::MatrixXd h_pairwise_weight = Eigen::MatrixXd::Ones(0,0);
+    Eigen::MatrixXd v_pairwise_weight = Eigen::MatrixXd::Ones(0,0);
+
     bool used_as_loss_augmented_inference = false;
 
     Eigen::MatrixXi ann;
     ann = shotton::annotate(img_filename, data_param, internal_energy_param, 
-                            unary_weight, used_as_loss_augmented_inference);
+                            unary_weight, h_pairwise_weight, v_pairwise_weight,
+                            used_as_loss_augmented_inference);
 
     const string ann_filepath = string(ann_results_dir+img_filename+".ann");
     util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
