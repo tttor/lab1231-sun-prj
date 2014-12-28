@@ -78,7 +78,8 @@ inline size_t get_n_pairwise_feature() {
 }
 
 inline size_t get_n_feature() {
-  return get_n_unary_feature() ;//+ get_n_pairwise_feature();
+  return get_n_unary_feature();
+  // return get_n_unary_feature() + get_n_pairwise_feature();
 } 
 
 // Pull out the local label-depend-sized feature matrix _out_ of the global constant-size feature matrix.
@@ -91,8 +92,8 @@ void get_weight(const STRUCTMODEL& mrf_model,
 
   // The weight matrix is row-wise mat, following the feature matrix
   WeightMatrix unary_weight(example_max_height(), example_max_width());
-  WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
-  WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
+  // WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
+  // WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
 
   // The weights in sm.w correspond to the features defined by psi() and range from index 1 to index sm->sizePsi. 
   // Following the feature array, the weight array is set with the following order: 
@@ -106,8 +107,8 @@ void get_weight(const STRUCTMODEL& mrf_model,
 
   //
   mrf_w->unary_weight = unary_weight.topLeftCorner(label_width, label_height);
-  mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
-  mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
+  // mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
+  // mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
 
   debug_out_msg("get_weight");
 }
