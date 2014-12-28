@@ -79,7 +79,7 @@ inline size_t get_n_pairwise_feature() {
 }
 
 inline size_t get_n_feature() {
-  // return get_n_unary_feature();
+  return get_n_unary_feature();
   return get_n_unary_feature() + get_n_pairwise_feature();
 } 
 
@@ -102,14 +102,14 @@ void get_weight(const STRUCTMODEL& mrf_model,
   for (size_t i=0; i<unary_weight.size(); ++i, ++w_idx) unary_weight.data()[i] = mrf_model.w[w_idx];
   mrf_w->unary_weight = unary_weight.topLeftCorner(label_width, label_height);
   
-  //  
-  WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
-  for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
-  mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
+  // //  
+  // WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
+  // for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  // mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
 
-  WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
-  for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
-  mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
+  // WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
+  // for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  // mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
 
   //
   assert(w_idx==mrf_model.sizePsi+1 && "FATAL:w_idx!=mrf_model.sizePsi+1");

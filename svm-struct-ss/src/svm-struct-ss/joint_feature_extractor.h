@@ -152,14 +152,14 @@ void extract_feature(const PATTERN& x, const LABEL& y,const size_t& n_word, SVEC
   unary_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width());
   set_unary_fea_mat(x,y, &unary_fea_mat);
 
-  //
-  util::FeatureMatrix horizontal_pairwise_fea_mat;
-  horizontal_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width()-1);
+  // //
+  // util::FeatureMatrix horizontal_pairwise_fea_mat;
+  // horizontal_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width()-1);
 
-  util::FeatureMatrix vertical_pairwise_fea_mat;
-  vertical_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height()-1,util::example_max_width());
+  // util::FeatureMatrix vertical_pairwise_fea_mat;
+  // vertical_pairwise_fea_mat = util::FeatureMatrix::Zero(util::example_max_height()-1,util::example_max_width());
 
-  set_pairwise_fea_mat(x,y,&horizontal_pairwise_fea_mat,&vertical_pairwise_fea_mat);
+  // set_pairwise_fea_mat(x,y,&horizontal_pairwise_fea_mat,&vertical_pairwise_fea_mat);
 
   // fill in the SVECTOR
   // Note: WORD's wnum begin at 1, therefore: wnum = word_idx + 1
@@ -171,17 +171,17 @@ void extract_feature(const PATTERN& x, const LABEL& y,const size_t& n_word, SVEC
     ++word_idx;
   }
 
-  for (FNUM i=0; i<horizontal_pairwise_fea_mat.size(); ++i) {
-    fvec->words[word_idx].wnum = word_idx + 1;
-    fvec->words[word_idx].weight = horizontal_pairwise_fea_mat.data()[i];
-    ++word_idx;
-  }
+  // for (FNUM i=0; i<horizontal_pairwise_fea_mat.size(); ++i) {
+  //   fvec->words[word_idx].wnum = word_idx + 1;
+  //   fvec->words[word_idx].weight = horizontal_pairwise_fea_mat.data()[i];
+  //   ++word_idx;
+  // }
 
-  for (FNUM i=0; i<vertical_pairwise_fea_mat.size(); ++i) {
-    fvec->words[word_idx].wnum = word_idx + 1;
-    fvec->words[word_idx].weight = vertical_pairwise_fea_mat.data()[i];
-    ++word_idx;
-  }
+  // for (FNUM i=0; i<vertical_pairwise_fea_mat.size(); ++i) {
+  //   fvec->words[word_idx].wnum = word_idx + 1;
+  //   fvec->words[word_idx].weight = vertical_pairwise_fea_mat.data()[i];
+  //   ++word_idx;
+  // }
 
   assert(word_idx==(n_word-1) && "err: word_idx must node to the last element");
   debug_out_msg("joint_feature_extractor::psi");
