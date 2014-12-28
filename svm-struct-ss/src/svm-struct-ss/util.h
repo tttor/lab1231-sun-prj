@@ -28,6 +28,7 @@ typedef
 Eigen::Matrix<FVAL, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> 
 FeatureMatrix;
 
+// The weight matrix is row-wise mat, following the feature matrix
 typedef
 Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> 
 WeightMatrix;
@@ -78,38 +79,40 @@ inline size_t get_n_pairwise_feature() {
 }
 
 inline size_t get_n_feature() {
-  return get_n_unary_feature();
-  // return get_n_unary_feature() + get_n_pairwise_feature();
+  // return get_n_unary_feature();
+  return get_n_unary_feature() + get_n_pairwise_feature();
 } 
 
 // Pull out the local label-depend-sized feature matrix _out_ of the global constant-size feature matrix.
 // Their top-left corners coincide.
 // This also applies to the weight matrix since the weight and the feature matrices are in one-on-one correspondence
+// The weights in sm.w correspond to the features defined by psi() and range from index 1 to index sm->sizePsi. 
+// Following the feature array, the weight array is set with the following order: 
+// (1) unary, (2) horizontal pairwise, (3) vertical pairwise, subsequently
+// TODO should we use sm.w _or_ sm.svm_model.lin_weights ( weights for linear case using folding)? Are they are always equal?
 void get_weight(const STRUCTMODEL& mrf_model, 
                 const size_t& label_width, const size_t& label_height,
                 MRFWeight* mrf_w) {
   debug_in_msg("get_weight");
 
-  // The weight matrix is row-wise mat, following the feature matrix
-  WeightMatrix unary_weight(example_max_height(), example_max_width());
-  // WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
-  // WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
-
-  // The weights in sm.w correspond to the features defined by psi() and range from index 1 to index sm->sizePsi. 
-  // Following the feature array, the weight array is set with the following order: 
-  // (1) unary, (2) horizontal pairwise, (3) vertical pairwise, subsequently
-  // TODO should we use sm.w _or_ sm.svm_model.lin_weights ( weights for linear case using folding)? Are they are always equal?
   size_t w_idx = 1;// index begins at 1 to sm->sizePsi
-  for (size_t i=0; i<unary_weight.size(); ++i, ++w_idx) unary_weight.data()[i] = mrf_model.w[w_idx];
-  // for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
-  // for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
-  assert(w_idx==mrf_model.sizePsi+1 && "FATAL:w_idx!=mrf_model.sizePsi+1");
 
   //
+  WeightMatrix unary_weight(example_max_height(), example_max_width());
+  for (size_t i=0; i<unary_weight.size(); ++i, ++w_idx) unary_weight.data()[i] = mrf_model.w[w_idx];
   mrf_w->unary_weight = unary_weight.topLeftCorner(label_width, label_height);
-  // mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
-  // mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
+  
+  //  
+  WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
+  for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
 
+  WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
+  for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
+
+  //
+  assert(w_idx==mrf_model.sizePsi+1 && "FATAL:w_idx!=mrf_model.sizePsi+1");
   debug_out_msg("get_weight");
 }
 
