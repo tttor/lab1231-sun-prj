@@ -8,10 +8,20 @@
 #include <boost/tokenizer.hpp>
 #include <Eigen/Dense>
 
+// #define DEBUG_ON
+
+#ifdef DEBUG_ON
 #define debug_var(name,value) std::cout<<name<<"= "<<value<<std::endl
 #define debug_msg(msg) std::cout<<msg<<std::endl
 #define debug_in_msg(funct) std::cout<<funct<<"(): BEGIN"<<std::endl
 #define debug_out_msg(funct) std::cout<<funct<<"(): END"<<std::endl
+#else
+#define debug_var(name,value) {}
+#define debug_msg(msg) {}
+#define debug_in_msg(funct) {}
+#define debug_out_msg(funct) {}
+#endif
+
 #define fatal_print(name,value) std::cout<<name<<value<<std::endl
 
 namespace svm_struct_ss {
