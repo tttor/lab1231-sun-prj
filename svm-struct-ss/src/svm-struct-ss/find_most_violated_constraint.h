@@ -25,12 +25,14 @@ LABEL margin_rescaling(PATTERN x, LABEL y, const STRUCTMODEL& mrf_model) {
 
   //
   svm_struct_ss::util::MRFWeight energy_external_param;
-  energy_external_param = svm_struct_ss::util::get_weight(mrf_model, y.width, y.height);
+  svm_struct_ss::util::get_weight(mrf_model, y.width, y.height, &energy_external_param);
 
   bool used_as_loss_augmented_inference = true;
   svm_struct_ss::util::LabelMatrix label_mat;
   label_mat = sun::shotton::annotate(x.id, data_param, energy_internal_param, 
-                                    energy_external_param.unary_weight,
+                                    energy_external_param.unary_weight_MatrixXd(),
+                                    energy_external_param.horizontal_pairwise_weight_MatrixXd(),
+                                    energy_external_param.vertical_pairwise_weight_MatrixXd(),
                                     used_as_loss_augmented_inference);
   
   //

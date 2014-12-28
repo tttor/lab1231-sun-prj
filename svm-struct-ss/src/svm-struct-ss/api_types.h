@@ -88,9 +88,14 @@ typedef struct structmodel {
   MODEL  *svm_model;  /* the learned SVM model */
   size_t   sizePsi;     /* maximum number of weights in w */
   double walpha;
+
   /* other information that is needed for the stuctural model can be
      added here, e.g. the grammar rules for NLP parsing */
   STRUCT_LEARN_PARM* learning_param;
+
+  size_t n_unary_feature;
+  size_t n_horizontal_pairwise_feature;
+  size_t n_vertical_pairwise_feature;
 } STRUCTMODEL;
 
 typedef struct struct_test_stats {

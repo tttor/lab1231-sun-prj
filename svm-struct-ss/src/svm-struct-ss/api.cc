@@ -54,6 +54,7 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
   debug_in_msg("init_struct_model");
 
   sm->sizePsi = svm_struct_ss::util::get_n_feature();
+  debug_var("sm->sizePsi",sm->sizePsi);
 
   debug_out_msg("init_struct_model");
 }
@@ -187,7 +188,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
   fvec->factor = 1.0;
   fvec->kernel_id = 0;
 
-  svm_struct_ss::joint_feature_extractor::psi(x, y, n_word, fvec);
+  svm_struct_ss::joint_feature_extractor::extract_feature(x, y, n_word, fvec);
 
   // set the termination sign
   fvec->words[n_word-1].wnum = 0;

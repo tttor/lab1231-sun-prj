@@ -28,28 +28,88 @@ typedef
 Eigen::Matrix<FVAL, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> 
 FeatureMatrix;
 
+typedef
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> 
+WeightMatrix;
+
 struct MRFWeight {
-  Eigen::MatrixXd unary_weight;
-  Eigen::MatrixXd horizontal_pairwise_weight;
-  Eigen::MatrixXd vertical_pairwise_weight;
+  WeightMatrix unary_weight;
+  WeightMatrix horizontal_pairwise_weight;
+  WeightMatrix vertical_pairwise_weight;
+
+  // These return default column-wise double matrices
+  inline Eigen::MatrixXd unary_weight_MatrixXd() {return unary_weight;}
+  inline Eigen::MatrixXd horizontal_pairwise_weight_MatrixXd() {return horizontal_pairwise_weight;}
+  inline Eigen::MatrixXd vertical_pairwise_weight_MatrixXd() {return vertical_pairwise_weight;}
 };
 
-MRFWeight get_weight(const STRUCTMODEL& mrf_model, const size_t& label_width, const size_t& label_height) {
-  // Eigen::MatrixXd unary_weight();
-  // unary_weight = 
-
-  // Eigen unary_weight;
-  // unary_weight()
-
-  MRFWeight mrf_w;
-  // mrf_w.unary_weight = 
-
-  return mrf_w;
+// row-wise idx flattening
+inline size_t flat_idx_rowcol(size_t row, size_t col, size_t n_col) {
+  return  col + (row * n_col);
 }
 
-// row-wise idx flattening
-size_t flat_idx_rowcol(size_t row, size_t col, size_t n_col) {
-  return  col + (row * n_col);
+inline size_t flat_idx_xy(const size_t& x, const size_t& y, const size_t& n_col) {
+  return x + (n_col * y);
+}
+
+inline size_t example_max_height() {
+  return SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_IMAGE_HEIGHT;
+}
+
+inline size_t example_max_width() {
+  return SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_IMAGE_WIDTH;
+}
+
+inline size_t get_n_unary_feature() {
+  return SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PIXEL;
+}
+
+inline size_t get_n_horizontal_pairwise_feature() {
+  return (example_max_width()-1) * example_max_height();
+}
+
+inline size_t get_n_vertical_pairwise_feature() {
+  return example_max_width() * (example_max_height()-1);
+}
+
+inline size_t get_n_pairwise_feature() {
+  assert(SVM_STRUCT_SS_EXAMPLE_PARAM_N_NEIGHBOUR==4 && "fatal: only N4 neigborhood system is supported");
+  return get_n_horizontal_pairwise_feature() + get_n_vertical_pairwise_feature();
+}
+
+inline size_t get_n_feature() {
+  return get_n_unary_feature() + get_n_pairwise_feature();
+} 
+
+// Pull out the local label-depend-sized feature matrix _out_ of the global constant-size feature matrix.
+// Their top-left corners coincide.
+// This also applies to the weight matrix since the weight and the feature matrices are in one-on-one correspondence
+void get_weight(const STRUCTMODEL& mrf_model, 
+                const size_t& label_width, const size_t& label_height,
+                MRFWeight* mrf_w) {
+  debug_in_msg("get_weight");
+
+  // The weight matrix is row-wise mat, following the feature matrix
+  WeightMatrix unary_weight(example_max_height(), example_max_width());
+  WeightMatrix horizontal_pairwise_weight((example_max_width()-1), example_max_height());
+  WeightMatrix vertical_pairwise_weight(example_max_width(), (example_max_height()-1));
+
+  // The weights in sm.w correspond to the features defined by psi() and range from index 1 to index sm->sizePsi. 
+  // Following the feature array, the weight array is set with the following order: 
+  // (1) unary, (2) horizontal pairwise, (3) vertical pairwise, subsequently
+  // TODO should we use sm.w _or_ sm.svm_model.lin_weights ( weights for linear case using folding)? Are they are always equal?
+  size_t w_idx = 1;// index begins at 1 to sm->sizePsi
+  for (size_t i=0; i<unary_weight.size(); ++i, ++w_idx) unary_weight.data()[i] = mrf_model.w[w_idx];
+  for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  assert(w_idx==mrf_model.sizePsi+1 && "FATAL:w_idx!=mrf_model.sizePsi+1");
+
+  //
+  mrf_w->unary_weight = unary_weight.topLeftCorner(label_width, label_height);
+  mrf_w->horizontal_pairwise_weight = horizontal_pairwise_weight.topLeftCorner(label_height, label_width-1);
+  mrf_w->vertical_pairwise_weight = vertical_pairwise_weight.topLeftCorner(label_height-1, label_width);
+
+  debug_out_msg("get_weight");
 }
 
 LABEL get_LABEL(const LabelMatrix& label_mat) {
@@ -103,14 +163,6 @@ SAMPLE get_set_of_examples(const std::string& list_filepath) {
 
   return set_of_examples;
 }
-
-size_t get_n_feature() {
-  const size_t n_unary_fea = SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PIXEL;
-  const size_t n_pairwise_fea = SVM_STRUCT_SS_EXAMPLE_PARAM_MAX_N_PAIRWISE_POTENTIAL;
-
-  // return n_unary_fea+n_pairwise_fea;
-  return n_unary_fea;
-} 
 
 }// namespace util
 }// namespace svm_struct_ss
