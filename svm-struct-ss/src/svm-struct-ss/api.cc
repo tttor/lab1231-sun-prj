@@ -220,6 +220,67 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
 }
 
 // MODIFIED:
+int         empty_label(LABEL y)
+{
+  /* Returns true, if y is an empty label. An empty label might be
+     returned by find_most_violated_constraint_???(x, y, sm) if there
+     is no incorrect label that can be found for x, or if it is unable
+     to label x at all */
+  if (y.size==0) return 1;
+  else return 0;
+}
+
+// MODIFIED:
+int         finalize_iteration(double ceps, int cached_constraint,
+             SAMPLE sample, STRUCTMODEL *sm,
+             CONSTSET cset, double *alpha, 
+             STRUCT_LEARN_PARM *sparm)
+{
+  /* This function is called just before the end of each cutting plane iteration. 
+
+  ceps is the amount by which the most violated constraint found in the current iteration was violated. 
+  cached_constraint is true if the added constraint was constructed from the cache. 
+  
+  If the return value is FALSE, then the algorithm is allowed to terminate. 
+  If it is TRUE, the algorithm will keep iterating even if the desired precision sparm->epsilon is already reached. */
+  return(0);
+}
+
+// MODIFIED:
+void        print_struct_learning_stats(SAMPLE sample, STRUCTMODEL *sm,
+          CONSTSET cset, double *alpha, 
+          STRUCT_LEARN_PARM *sparm)
+{
+  /* This function is called after training and allows final touches to
+     the model sm. But primarly it allows computing and printing any
+     kind of statistic (e.g. training error) you might want. */
+}
+
+void        print_struct_testing_stats(SAMPLE sample, STRUCTMODEL *sm,
+               STRUCT_LEARN_PARM *sparm, 
+               STRUCT_TEST_STATS *teststats)
+{
+  /* This function is called after making all test predictions in
+     svm_struct_classify and allows computing and printing any kind of
+     evaluation (e.g. precision/recall) you might want. You can use
+     the function eval_prediction to accumulate the necessary
+     statistics for each prediction. */
+}
+
+void        eval_prediction(long exnum, EXAMPLE ex, LABEL ypred, 
+          STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm, 
+          STRUCT_TEST_STATS *teststats)
+{
+  /* This function allows you to accumlate statistic for how well the
+     predicition matches the labeled example. It is called from
+     svm_struct_classify. See also the function
+     print_struct_testing_stats. */
+  if(exnum == 0) { /* this is the first time the function is
+          called. So initialize the teststats */
+  }
+}
+
+// MODIFIED:
 void        write_struct_model(char *file, STRUCTMODEL *sm, 
 			       STRUCT_LEARN_PARM *sparm)
 {
@@ -233,6 +294,32 @@ STRUCTMODEL read_struct_model(char *file, STRUCT_LEARN_PARM *sparm)
      only in the prediction module, not in the learning module. */
 }
 
+// MODIFIED:
+void        write_label(FILE *fp, LABEL y)
+{
+  /* Writes label y to file handle fp. */
+} 
+
+// MODIFIED:
+void        free_pattern(PATTERN x) {
+  /* Frees the memory of x. */
+}
+
+// MODIFIED:
+void        free_label(LABEL y) {
+  /* Frees the memory of y. */
+}
+
+// MODIFIED:
+void        free_struct_model(STRUCTMODEL sm) 
+{
+  /* Frees the memory of model. */
+  if(sm.w) free(sm.w); /* this is free'd in free_model */
+  if(sm.svm_model) free_model(sm.svm_model,1);
+
+  /* add free calls for user defined data here */
+  if(learning_param) free(learning_param);
+}
 
 // YET EMPTY DEFINITIONS _or_ NOT YET ELABORATED //////////////////////////////
 void        svm_struct_learn_api_init(int argc, char* argv[])
@@ -296,78 +383,6 @@ CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
     }
   }
   return(c);
-}
-
-int         empty_label(LABEL y)
-{
-  /* Returns true, if y is an empty label. An empty label might be
-     returned by find_most_violated_constraint_???(x, y, sm) if there
-     is no incorrect label that can be found for x, or if it is unable
-     to label x at all */
-  return(0);
-}
-
-int         finalize_iteration(double ceps, int cached_constraint,
-             SAMPLE sample, STRUCTMODEL *sm,
-             CONSTSET cset, double *alpha, 
-             STRUCT_LEARN_PARM *sparm)
-{
-  /* This function is called just before the end of each cutting plane iteration. ceps is the amount by which the most violated constraint found in the current iteration was violated. cached_constraint is true if the added constraint was constructed from the cache. If the return value is FALSE, then the algorithm is allowed to terminate. If it is TRUE, the algorithm will keep iterating even if the desired precision sparm->epsilon is already reached. */
-  return(0);
-}
-
-void        print_struct_learning_stats(SAMPLE sample, STRUCTMODEL *sm,
-          CONSTSET cset, double *alpha, 
-          STRUCT_LEARN_PARM *sparm)
-{
-  /* This function is called after training and allows final touches to
-     the model sm. But primarly it allows computing and printing any
-     kind of statistic (e.g. training error) you might want. */
-}
-
-void        print_struct_testing_stats(SAMPLE sample, STRUCTMODEL *sm,
-               STRUCT_LEARN_PARM *sparm, 
-               STRUCT_TEST_STATS *teststats)
-{
-  /* This function is called after making all test predictions in
-     svm_struct_classify and allows computing and printing any kind of
-     evaluation (e.g. precision/recall) you might want. You can use
-     the function eval_prediction to accumulate the necessary
-     statistics for each prediction. */
-}
-
-void        eval_prediction(long exnum, EXAMPLE ex, LABEL ypred, 
-          STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm, 
-          STRUCT_TEST_STATS *teststats)
-{
-  /* This function allows you to accumlate statistic for how well the
-     predicition matches the labeled example. It is called from
-     svm_struct_classify. See also the function
-     print_struct_testing_stats. */
-  if(exnum == 0) { /* this is the first time the function is
-          called. So initialize the teststats */
-  }
-}
-
-void        write_label(FILE *fp, LABEL y)
-{
-  /* Writes label y to file handle fp. */
-} 
-
-void        free_pattern(PATTERN x) {
-  /* Frees the memory of x. */
-}
-
-void        free_label(LABEL y) {
-  /* Frees the memory of y. */
-}
-
-void        free_struct_model(STRUCTMODEL sm) 
-{
-  /* Frees the memory of model. */
-  /* if(sm.w) free(sm.w); */ /* this is free'd in free_model */
-  if(sm.svm_model) free_model(sm.svm_model,1);
-  /* add free calls for user defined data here */
 }
 
 void        free_struct_sample(SAMPLE s)
