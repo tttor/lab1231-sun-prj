@@ -7,12 +7,12 @@ void train(DataParam data_param, EnergyParam* energy_param) {
   const std::string data_name = data_param["name"];
 
   if (data_param["name"]=="msrc21") {
-    std::cout << "Use param from [Shotton,2009]\n";
+    // std::cout << "Use param from [Shotton,2009]\n";
     (*energy_param)["theta_phi_1"] = 4.5;
     (*energy_param)["theta_phi_2"] = 1.0;
   } 
   else if (data_param["name"]=="voc2010") {
-    std::cout << "Use param from [Shotton,2009]\n";
+    // std::cout << "Use param from [Shotton,2009]\n";
     (*energy_param)["theta_phi_1"] = 4.5;
     (*energy_param)["theta_phi_2"] = 1.0;
   }
@@ -183,11 +183,11 @@ void set_2nd_order(const cv::Mat& img, const size_t& n_label, EnergyParam energy
 
 void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_var, Eigen::MatrixXi* ann) {
   using namespace std;
-  cout << "infer(): BEGIN\n";
-  cout << "method= " << method << endl;
+  // cout << "infer(): BEGIN\n";
 
   vector<size_t> ann_vec(n_var);
-  
+
+  cout << method << " is inferring ..." << endl;
   if (method=="AlphaExpansion") {
     typedef 
     opengm::external::MinSTCutKolmogorov<size_t, double> 
@@ -203,7 +203,6 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
 
     MinAlphaExpansion inf_engine(gm);
 
-    cout << "Inferring ..." << endl;
     inf_engine.infer();
     inf_engine.arg(ann_vec);
   }
@@ -227,7 +226,7 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
     }
   }
 
-  std::cout << "infer(): END\n";
+  // std::cout << "infer(): END\n";
 }
 
 }// namespace shotton
