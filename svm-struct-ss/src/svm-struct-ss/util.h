@@ -78,7 +78,7 @@ inline size_t get_n_pairwise_feature() {
 }
 
 inline size_t get_n_feature() {
-  return get_n_unary_feature() + get_n_pairwise_feature();
+  return get_n_unary_feature() ;//+ get_n_pairwise_feature();
 } 
 
 // Pull out the local label-depend-sized feature matrix _out_ of the global constant-size feature matrix.
@@ -100,8 +100,8 @@ void get_weight(const STRUCTMODEL& mrf_model,
   // TODO should we use sm.w _or_ sm.svm_model.lin_weights ( weights for linear case using folding)? Are they are always equal?
   size_t w_idx = 1;// index begins at 1 to sm->sizePsi
   for (size_t i=0; i<unary_weight.size(); ++i, ++w_idx) unary_weight.data()[i] = mrf_model.w[w_idx];
-  for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
-  for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  // for (size_t i=0; i<horizontal_pairwise_weight.size(); ++i, ++w_idx) horizontal_pairwise_weight.data()[i] = mrf_model.w[w_idx];
+  // for (size_t i=0; i<vertical_pairwise_weight.size(); ++i, ++w_idx) vertical_pairwise_weight.data()[i] = mrf_model.w[w_idx];
   assert(w_idx==mrf_model.sizePsi+1 && "FATAL:w_idx!=mrf_model.sizePsi+1");
 
   //
