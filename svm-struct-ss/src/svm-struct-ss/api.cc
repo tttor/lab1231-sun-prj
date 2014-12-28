@@ -318,7 +318,7 @@ void        free_struct_model(STRUCTMODEL sm)
   if(sm.svm_model) free_model(sm.svm_model,1);
 
   /* add free calls for user defined data here */
-  if(learning_param) free(learning_param);
+  if(sm.learning_param) free(sm.learning_param);
 }
 
 // YET EMPTY DEFINITIONS _or_ NOT YET ELABORATED //////////////////////////////
