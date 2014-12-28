@@ -74,6 +74,7 @@ LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm,
   LABEL y;
 
   /* insert your code for computing the predicted label y here */
+  assert(false && "NOT IMPLEMENTED YET");
 
   debug_out_msg("classify_struct_example");
   return(y);
@@ -243,6 +244,8 @@ int         finalize_iteration(double ceps, int cached_constraint,
   
   If the return value is FALSE, then the algorithm is allowed to terminate. 
   If it is TRUE, the algorithm will keep iterating even if the desired precision sparm->epsilon is already reached. */
+  using namespace std;
+  // assert(false && "NOT IMPLEMENTED YET: finalize_iteration");
   return(0);
 }
 

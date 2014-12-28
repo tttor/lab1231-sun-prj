@@ -24,8 +24,8 @@ LABEL margin_rescaling(PATTERN x, LABEL y, const STRUCTMODEL& mrf_model) {
   sun::shotton::train(data_param, &energy_internal_param);
 
   //
-  svm_struct_ss::util::MRFWeight energy_external_param;
-  svm_struct_ss::util::get_weight(mrf_model, y.width, y.height, &energy_external_param);
+  svm_struct_ss::util::MRFWeight energy_external_param(y.height,y.width);
+  svm_struct_ss::util::get_weight(mrf_model, &energy_external_param);
   debug_var("energy_external_param.unary_weight_MatrixXd().size()",energy_external_param.unary_weight_MatrixXd().size());
   debug_var("energy_external_param.horizontal_pairwise_weight_MatrixXd().size()",energy_external_param.horizontal_pairwise_weight_MatrixXd().size());
   debug_var("energy_external_param.vertical_pairwise_weight_MatrixXd().size()",energy_external_param.vertical_pairwise_weight_MatrixXd().size());

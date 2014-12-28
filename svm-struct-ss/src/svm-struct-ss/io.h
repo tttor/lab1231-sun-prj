@@ -8,8 +8,6 @@
 #include <boost/tokenizer.hpp>
 #include <Eigen/Dense>
 
-// #define DEBUG_ON
-
 #ifdef DEBUG_ON
 #define debug_var(name,value) std::cout<<name<<"= "<<value<<std::endl
 #define debug_msg(msg) std::cout<<msg<<std::endl
