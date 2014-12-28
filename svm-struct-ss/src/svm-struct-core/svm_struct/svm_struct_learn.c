@@ -26,8 +26,6 @@
 #define MAX(x,y)      ((x) < (y) ? (y) : (x))
 #define MIN(x,y)      ((x) > (y) ? (y) : (x))
 
-#define debug_msg(msg) fprintf(stderr, "AT svm_struct_learn.c: %s\n", msg)
-#define debug_var(id,val) fprintf(stderr, "AT svm_struct_learn.c: %s= %f\n", id, (float)val)
 
 void svm_learn_struct(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 		      LEARN_PARM *lparm, KERNEL_PARM *kparm, 
@@ -475,8 +473,6 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 			    LEARN_PARM *lparm, KERNEL_PARM *kparm, 
 			    STRUCTMODEL *sm, int alg_type)
 {
-	fprintf(stderr, "%s\n", "svm_learn_struct_joint: BEGIN");
-
   int         i,j;
   int         numIt=0;
   long        argmax_count=0;
@@ -515,8 +511,6 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
   long        uptr=0;
   long        *randmapping=NULL;
   long        batch_size=n;
-
-  debug_msg("after init var");
 
   rt1=get_runtime();
 
@@ -562,7 +556,6 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
     kparm->gram_matrix=init_kernel_matrix(&cset,kparm);
 
   /* set initial model and slack variables */
-  debug_msg("set initial model and slack variables");
   svmModel=(MODEL *)my_malloc(sizeof(MODEL));
   lparm->epsilon_crit=epsilon;
   svm_learn_optimization(cset.lhs,cset.rhs,cset.m,sizePsi,
@@ -572,32 +565,22 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
   sm->w=svmModel->lin_weights; /* short cut to weight vector */
 
   /* create a cache of the feature vectors for the correct labels */
-  debug_msg("create a cache of the feature vectors for the correct labels");
-  debug_var("n",n);
   fycache=(SVECTOR **)my_malloc(n*sizeof(SVECTOR *));
   for(i=0;i<n;i++) {
     if(USE_FYCACHE) {
-      debug_msg("USE_FYCACHE");
-
       fy=psi(ex[i].x,ex[i].y,sm,sparm);
-	  debug_msg("got psi()");
-
       if(kparm->kernel_type == LINEAR) { /* store difference vector directly */
-	  	debug_msg("kparm->kernel_type == LINEAR");
-		diff=add_list_sort_ss_r(fy,COMPACT_ROUNDING_THRESH); 
-		free_svector(fy);
-		fy=diff;
+	diff=add_list_sort_ss_r(fy,COMPACT_ROUNDING_THRESH); 
+	free_svector(fy);
+	fy=diff;
       }
     }
     else
       fy=NULL;
-
-  	debug_msg("will fycache[i]=fy;");
     fycache[i]=fy;
   }
 
   /* initialize the constraint cache */
-  debug_msg("initialize the constraint cache");
   if(alg_type == ONESLACK_DUAL_CACHE_ALG) {
     ccache=create_constraint_cache(sample,sparm,sm);
     /* NOTE:  */
@@ -622,9 +605,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
     /*****************/
    /*** main loop ***/
   /*****************/
-  debug_msg("main loop: BEGIN");
   do { /* iteratively find and add constraints to working set */
-    debug_msg("iter main learning loop:begin");
 
       if(struct_verbosity>=1) { 
 	printf("Iter %i: ",++numIt); 
@@ -645,19 +626,15 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
       rt_total+=MAX(get_runtime()-rt1,0);
 
       /**** find a violated joint constraint ****/
-      debug_msg("find a violated joint constraint");
       lhs=NULL;
       rhs=0;
       if(alg_type == ONESLACK_DUAL_CACHE_ALG) {
 	rt1=get_runtime();
-
 	/* Compute violation of constraints in cache for current w */
-	debug_msg("Compute violation of constraints in cache for current w ");
 	if(struct_verbosity>=2) rt2=get_runtime();
 	update_constraint_cache_for_model(ccache, svmModel);
 	if(struct_verbosity>=2) rt_cacheupdate+=MAX(get_runtime()-rt2,0);
 	/* Is there is a sufficiently violated constraint in cache? */
-	debug_msg("Is there is a sufficiently violated constraint in cache?");
 	viol=compute_violation_of_constraint_in_cache(ccache,epsilon_est/2);
 	if(viol-slack > MAX(epsilon_est/10,sparm->epsilon)) { 
 	  /* There is a sufficiently violated constraint in cache, so
@@ -717,7 +694,6 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
       }
       else { 
 	/* do not use constraint from cache */
-    debug_msg("do not use constraint from cache");
 	rt1=get_runtime();
 	cached_constraint=0;
 	if(kparm->kernel_type == LINEAR)
@@ -726,7 +702,6 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 	rt_total+=MAX(get_runtime()-rt1,0);
 
 	for(i=0; i<n; i++) {
-		debug_msg("looping over example: BEGIN");
 	  rt1=get_runtime();
 
 	  if(struct_verbosity>=1) 
@@ -736,9 +711,7 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 	  find_most_violated_constraint(&fydelta,&rhs_i,&ex[i],fycache[i],n,
 				      sm,sparm,&rt_viol,&rt_psi,&argmax_count);
 	  /* add current fy-fybar to lhs of constraint */
-	  debug_msg("add current fy-fybar to lhs of constraint:begin");
 	  if(kparm->kernel_type == LINEAR) {
-	  	debug_msg("kparm->kernel_type == LINEAR");// BUG HERE
 	    add_list_n_ns(lhs_n,fydelta,1.0); /* add fy-fybar to sum */
 	    free_svector(fydelta);
 	  }
@@ -747,9 +720,9 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 	    lhs=fydelta;
 	  }
 	  rhs+=rhs_i;                         /* add loss to rhs */
-	  debug_msg("add current fy-fybar to lhs of constraint: end");
+	  
 	  rt_total+=MAX(get_runtime()-rt1,0);
-	  debug_msg("looping over example: END");
+
 	} /* end of example loop */
 
 	rt1=get_runtime();
@@ -855,10 +828,10 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
 	       svmModel->sv_num-1,ceps,svmModel->maxdiff);
 
       rt_total+=MAX(get_runtime()-rt1,0);
-    debug_msg("iter main learning loop: end");
+
   } while(cached_constraint || (ceps > sparm->epsilon) || 
 	  finalize_iteration(ceps,cached_constraint,sample,sm,cset,alpha,sparm)
-	);
+	 );
   
 
   if(struct_verbosity>=1) {
@@ -949,7 +922,6 @@ void find_most_violated_constraint(SVECTOR **fydelta, double *rhs,
      /* returns fydelta=fy-fybar and rhs scalar value that correspond
 	to the most violated constraint for example ex */
 {
-  debug_msg("find_most_violated_constrain: begin");
   double      rt2=0;
   LABEL       ybar;
   SVECTOR     *fybar, *fy;
@@ -970,20 +942,17 @@ void find_most_violated_constraint(SVECTOR **fydelta, double *rhs,
   }
   
   /**** get psi(x,y) and psi(x,ybar) ****/
-  debug_msg("get psi(x,y) and psi(x,ybar)");
   if(struct_verbosity>=2) rt2=get_runtime();
   if(fycached)
     fy=copy_svector(fycached); 
   else 
     fy=psi(ex->x,ex->y,sm,sparm);
-
   fybar=psi(ex->x,ybar,sm,sparm);
   if(struct_verbosity>=2) (*rt_psi)+=MAX(get_runtime()-rt2,0);
   lossval=loss(ex->y,ybar,sparm);
   free_label(ybar);
   
   /**** scale feature vector and margin by loss ****/
-  debug_msg("scale feature vector and margin by loss ");
   if(sparm->loss_type == SLACK_RESCALING)
     factor=lossval/n;
   else                 /* do not rescale vector for */
@@ -994,7 +963,6 @@ void find_most_violated_constraint(SVECTOR **fydelta, double *rhs,
 
   (*fydelta)=fybar;
   (*rhs)=lossval/n;
-  debug_msg("find_most_violated_constrain: end");
 }
 
 
