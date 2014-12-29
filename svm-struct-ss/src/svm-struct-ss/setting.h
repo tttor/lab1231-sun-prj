@@ -40,4 +40,7 @@
 */
 # define COMPACT_ROUNDING_THRESH 10E-15
 
+// 0 = NO, 1: YES
+# define START_WITH_EMPTY_SET_OF_CONSTRAINTS 1
+
 #endif

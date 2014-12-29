@@ -83,6 +83,53 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
 }
 
 // MODIFIED:
+CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm, 
+            STRUCT_LEARN_PARM *sparm)
+{
+  /* Initializes the optimization problem. Typically, you do not need
+     to change this function, since you want to start with an empty
+     set of constraints. However, if for example you have constraints
+     that certain weights need to be positive, you might put that in
+     here. The constraints are represented as lhs[i]*w >= rhs[i]. lhs
+     is an array of feature vectors, rhs is an array of doubles. m is
+     the number of constraints. The function returns the initial
+     set of constraints. */
+  debug_in_msg("init_struct_constraints");
+
+  CONSTSET c;
+  long     sizePsi=sm->sizePsi;
+  long     i;
+  WORD     words[2];
+
+  if(START_WITH_EMPTY_SET_OF_CONSTRAINTS) { /* normal case: start with empty set of constraints */
+    debug_msg("normal case: start with empty set of constraints");
+    c.lhs=NULL;
+    c.rhs=NULL;
+    c.m=0;
+  }
+  else { /* add constraints so that all learned weights are
+            positive. WARNING: Currently, they are positive only up to
+            precision epsilon set by -e. */
+    debug_msg("add constraints so that all learned weights are positive");       
+    c.lhs=my_malloc(sizeof(DOC *)*sizePsi);
+    c.rhs=my_malloc(sizeof(double)*sizePsi);
+    for(i=0; i<sizePsi; i++) {
+      words[0].wnum=i+1;
+      words[0].weight=1.0;
+      words[1].wnum=0;
+      /* the following slackid is a hack. we will run into problems,
+         if we have move than 1000000 slack sets (ie examples) */
+      c.lhs[i]=create_example(i,0,1000000+i,1,create_svector(words,"",1.0));
+      c.rhs[i]=0.0;
+    }
+    c.m = sizePsi;// TODO @tttor: why? is this how to dd constraints so that all learned weights are positive?
+  }
+  debug_var("c.m",c.m);
+  debug_in_msg("init_struct_constraints");
+  return(c);
+}
+
+// MODIFIED:
 LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm, 
 				    STRUCT_LEARN_PARM *sparm)
 {
@@ -372,45 +419,6 @@ void        svm_struct_classify_api_exit()
 {
   /* Called in prediction part at the very end to allow any clean-up
      that might be necessary. */
-}
-
-CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm, 
-            STRUCT_LEARN_PARM *sparm)
-{
-  /* Initializes the optimization problem. Typically, you do not need
-     to change this function, since you want to start with an empty
-     set of constraints. However, if for example you have constraints
-     that certain weights need to be positive, you might put that in
-     here. The constraints are represented as lhs[i]*w >= rhs[i]. lhs
-     is an array of feature vectors, rhs is an array of doubles. m is
-     the number of constraints. The function returns the initial
-     set of constraints. */
-  CONSTSET c;
-  long     sizePsi=sm->sizePsi;
-  long     i;
-  WORD     words[2];
-
-  if(1) { /* normal case: start with empty set of constraints */
-    c.lhs=NULL;
-    c.rhs=NULL;
-    c.m=0;
-  }
-  else { /* add constraints so that all learned weights are
-            positive. WARNING: Currently, they are positive only up to
-            precision epsilon set by -e. */
-    c.lhs=my_malloc(sizeof(DOC *)*sizePsi);
-    c.rhs=my_malloc(sizeof(double)*sizePsi);
-    for(i=0; i<sizePsi; i++) {
-      words[0].wnum=i+1;
-      words[0].weight=1.0;
-      words[1].wnum=0;
-      /* the following slackid is a hack. we will run into problems,
-         if we have move than 1000000 slack sets (ie examples) */
-      c.lhs[i]=create_example(i,0,1000000+i,1,create_svector(words,"",1.0));
-      c.rhs[i]=0.0;
-    }
-  }
-  return(c);
 }
 
 void        free_struct_sample(SAMPLE s)
