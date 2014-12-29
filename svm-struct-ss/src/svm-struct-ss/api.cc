@@ -35,16 +35,33 @@ SAMPLE read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 {
   /* Reads struct examples and returns them in sample. The number of
      examples must be written into sample.n */
-  SAMPLE sample;// set_of_examples
-  sample = svm_struct_ss::util::get_set_of_examples(std::string(file));
+  SAMPLE   sample;  /* sample */
+  EXAMPLE  *examples;
+  long     n;       /* number of examples */
+
+  // n=100; /* replace by appropriate number of examples */
+  // examples=(EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n);
+
+  /* fill in your code here */
+  std::vector<std::string> list;
+  list = svm_struct_ss::io::read_list(std::string(file));
+
+  n = list.size();
+
+  examples = (EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n);
+  svm_struct_ss::util::set_examples(list,examples);
+
+  //
+  sample.n = n;
+  sample.examples = examples;
 
   // debug_var("sample.n", sample.n);
   // debug_var("sample.examples[0].x.id",sample.examples[0].x.id);
   // debug_var("sample.examples[0].y.height",sample.examples[0].y.height);
   // debug_var("sample.examples[0].y.label[0]",sample.examples[0].y.flatten_label[0]);
   // assert(false);
-  
-  return sample;
+
+  return(sample);
 }
 
 // MODIFIED:

@@ -136,19 +136,16 @@ LABEL get_LABEL(const LabelMatrix& label_mat) {
   return label;
 }
 
-SAMPLE get_set_of_examples(const std::string& list_filepath) {
-  using namespace std;
-  //
+size_t get_n_examples(const std::string& list_filepath) {
   std::vector<std::string> list;
   list = io::read_list(list_filepath);
 
-  //
-  const size_t n_example = list.size();
-  debug_var("n_example",n_example);
+  return list.size();
+}
 
-  EXAMPLE* examples;
-  examples = (EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n_example);
-
+void set_examples(const std::vector<std::string>& list, EXAMPLE *examples) {
+  using namespace std;
+  size_t n_example = list.size();
   for(size_t i=0; i<n_example; ++i) {
     cout << "Reading example= " << i+1 << " of " << n_example << endl;
 
@@ -167,13 +164,6 @@ SAMPLE get_set_of_examples(const std::string& list_filepath) {
     examples[i].x = pattern;
     examples[i].y = label;
   }
-
-  //
-  SAMPLE set_of_examples;
-  set_of_examples.n = n_example;
-  set_of_examples.examples = examples;
-
-  return set_of_examples;
 }
 
 }// namespace util
