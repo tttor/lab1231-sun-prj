@@ -73,10 +73,12 @@ int main (int argc, char* argv[])
     svm_learn_struct(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,NSLACK_ALG);
   else if(alg_type == 1)
     svm_learn_struct(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,NSLACK_SHRINK_ALG);
-  else if(alg_type == 2)
+  else if(alg_type == 2) {
+    cout << "svm_learn_struct_joint(...ONESLACK_DUAL_ALG)" << endl;
     svm_learn_struct_joint(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,ONESLACK_PRIMAL_ALG);
+  }
   else if(alg_type == 3) {
-    cout << "cout << svm_learn_struct_joint(...ONESLACK_DUAL_ALG)" << endl;
+    cout << "svm_learn_struct_joint(...ONESLACK_DUAL_ALG)" << endl;
     svm_learn_struct_joint(sample,&struct_parm,&learn_parm,&kernel_parm,&structmodel,ONESLACK_DUAL_ALG);
   }
   else if(alg_type == 4)

@@ -38,6 +38,12 @@ SAMPLE read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
   SAMPLE sample;// set_of_examples
   sample = svm_struct_ss::util::get_set_of_examples(std::string(file));
 
+  // debug_var("sample.n", sample.n);
+  // debug_var("sample.examples[0].x.id",sample.examples[0].x.id);
+  // debug_var("sample.examples[0].y.height",sample.examples[0].y.height);
+  // debug_var("sample.examples[0].y.label[0]",sample.examples[0].y.flatten_label[0]);
+  // assert(false);
+  
   return sample;
 }
 
@@ -327,8 +333,10 @@ void        free_struct_model(STRUCTMODEL sm)
 // YET EMPTY DEFINITIONS _or_ NOT YET ELABORATED //////////////////////////////
 void        svm_struct_learn_api_init(int argc, char* argv[])
 {
+  debug_in_msg("svm_struct_learn_api_init");
   /* Called in learning part before anything else is done to allow
      any initializations that might be necessary. */
+  debug_out_msg("svm_struct_learn_api_init");
 }
 
 void        svm_struct_learn_api_exit()

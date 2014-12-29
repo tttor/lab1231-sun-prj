@@ -131,7 +131,7 @@ LABEL get_LABEL(const LabelMatrix& label_mat) {
   label.height = label_mat.rows();
   label.size = label.height*label.width;
   label.max_size = sizeof(label.flatten_label)/sizeof(label.flatten_label[0]);
-  for (size_t j=0; j<label.size; ++j) label.flatten_label[j] = label_mat.data()[j];// row-wise flattening
+  for (size_t j=0; j<label.size; ++j) label.flatten_label[j] = label_mat.data()[j];// row-wise flattening as LabelMatrix is row-major
 
   return label;
 }
@@ -140,11 +140,11 @@ SAMPLE get_set_of_examples(const std::string& list_filepath) {
   using namespace std;
   //
   std::vector<std::string> list;
-  list = svm_struct_ss::io::read_list(list_filepath);
+  list = io::read_list(list_filepath);
 
   //
   const size_t n_example = list.size();
-  debug_var("n_example=",n_example);
+  debug_var("n_example",n_example);
 
   EXAMPLE* examples;
   examples = (EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n_example);
@@ -159,8 +159,8 @@ SAMPLE get_set_of_examples(const std::string& list_filepath) {
     //
     LABEL label;
 
-    string gt_csv_filepath = string(svm_struct_ss::data_param::gt_csv_dir+"/"+list.at(i)+".csv");
-    LabelMatrix label_mat = svm_struct_ss::io::read_csv<LabelMatrix>(gt_csv_filepath);
+    string gt_csv_filepath = string(data_param::gt_csv_dir+"/"+list.at(i)+".csv");
+    LabelMatrix label_mat = io::read_csv<LabelMatrix>(gt_csv_filepath);
     label = get_LABEL(label_mat);
 
     //
