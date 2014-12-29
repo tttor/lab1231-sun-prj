@@ -30,13 +30,14 @@ void set_unary_fea_mat(const PATTERN& x, const LABEL& y, util::FeatureMatrix* un
 
   // get unary joint feature
   util::FeatureMatrix local_unary_fea_mat(unary_prob_img.height(), unary_prob_img.width());
-  for (size_t r=0; r<local_unary_fea_mat.rows(); ++r) 
+  for (size_t r=0; r<local_unary_fea_mat.rows(); ++r) {
     for (size_t c=0; c<local_unary_fea_mat.cols(); ++c) { 
       size_t flat_idx = util::flat_idx_rowcol( r,c,unary_prob_img.width() );
       local_unary_fea_mat(r,c) = sun::shotton::get_unary_potential_from_unary_prob_image(unary_prob_img,
                                                                                          c, r,
                                                                                          y.flatten_label[flat_idx]); 
     }
+  }
 
   // put the local unary joint feature to the global unary joint feature whose size is constant
   // the top left corner of this feature matrix always coincides with the top left corner of max feature matrix
@@ -160,7 +161,7 @@ void extract_feature(const PATTERN& x, const LABEL& y,const size_t& n_word, SVEC
   FNUM word_idx = 0;
 
   // unary fea
-  util::FeatureMatrix unary_fea_mat;
+  util::FeatureMatrix unary_fea_mat;// constant size, set to maximum size of input images
   unary_fea_mat = util::FeatureMatrix::Zero(util::example_max_height(),util::example_max_width());
   set_unary_fea_mat(x,y, &unary_fea_mat);
   

@@ -13,11 +13,20 @@ doubts on rank's implementation:
 > @inferWithLoss(); #pairwise_w? (x.width - 1) * (x.height - 1)? for N4?
 > @void set_2nd_order: unequal_pen *=  max(0.0,pair_weights[util::flat_idx(x, y, img_mat.cols - 1)]); 
 seem that the pairwise fea is uncomplete for N4
-but 
-@psi():
+but @psi():
 double *pair_psi = (double *)malloc(sizeof(double) * (2 * (x.width - 1) * (x.height - 1)));
+this cannot be right?
+but @get_2nd_order_psi():
+psi[x + y * (img_mat.cols - 1)] = annotation_matrix(y, x) == annotation_matrix(y, x + 1) ? equal_pen : unequal_pen; //horizontal psi
+psi[psioffset + x + y * (img_mat.cols - 1) ] = annotation_matrix(y, x) == annotation_matrix(y + 1, x) ? equal_pen : unequal_pen; //vertical psi
 > @set_1st_orderWithLoss(): 
 energy(i) =  (float)max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)]) * max(0.0,(double)-log(unary_matrix(5 * x, 5 * y, i)+DBL_EPSILON)) - hinge_loss;
+unnecessary outer max()?
+> @psi():
+energy_unary = max(0.0,(double)-log(unary_matrix(5 * xx, 5 * yy, y.annotation_matrix(yy, xx))+DBL_EPSILON));
+fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -energy_unary; //make sure it is potential invers
+why inverse energy_unary?
+> where do u handle missing feature values, due to diff size of input images
 ===
 The flow of learning via learn.cc
 
