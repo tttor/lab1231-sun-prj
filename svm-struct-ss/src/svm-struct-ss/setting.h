@@ -1,7 +1,7 @@
 #ifndef SVM_STRUCT_SS_SETTING_H
 #define SVM_STRUCT_SS_SETTING_H
 
-// #define DEBUG_ON
+#define DEBUG_ON
 
 /* default precision for solving the optimization problem */
 # define DEFAULT_EPS         0.1
@@ -18,8 +18,7 @@
 #define  NSLACK_SHRINK_ALG        1
 #define  ONESLACK_PRIMAL_ALG      2
 #define  ONESLACK_DUAL_ALG        3
-#define  ONESLACK_DUAL_CACHE_ALG  4
-*/
+#define  ONESLACK_DUAL_CACHE_ALG  4 */
 # define DEFAULT_ALG_TYPE    3
 
 /* store Psi(x,y) (for ALG_TYPE 1) instead of recomputing it every time: */
@@ -40,5 +39,8 @@
      10E-10 if COMPACT_CACHED_VECTORS is 2 or 3 
 */
 # define COMPACT_ROUNDING_THRESH 10E-15
+
+// 0 = NO, 1: YES
+# define START_WITH_EMPTY_SET_OF_CONSTRAINTS 0
 
 #endif

@@ -35,10 +35,33 @@ SAMPLE read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 {
   /* Reads struct examples and returns them in sample. The number of
      examples must be written into sample.n */
-  SAMPLE sample;// set_of_examples
-  sample = svm_struct_ss::util::get_set_of_examples(std::string(file));
+  SAMPLE   sample;  /* sample */
+  EXAMPLE  *examples;
+  long     n;       /* number of examples */
 
-  return sample;
+  // n=100; /* replace by appropriate number of examples */
+  // examples=(EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n);
+
+  /* fill in your code here */
+  std::vector<std::string> list;
+  list = svm_struct_ss::io::read_list(std::string(file));
+
+  n = list.size();
+
+  examples = (EXAMPLE *)my_malloc(sizeof(EXAMPLE)*n);
+  svm_struct_ss::util::set_examples(list,examples);
+
+  //
+  sample.n = n;
+  sample.examples = examples;
+
+  // debug_var("sample.n", sample.n);
+  // debug_var("sample.examples[0].x.id",sample.examples[0].x.id);
+  // debug_var("sample.examples[0].y.height",sample.examples[0].y.height);
+  // debug_var("sample.examples[0].y.label[0]",sample.examples[0].y.flatten_label[0]);
+  // assert(false);
+
+  return(sample);
 }
 
 // MODIFIED:
@@ -60,60 +83,50 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
 }
 
 // MODIFIED:
-LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm, 
-				    STRUCT_LEARN_PARM *sparm)
+CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm, 
+            STRUCT_LEARN_PARM *sparm)
 {
-  /* Finds the label yhat for pattern x that scores the highest
-     according to the linear evaluation function in sm, especially the
-     weights sm.w. The returned label is taken as the prediction of sm
-     for the pattern x. The weights correspond to the features defined
-     by psi() and range from index 1 to index sm->sizePsi. If the
-     function cannot find a label, it shall return an empty label as
-     recognized by the function empty_label(y). */
-  debug_in_msg("classify_struct_example");
-  LABEL y;
+  /* Initializes the optimization problem. Typically, you do not need
+     to change this function, since you want to start with an empty
+     set of constraints. However, if for example you have constraints
+     that certain weights need to be positive, you might put that in
+     here. The constraints are represented as lhs[i]*w >= rhs[i]. lhs
+     is an array of feature vectors, rhs is an array of doubles. m is
+     the number of constraints. The function returns the initial
+     set of constraints. */
+  debug_in_msg("init_struct_constraints");
 
-  /* insert your code for computing the predicted label y here */
-  assert(false && "NOT IMPLEMENTED YET");
+  CONSTSET c;
+  long     sizePsi=sm->sizePsi;
+  long     i;
+  WORD     words[2];
 
-  debug_out_msg("classify_struct_example");
-  return(y);
-}
-
-// MODIFIED:
-LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y, 
-						     STRUCTMODEL *sm, 
-						     STRUCT_LEARN_PARM *sparm)
-{
-  /* Finds the label ybar for pattern x that that is responsible for
-     the most violated constraint for the slack rescaling
-     formulation. For linear slack variables, this is that label ybar
-     that maximizes
-
-            argmax_{ybar} loss(y,ybar)*(1-psi(x,y)+psi(x,ybar)) 
-
-     Note that ybar may be equal to y (i.e. the max is 0), which is
-     different from the algorithms described in
-     [Tschantaridis/05]. Note that this argmax has to take into
-     account the scoring function in sm, especially the weights sm.w,
-     as well as the loss function, and whether linear or quadratic
-     slacks are used. The weights in sm.w correspond to the features
-     defined by psi() and range from index 1 to index
-     sm->sizePsi. Most simple is the case of the zero/one loss
-     function. For the zero/one loss, this function should return the
-     highest scoring label ybar (which may be equal to the correct
-     label y), or the second highest scoring label ybar, if
-     Psi(x,ybar)>Psi(x,y)-1. If the function cannot find a label, it
-     shall return an empty label as recognized by the function
-     empty_label(y). */
-  debug_in_msg("find_most_violated_constraint_slackrescaling");
-  LABEL ybar;
-
-  /* insert your code for computing the label ybar here */
-  assert(false && "NOT IMPLEMENTED YET: find_most_violated_constraint_slackrescaling");
-
-  debug_out_msg("find_most_violated_constraint_slackrescaling");
-  return(ybar);
+  if(START_WITH_EMPTY_SET_OF_CONSTRAINTS) { /* normal case: start with empty set of constraints */
+    debug_msg("normal case: start with empty set of constraints");
+    c.lhs=NULL;
+    c.rhs=NULL;
+    c.m=0;
+  }
+  else { /* add constraints so that all learned weights are
+            positive. WARNING: Currently, they are positive only up to
+            precision epsilon set by -e. */
+    debug_msg("add constraints so that all learned weights are positive");       
+    c.lhs=my_malloc(sizeof(DOC *)*sizePsi);
+    c.rhs=my_malloc(sizeof(double)*sizePsi);
+    for(i=0; i<sizePsi; i++) {
+      words[0].wnum=i+1;
+      words[0].weight=1.0;
+      words[1].wnum=0;
+      /* the following slackid is a hack. we will run into problems,
+         if we have move than 1000000 slack sets (ie examples) */
+      c.lhs[i]=create_example(i,0,1000000+i,1,create_svector(words,"",1.0));
+      c.rhs[i]=0.0;
+    }
+    c.m = sizePsi;// TODO @tttor: why? is this how to dd constraints so that all learned weights are positive?
+  }
+  debug_var("c.m",c.m);
+  debug_in_msg("init_struct_constraints");
+  return(c);
 }
 
 // MODIFIED:
@@ -178,23 +191,26 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
      inner vector product) and the appropriate function of the
      loss + margin/slack rescaling method. See that paper for details. */
   /* insert code for computing the feature vector for x and y here */
-  debug_in_msg("api::psi");
+  // TODO @tttor: we may have a list of 3 feature vector: unary, pairwise_horizontal, pairwise_vertical
+  // Currently, they are merged in one feature vector, so this psi() returns a list of one big feature vector
+  debug_in_msg("psi");
 
-  const size_t n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
   SVECTOR* fvec;
-  fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));
-  fvec->words = (WORD *) my_malloc( sizeof(WORD)*n_word );
-  fvec->next = NULL;
-  fvec->userdefined = NULL;
+  fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));// fvec points to a list of _one_ feature-vector
+  fvec->next = NULL;// we have only this single feature vector
   fvec->factor = 1.0;
   fvec->kernel_id = 0;
+  fvec->userdefined = NULL;
+  
+  const size_t n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
+  fvec->words = (WORD *) my_malloc( sizeof(WORD)*n_word );
 
   svm_struct_ss::joint_feature_extractor::extract_feature(x, y, n_word, fvec);
 
   // set the termination sign
   fvec->words[n_word-1].wnum = 0;
 
-  debug_out_msg("api::psi");
+  debug_out_msg("psi");
   return(fvec);
 }
 
@@ -218,6 +234,63 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
   
   debug_out_msg("loss");
   return loss;
+}
+
+// MODIFIED:
+LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm, 
+            STRUCT_LEARN_PARM *sparm)
+{
+  /* Finds the label yhat for pattern x that scores the highest
+     according to the linear evaluation function in sm, especially the
+     weights sm.w. The returned label is taken as the prediction of sm
+     for the pattern x. The weights correspond to the features defined
+     by psi() and range from index 1 to index sm->sizePsi. If the
+     function cannot find a label, it shall return an empty label as
+     recognized by the function empty_label(y). */
+  debug_in_msg("classify_struct_example");
+  LABEL y;
+
+  /* insert your code for computing the predicted label y here */
+  assert(false && "NOT IMPLEMENTED YET");
+
+  debug_out_msg("classify_struct_example");
+  return(y);
+}
+
+// MODIFIED:
+LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y, 
+                 STRUCTMODEL *sm, 
+                 STRUCT_LEARN_PARM *sparm)
+{
+  /* Finds the label ybar for pattern x that that is responsible for
+     the most violated constraint for the slack rescaling
+     formulation. For linear slack variables, this is that label ybar
+     that maximizes
+
+            argmax_{ybar} loss(y,ybar)*(1-psi(x,y)+psi(x,ybar)) 
+
+     Note that ybar may be equal to y (i.e. the max is 0), which is
+     different from the algorithms described in
+     [Tschantaridis/05]. Note that this argmax has to take into
+     account the scoring function in sm, especially the weights sm.w,
+     as well as the loss function, and whether linear or quadratic
+     slacks are used. The weights in sm.w correspond to the features
+     defined by psi() and range from index 1 to index
+     sm->sizePsi. Most simple is the case of the zero/one loss
+     function. For the zero/one loss, this function should return the
+     highest scoring label ybar (which may be equal to the correct
+     label y), or the second highest scoring label ybar, if
+     Psi(x,ybar)>Psi(x,y)-1. If the function cannot find a label, it
+     shall return an empty label as recognized by the function
+     empty_label(y). */
+  debug_in_msg("find_most_violated_constraint_slackrescaling");
+  LABEL ybar;
+
+  /* insert your code for computing the label ybar here */
+  assert(false && "NOT IMPLEMENTED YET: find_most_violated_constraint_slackrescaling");
+
+  debug_out_msg("find_most_violated_constraint_slackrescaling");
+  return(ybar);
 }
 
 // MODIFIED:
@@ -327,8 +400,10 @@ void        free_struct_model(STRUCTMODEL sm)
 // YET EMPTY DEFINITIONS _or_ NOT YET ELABORATED //////////////////////////////
 void        svm_struct_learn_api_init(int argc, char* argv[])
 {
+  debug_in_msg("svm_struct_learn_api_init");
   /* Called in learning part before anything else is done to allow
      any initializations that might be necessary. */
+  debug_out_msg("svm_struct_learn_api_init");
 }
 
 void        svm_struct_learn_api_exit()
@@ -347,45 +422,6 @@ void        svm_struct_classify_api_exit()
 {
   /* Called in prediction part at the very end to allow any clean-up
      that might be necessary. */
-}
-
-CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm, 
-            STRUCT_LEARN_PARM *sparm)
-{
-  /* Initializes the optimization problem. Typically, you do not need
-     to change this function, since you want to start with an empty
-     set of constraints. However, if for example you have constraints
-     that certain weights need to be positive, you might put that in
-     here. The constraints are represented as lhs[i]*w >= rhs[i]. lhs
-     is an array of feature vectors, rhs is an array of doubles. m is
-     the number of constraints. The function returns the initial
-     set of constraints. */
-  CONSTSET c;
-  long     sizePsi=sm->sizePsi;
-  long     i;
-  WORD     words[2];
-
-  if(1) { /* normal case: start with empty set of constraints */
-    c.lhs=NULL;
-    c.rhs=NULL;
-    c.m=0;
-  }
-  else { /* add constraints so that all learned weights are
-            positive. WARNING: Currently, they are positive only up to
-            precision epsilon set by -e. */
-    c.lhs=my_malloc(sizeof(DOC *)*sizePsi);
-    c.rhs=my_malloc(sizeof(double)*sizePsi);
-    for(i=0; i<sizePsi; i++) {
-      words[0].wnum=i+1;
-      words[0].weight=1.0;
-      words[1].wnum=0;
-      /* the following slackid is a hack. we will run into problems,
-         if we have move than 1000000 slack sets (ie examples) */
-      c.lhs[i]=create_example(i,0,1000000+i,1,create_svector(words,"",1.0));
-      c.rhs[i]=0.0;
-    }
-  }
-  return(c);
 }
 
 void        free_struct_sample(SAMPLE s)
