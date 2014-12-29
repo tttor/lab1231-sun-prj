@@ -130,63 +130,6 @@ CONSTSET    init_struct_constraints(SAMPLE sample, STRUCTMODEL *sm,
 }
 
 // MODIFIED:
-LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm, 
-				    STRUCT_LEARN_PARM *sparm)
-{
-  /* Finds the label yhat for pattern x that scores the highest
-     according to the linear evaluation function in sm, especially the
-     weights sm.w. The returned label is taken as the prediction of sm
-     for the pattern x. The weights correspond to the features defined
-     by psi() and range from index 1 to index sm->sizePsi. If the
-     function cannot find a label, it shall return an empty label as
-     recognized by the function empty_label(y). */
-  debug_in_msg("classify_struct_example");
-  LABEL y;
-
-  /* insert your code for computing the predicted label y here */
-  assert(false && "NOT IMPLEMENTED YET");
-
-  debug_out_msg("classify_struct_example");
-  return(y);
-}
-
-// MODIFIED:
-LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y, 
-						     STRUCTMODEL *sm, 
-						     STRUCT_LEARN_PARM *sparm)
-{
-  /* Finds the label ybar for pattern x that that is responsible for
-     the most violated constraint for the slack rescaling
-     formulation. For linear slack variables, this is that label ybar
-     that maximizes
-
-            argmax_{ybar} loss(y,ybar)*(1-psi(x,y)+psi(x,ybar)) 
-
-     Note that ybar may be equal to y (i.e. the max is 0), which is
-     different from the algorithms described in
-     [Tschantaridis/05]. Note that this argmax has to take into
-     account the scoring function in sm, especially the weights sm.w,
-     as well as the loss function, and whether linear or quadratic
-     slacks are used. The weights in sm.w correspond to the features
-     defined by psi() and range from index 1 to index
-     sm->sizePsi. Most simple is the case of the zero/one loss
-     function. For the zero/one loss, this function should return the
-     highest scoring label ybar (which may be equal to the correct
-     label y), or the second highest scoring label ybar, if
-     Psi(x,ybar)>Psi(x,y)-1. If the function cannot find a label, it
-     shall return an empty label as recognized by the function
-     empty_label(y). */
-  debug_in_msg("find_most_violated_constraint_slackrescaling");
-  LABEL ybar;
-
-  /* insert your code for computing the label ybar here */
-  assert(false && "NOT IMPLEMENTED YET: find_most_violated_constraint_slackrescaling");
-
-  debug_out_msg("find_most_violated_constraint_slackrescaling");
-  return(ybar);
-}
-
-// MODIFIED:
 LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y, 
 						     STRUCTMODEL *sm, 
 						     STRUCT_LEARN_PARM *sparm)
@@ -248,7 +191,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
      inner vector product) and the appropriate function of the
      loss + margin/slack rescaling method. See that paper for details. */
   /* insert code for computing the feature vector for x and y here */
-  debug_in_msg("api::psi");
+  debug_in_msg("psi");
 
   const size_t n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
   SVECTOR* fvec;
@@ -264,7 +207,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
   // set the termination sign
   fvec->words[n_word-1].wnum = 0;
 
-  debug_out_msg("api::psi");
+  debug_out_msg("psi");
   return(fvec);
 }
 
@@ -288,6 +231,63 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
   
   debug_out_msg("loss");
   return loss;
+}
+
+// MODIFIED:
+LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm, 
+            STRUCT_LEARN_PARM *sparm)
+{
+  /* Finds the label yhat for pattern x that scores the highest
+     according to the linear evaluation function in sm, especially the
+     weights sm.w. The returned label is taken as the prediction of sm
+     for the pattern x. The weights correspond to the features defined
+     by psi() and range from index 1 to index sm->sizePsi. If the
+     function cannot find a label, it shall return an empty label as
+     recognized by the function empty_label(y). */
+  debug_in_msg("classify_struct_example");
+  LABEL y;
+
+  /* insert your code for computing the predicted label y here */
+  assert(false && "NOT IMPLEMENTED YET");
+
+  debug_out_msg("classify_struct_example");
+  return(y);
+}
+
+// MODIFIED:
+LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y, 
+                 STRUCTMODEL *sm, 
+                 STRUCT_LEARN_PARM *sparm)
+{
+  /* Finds the label ybar for pattern x that that is responsible for
+     the most violated constraint for the slack rescaling
+     formulation. For linear slack variables, this is that label ybar
+     that maximizes
+
+            argmax_{ybar} loss(y,ybar)*(1-psi(x,y)+psi(x,ybar)) 
+
+     Note that ybar may be equal to y (i.e. the max is 0), which is
+     different from the algorithms described in
+     [Tschantaridis/05]. Note that this argmax has to take into
+     account the scoring function in sm, especially the weights sm.w,
+     as well as the loss function, and whether linear or quadratic
+     slacks are used. The weights in sm.w correspond to the features
+     defined by psi() and range from index 1 to index
+     sm->sizePsi. Most simple is the case of the zero/one loss
+     function. For the zero/one loss, this function should return the
+     highest scoring label ybar (which may be equal to the correct
+     label y), or the second highest scoring label ybar, if
+     Psi(x,ybar)>Psi(x,y)-1. If the function cannot find a label, it
+     shall return an empty label as recognized by the function
+     empty_label(y). */
+  debug_in_msg("find_most_violated_constraint_slackrescaling");
+  LABEL ybar;
+
+  /* insert your code for computing the label ybar here */
+  assert(false && "NOT IMPLEMENTED YET: find_most_violated_constraint_slackrescaling");
+
+  debug_out_msg("find_most_violated_constraint_slackrescaling");
+  return(ybar);
 }
 
 // MODIFIED:
