@@ -9,10 +9,13 @@ rank:
 doubts on rank's implementation:
 > 0/1 loss calculation, should not we treat a label y as one sample? affects loss-augmented inference
 > learned weights? sm.m or sm.lin_weights?
-> why set c.m = sizePsi; in ? should w>0?
+> @init_struct_constraints(): why set c.m = sizePsi; in ? should w>0?
 > @inferWithLoss(); #pairwise_w? (x.width - 1) * (x.height - 1)? for N4?
 > @void set_2nd_order: unequal_pen *=  max(0.0,pair_weights[util::flat_idx(x, y, img_mat.cols - 1)]); 
 seem that the pairwise fea is uncomplete for N4
+but 
+@psi():
+double *pair_psi = (double *)malloc(sizeof(double) * (2 * (x.width - 1) * (x.height - 1)));
 > @set_1st_orderWithLoss(): 
 energy(i) =  (float)max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)]) * max(0.0,(double)-log(unary_matrix(5 * x, 5 * y, i)+DBL_EPSILON)) - hinge_loss;
 ===

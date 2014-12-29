@@ -191,16 +191,19 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
      inner vector product) and the appropriate function of the
      loss + margin/slack rescaling method. See that paper for details. */
   /* insert code for computing the feature vector for x and y here */
+  // TODO @tttor: we may have a list of 3 feature vector: unary, pairwise_horizontal, pairwise_vertical
+  // Currently, they are merged in one feature vector, so this psi() returns a list of one big feature vector
   debug_in_msg("psi");
 
-  const size_t n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
   SVECTOR* fvec;
-  fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));
-  fvec->words = (WORD *) my_malloc( sizeof(WORD)*n_word );
-  fvec->next = NULL;
-  fvec->userdefined = NULL;
+  fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));// fvec points to a list of _one_ feature-vector
+  fvec->next = NULL;// we have only this single feature vector
   fvec->factor = 1.0;
   fvec->kernel_id = 0;
+  fvec->userdefined = NULL;
+  
+  const size_t n_word = sm->sizePsi+1;// plus one for a termination flag, where wnum=0
+  fvec->words = (WORD *) my_malloc( sizeof(WORD)*n_word );
 
   svm_struct_ss::joint_feature_extractor::extract_feature(x, y, n_word, fvec);
 

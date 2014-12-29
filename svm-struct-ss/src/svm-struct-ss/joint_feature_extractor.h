@@ -17,6 +17,7 @@ namespace joint_feature_extractor {
 
 void set_unary_fea_mat(const PATTERN& x, const LABEL& y, util::FeatureMatrix* unary_fea_mat) {
   using namespace std;
+  namespace sun = lab1231_sun_prj;
 
   // get unary Philipp prob image
   debug_msg("computing unary fea:...");
@@ -32,7 +33,9 @@ void set_unary_fea_mat(const PATTERN& x, const LABEL& y, util::FeatureMatrix* un
   for (size_t r=0; r<local_unary_fea_mat.rows(); ++r) 
     for (size_t c=0; c<local_unary_fea_mat.cols(); ++c) { 
       size_t flat_idx = util::flat_idx_rowcol( r,c,unary_prob_img.width() );
-      local_unary_fea_mat(r,c) = unary_prob_img( c,r,y.flatten_label[flat_idx] ); 
+      local_unary_fea_mat(r,c) = sun::shotton::get_unary_potential_from_unary_prob_image(unary_prob_img,
+                                                                                         c, r,
+                                                                                         y.flatten_label[flat_idx]); 
     }
 
   // put the local unary joint feature to the global unary joint feature whose size is constant
