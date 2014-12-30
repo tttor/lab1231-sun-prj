@@ -7,7 +7,10 @@ rank:
 
 ===
 doubts on rank's implementation:
-> 0/1 loss calculation, should not we treat a label y as one sample? affects loss-augmented inference
+> 0/1 loss calculation, should not we treat a label y as one sample, instread of loss for each element of y?
+this also affects loss-augmented inference!
+Notice that in svm-struct-multiclass, the loss is multiplied by a magic 100; the loss itself is 0 or 1 for each sample
+Notice that in svm-struct-hmm, it computes per label element losses and sum them up to become loss for a label, similiar to what rank did
 > learned weights? sm.m or sm.lin_weights?
 > @init_struct_constraints(): why set c.m = sizePsi; in ? should w>0?
 > @inferWithLoss(); #pairwise_w? (x.width - 1) * (x.height - 1)? for N4?

@@ -6,8 +6,9 @@
 namespace svm_struct_ss {
 namespace loss_function {
 
-double zero_one_loss(const LABEL& y, const LABEL& ybar) {
+double zero_one_loss(const LABEL& y, const LABEL& ybar, const bool& as_sum_of_label_element_losses=false) {
   debug_in_msg("zero_one_loss");
+  debug_var("as_sum_of_label_element_losses",as_sum_of_label_element_losses);
   assert(y.size==ybar.size && "y.size!=ybar.size");
 
   double loss = 0.0; // optimistic init
@@ -16,8 +17,13 @@ double zero_one_loss(const LABEL& y, const LABEL& ybar) {
       continue;
 
     if (y.flatten_label[i] != ybar.flatten_label[i]) {
-      loss = 1.0;
-      break;
+      if (as_sum_of_label_element_losses) {
+        loss = loss + 1.0;
+      }
+      else {
+        loss = 1.0;
+        break;  
+      }
     }
   }
 
@@ -26,7 +32,7 @@ double zero_one_loss(const LABEL& y, const LABEL& ybar) {
 }
 
 double hinge_loss() {
-
+  // TODO
 }
 
 }
