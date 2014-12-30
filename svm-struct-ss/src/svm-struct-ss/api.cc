@@ -1,5 +1,9 @@
 /***********************************************************************/
 /*                                                                     */
+/*   svm_struct_ss api.c                                               */
+/*   @author: vektor dewanto                                           */
+/*                                                                     */
+/*   based on:                                                         */
 /*   svm_struct_api.c                                                  */
 /*                                                                     */
 /*   Definition of API for attaching implementing SVM learning of      */
@@ -66,8 +70,9 @@ SAMPLE read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 
 // MODIFIED:
 void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm, 
-			      STRUCT_LEARN_PARM *sparm, LEARN_PARM *lparm, 
-			      KERNEL_PARM *kparm)
+                              STRUCT_LEARN_PARM *sparm, // learning parama for svm_struct
+                              LEARN_PARM *lparm, // learning parama for svm_light
+                              KERNEL_PARM *kparm)
 {
   /* Initialize structmodel sm. The weight vector w does not need to be
      initialized, but you need to provide the maximum size of the
@@ -79,13 +84,11 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
   sm->sizePsi = svm_struct_ss::util::get_n_feature();
   debug_var("sm->sizePsi",sm->sizePsi);
 
-  size_t n_unary_feature;
-  size_t n_horizontal_pairwise_feature;
-  size_t n_vertical_pairwise_feature;
-
   sm->n_unary_feature = svm_struct_ss::util::get_n_unary_feature();
   sm->n_horizontal_pairwise_feature = svm_struct_ss::util::get_n_horizontal_pairwise_feature();
   sm->n_vertical_pairwise_feature = svm_struct_ss::util::get_n_vertical_pairwise_feature();
+
+  sm->learning_param = sparm;
 
   // TODO @tttor: initialize sm.w? how? and other members? 
   size_t n_weight = sm->sizePsi; 
@@ -95,7 +98,7 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
   for (size_t i=1; i<(n_weight+1); ++i) {
     if(WEIGHT_INIT_MODE==0) sm->w[i] = 0.0;
     else if (WEIGHT_INIT_MODE==1) sm->w[i] = 1.0;
-    else assert(false && "UNKOWN WEIGHT_INIT_MODE");  
+    else assert(false && "UNKNOWN WEIGHT_INIT_MODE");  
   }
 
   debug_out_msg("init_struct_model");
