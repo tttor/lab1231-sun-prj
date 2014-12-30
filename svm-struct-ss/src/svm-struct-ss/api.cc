@@ -79,6 +79,25 @@ void        init_struct_model(SAMPLE sample, STRUCTMODEL *sm,
   sm->sizePsi = svm_struct_ss::util::get_n_feature();
   debug_var("sm->sizePsi",sm->sizePsi);
 
+  size_t n_unary_feature;
+  size_t n_horizontal_pairwise_feature;
+  size_t n_vertical_pairwise_feature;
+
+  sm->n_unary_feature = svm_struct_ss::util::get_n_unary_feature();
+  sm->n_horizontal_pairwise_feature = svm_struct_ss::util::get_n_horizontal_pairwise_feature();
+  sm->n_vertical_pairwise_feature = svm_struct_ss::util::get_n_vertical_pairwise_feature();
+
+  // TODO @tttor: initialize sm.w? how? and other members? 
+  size_t n_weight = sm->sizePsi; 
+  sm->w = (double *)my_malloc(sizeof(double)*(n_weight+1));// plus one as the weights in sm.w range from index 1 to index sm->sizePsi.
+
+  sm->w[0] = 0.0;// the w at [0] is useless
+  for (size_t i=1; i<(n_weight+1); ++i) {
+    if(WEIGHT_INIT_MODE==0) sm->w[i] = 0.0;
+    else if (WEIGHT_INIT_MODE==1) sm->w[i] = 1.0;
+    else assert(false && "UNKOWN WEIGHT_INIT_MODE");  
+  }
+
   debug_out_msg("init_struct_model");
 }
 

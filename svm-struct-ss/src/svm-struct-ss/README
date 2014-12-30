@@ -30,6 +30,7 @@ energy_unary = max(0.0,(double)-log(unary_matrix(5 * xx, 5 * yy, y.annotation_ma
 fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -energy_unary; //make sure it is potential invers
 why inverse energy_unary?
 > where do u handle missing feature values, due to diff size of input images
+> how do u initialiaze the mrf weights? ones? zeros?
 ===
 The flow of learning via learn.cc
 
