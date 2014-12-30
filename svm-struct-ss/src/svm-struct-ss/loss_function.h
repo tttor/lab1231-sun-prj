@@ -6,7 +6,9 @@
 namespace svm_struct_ss {
 namespace loss_function {
 
-double zero_one_loss(const LABEL& y, const LABEL& ybar, const bool& as_sum_of_label_element_losses=false) {
+double zero_one_loss(const LABEL& y, const LABEL& ybar, 
+                     const bool& as_sum_of_label_element_losses=false,
+                     const bool& normalized=false) {
   debug_in_msg("zero_one_loss");
   debug_var("as_sum_of_label_element_losses",as_sum_of_label_element_losses);
   assert(y.size==ybar.size && "y.size!=ybar.size");
@@ -26,6 +28,9 @@ double zero_one_loss(const LABEL& y, const LABEL& ybar, const bool& as_sum_of_la
       }
     }
   }
+
+  if (normalized) 
+    loss = loss / y.size;
 
   debug_out_msg("zero_one_loss");
   return loss;
