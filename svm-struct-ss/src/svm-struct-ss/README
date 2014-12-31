@@ -6,6 +6,22 @@ rank:
 -w 2 -c 1 -e 100
 
 ===
+Debugging:
+
+problem:
+learning fails
+
+> svm_struct hyperparam
+> review the implementation
+> handle for diff. size of input examples
+> the inference: alpha-expansion, icm?
+> image resize-ing?
+> the loss function?
+> internal param for edge potential?
+> weight initialization?
+> investigate the learning statistic for each iteration?
+
+===
 doubts on rank's implementation:
 > 0/1 loss calculation, should not we treat a label y as one sample, instread of loss for each element of y?
 this also affects loss-augmented inference!
@@ -31,6 +47,8 @@ fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -e
 why inverse energy_unary?
 > where do u handle missing feature values, due to diff size of input images
 > how do u initialiaze the mrf weights? ones? zeros?
+> meaning of learning output statistics
+
 ===
 The flow of learning via learn.cc
 
