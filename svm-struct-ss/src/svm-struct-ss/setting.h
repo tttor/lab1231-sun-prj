@@ -40,7 +40,10 @@
 */
 # define COMPACT_ROUNDING_THRESH 10E-15
 
-// 0 = NO, 1: YES
+// 0: NO, 1: YES
 # define START_WITH_EMPTY_SET_OF_CONSTRAINTS 0
+
+// 0: Zeros, 1: Ones, 
+#define WEIGHT_INIT_MODE 0
 
 #endif

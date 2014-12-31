@@ -101,7 +101,8 @@ inline size_t get_n_feature() {
 void get_weight(const STRUCTMODEL& mrf_model, MRFWeight* mrf_w) {
   debug_in_msg("get_weight");
 
-  size_t w_idx = 1;// The weights in sm.w range from index 1 to index sm->sizePsi.
+  // The weights in sm.w range from index 1 to index sm->sizePsi.
+  size_t w_idx = 1;
 
   // unary
   WeightMatrix unary_weight(example_max_height(), example_max_width());

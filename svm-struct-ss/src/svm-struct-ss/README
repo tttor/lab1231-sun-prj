@@ -6,8 +6,27 @@ rank:
 -w 2 -c 1 -e 100
 
 ===
+Debugging:
+
+problem:
+learning fails
+
+> svm_struct hyperparam
+> review the implementation
+> handle for diff. size of input examples
+> the inference: alpha-expansion, icm?
+> image resize-ing?
+> the loss function?
+> internal param for edge potential?
+> weight initialization?
+> investigate the learning statistic for each iteration?
+
+===
 doubts on rank's implementation:
-> 0/1 loss calculation, should not we treat a label y as one sample? affects loss-augmented inference
+> 0/1 loss calculation, should not we treat a label y as one sample, instread of loss for each element of y?
+this also affects loss-augmented inference!
+Notice that in svm-struct-multiclass, the loss is multiplied by a magic 100; the loss itself is 0 or 1 for each sample
+Notice that in svm-struct-hmm, it computes per label element losses and sum them up to become loss for a label, similiar to what rank did
 > learned weights? sm.m or sm.lin_weights?
 > @init_struct_constraints(): why set c.m = sizePsi; in ? should w>0?
 > @inferWithLoss(); #pairwise_w? (x.width - 1) * (x.height - 1)? for N4?
@@ -27,6 +46,9 @@ energy_unary = max(0.0,(double)-log(unary_matrix(5 * xx, 5 * yy, y.annotation_ma
 fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -energy_unary; //make sure it is potential invers
 why inverse energy_unary?
 > where do u handle missing feature values, due to diff size of input images
+> how do u initialiaze the mrf weights? ones? zeros?
+> meaning of learning output statistics
+
 ===
 The flow of learning via learn.cc
 

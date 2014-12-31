@@ -1,6 +1,7 @@
 /***********************************************************************/
 /*                                                                     */
-/*   svm_struct_ss_api_types.h                                            */
+/*   svm_struct_ss_api_types.h                                         */
+/*   @author: vektor dewanto                                           */
 /*                                                                     */
 /*   Definition of API for attaching implementing SVM learning of      */
 /*   structures (e.g. parsing, multi-label classification, HMM)        */ 
