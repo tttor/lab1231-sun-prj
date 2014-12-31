@@ -39,6 +39,8 @@ SAMPLE read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
 {
   /* Reads struct examples and returns them in sample. The number of
      examples must be written into sample.n */
+  debug_in_msg("read_struct_examples");
+
   SAMPLE   sample;  /* sample */
   EXAMPLE  *examples;
   long     n;       /* number of examples */
@@ -65,6 +67,7 @@ SAMPLE read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
   // debug_var("sample.examples[0].y.label[0]",sample.examples[0].y.flatten_label[0]);
   // assert(false);
 
+  debug_out_msg("read_struct_examples");
   return(sample);
 }
 
@@ -322,8 +325,13 @@ int         empty_label(LABEL y)
      returned by find_most_violated_constraint_???(x, y, sm) if there
      is no incorrect label that can be found for x, or if it is unable
      to label x at all */
-  if (y.size==0) return 1;
-  else return 0;
+  debug_in_msg("empty_label");
+
+  int empty = 0;
+  if (y.size==0) empty = 1;
+
+  debug_out_msg("empty_label");
+  return empty;
 }
 
 // MODIFIED:
@@ -339,8 +347,12 @@ int         finalize_iteration(double ceps, int cached_constraint,
   
   If the return value is FALSE, then the algorithm is allowed to terminate. 
   If it is TRUE, the algorithm will keep iterating even if the desired precision sparm->epsilon is already reached. */
+  debug_in_msg("finalize_iteration");
   using namespace std;
+
   // assert(false && "NOT IMPLEMENTED YET: finalize_iteration");
+
+  debug_out_msg("finalize_iteration");
   return(0);
 }
 
@@ -352,6 +364,8 @@ void        print_struct_learning_stats(SAMPLE sample, STRUCTMODEL *sm,
   /* This function is called after training and allows final touches to
      the model sm. But primarly it allows computing and printing any
      kind of statistic (e.g. training error) you might want. */
+  debug_in_msg("print_struct_learning_stats");
+  debug_out_msg("print_struct_learning_stats");
 }
 
 void        print_struct_testing_stats(SAMPLE sample, STRUCTMODEL *sm,
@@ -363,6 +377,7 @@ void        print_struct_testing_stats(SAMPLE sample, STRUCTMODEL *sm,
      evaluation (e.g. precision/recall) you might want. You can use
      the function eval_prediction to accumulate the necessary
      statistics for each prediction. */
+     assert(false);
 }
 
 void        eval_prediction(long exnum, EXAMPLE ex, LABEL ypred, 
@@ -373,6 +388,8 @@ void        eval_prediction(long exnum, EXAMPLE ex, LABEL ypred,
      predicition matches the labeled example. It is called from
      svm_struct_classify. See also the function
      print_struct_testing_stats. */
+  assert(false);
+  
   if(exnum == 0) { /* this is the first time the function is
           called. So initialize the teststats */
   }
@@ -419,12 +436,11 @@ void        free_struct_model(STRUCTMODEL sm)
   if(sm.learning_param) free(sm.learning_param);
 }
 
-// YET EMPTY DEFINITIONS _or_ NOT YET ELABORATED //////////////////////////////
 void        svm_struct_learn_api_init(int argc, char* argv[])
 {
-  debug_in_msg("svm_struct_learn_api_init");
   /* Called in learning part before anything else is done to allow
      any initializations that might be necessary. */
+  debug_in_msg("svm_struct_learn_api_init");
   debug_out_msg("svm_struct_learn_api_init");
 }
 
@@ -432,20 +448,25 @@ void        svm_struct_learn_api_exit()
 {
   /* Called in learning part at the very end to allow any clean-up
      that might be necessary. */
+  debug_in_msg("svm_struct_learn_api_exit");
+  debug_out_msg("svm_struct_learn_api_exit");
 }
 
 void        svm_struct_classify_api_init(int argc, char* argv[])
 {
   /* Called in prediction part before anything else is done to allow
      any initializations that might be necessary. */
+  assert(false);
 }
 
 void        svm_struct_classify_api_exit()
 {
   /* Called in prediction part at the very end to allow any clean-up
      that might be necessary. */
+  assert(false);
 }
 
+// YET EMPTY DEFINITIONS _or_ NOT YET ELABORATED //////////////////////////////
 void        free_struct_sample(SAMPLE s)
 {
   /* Frees the memory of sample s. */
