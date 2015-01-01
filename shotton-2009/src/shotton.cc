@@ -79,15 +79,6 @@ void set_zero_one_loss(const size_t& n_row, const size_t& n_col, const bool& act
   }
 } 
 
-double get_unary_potential_from_unary_prob_image(const ProbImage& prob_img, 
-                                                 const size_t& x, const size_t& y,
-                                                 const size_t& label) {
-  double potential;
-  potential = -1.0 * log( prob_img(x,y,label) );// multiplied by -1.0 for E>=0 since (log p)<=0
-
-  return potential;
-}
-
 void set_1st_order(const cv::Mat& img, const std::string& img_filename, DataParam data_param, 
                    const Eigen::MatrixXd& weight, 
                    GraphicalModel* gm) {
@@ -112,7 +103,7 @@ void set_1st_order(const cv::Mat& img, const std::string& img_filename, DataPara
       opengm::ExplicitFunction<float> energy(shape, shape+1);
 
       for(int i = 0; i < n_label; i++) {
-        energy(i) = get_unary_potential_from_unary_prob_image(unary_prob_img,x,y,i);
+        energy(i) = philipp_unary_mrf::get_unary_potential_from_unary_prob_image(unary_prob_img,x,y,i);
         energy(i) = energy(i) * weight(y,x);
       } 
 

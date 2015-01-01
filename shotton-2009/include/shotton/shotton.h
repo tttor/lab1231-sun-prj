@@ -35,6 +35,7 @@
 #include <util/util.h>
 #include <shotton/edge_potential.h>
 #include <shotton/loss_functor.h>
+#include <philipp-unary-mrf/philipp_unary_mrf.h>
 
 namespace lab1231_sun_prj {
 namespace shotton {
@@ -101,12 +102,6 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
  */
 void set_zero_one_loss(const size_t& n_row, const size_t& n_col, const bool& active, GraphicalModel* gm);
 
-/*!
- * @brief Set the unary potential/energy for a given prob img,x,y,label
- */
-double get_unary_potential_from_unary_prob_image(const ProbImage& prob_img, 
-                                                 const size_t& x, const size_t& y,
-                                                 const size_t& label);
 }// namespace shotton
 } // namespace lab1231_sun_prj
 
