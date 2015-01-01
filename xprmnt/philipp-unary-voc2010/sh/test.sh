@@ -7,13 +7,14 @@ curr_dir="$(dirname "$0")"
 
 # Constant params across num
 exe=../../../philipp-unary-mrf/build/main
-root_dir=/home/tor/sun4/xprmnt/own-unary-voc2010-scaled
+root_dir=/home/tor/xprmnt/generating-philipp-unary-voc2010/unary-scaled
 . "$curr_dir/set_dataset_param.sh"
 
 # Varied params
 # num=$1
-result_dir=$root_dir/annotation/split_voc2010_philipp_Test_csv/
-test_img_list_filepath=/home/tor/sun3/dataset/pascal/VOC2010/meta/split_voc2010_philipp/Test.txt
+result_id=debug2
+result_dir=$root_dir/annotation/$result_id
+test_img_list_filepath=/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/Test.txt
 
 # Annotate
 rm -rf $result_dir

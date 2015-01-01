@@ -16,7 +16,8 @@
 #include <util/util.h>
 #include <prob-image/probimage.h>
 
-namespace sun = lab1231_sun_prj;
+namespace lab1231_sun_prj {
+namespace philipp_unary_mrf{
 
 typedef 
 opengm::GraphicalModel<
@@ -26,8 +27,19 @@ opengm::GraphicalModel<
   opengm::SimpleDiscreteSpace<size_t, size_t> > 
 GraphicalModel;
 
-Eigen::MatrixXi annotate(const std::string& img_filename, sun::util::DataParam data_param);
-void set_1st_order(const std::string& img_filename, const size_t& n_label, const std::string& unary_prob_img_dir, GraphicalModel* gm);
+Eigen::MatrixXi annotate(const std::string& img_filename, util::DataParam data_param);
+
+void set_1st_order(const std::string& img_filename, const size_t& n_label, 
+                   const std::string& unary_prob_img_dir, GraphicalModel* gm);
+
 void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_var, Eigen::MatrixXi* ann);
+
+double get_unary_potential_from_unary_prob_image(const ProbImage& prob_img, 
+                                                 const size_t& x, const size_t& y,
+                                                 const size_t& label);
+
+
+}
+}
 
 #endif

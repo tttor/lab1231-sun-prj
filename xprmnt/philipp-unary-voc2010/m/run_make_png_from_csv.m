@@ -9,15 +9,15 @@ VOCcode_dir = '../../../external/VOCdevkit/VOCcode';
 addpath(VOCcode_dir);
 
 %%
-csv_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010-scaled/annotation/split_voc2010_philipp_Test_csv';
-png_dir = '/home/tor/sun4/xprmnt/own-unary-voc2010-scaled/annotation/split_voc2010_philipp_Test_cls';
+csv_dir = '/media/tor/46DAF35ADAF344A9/tor/robotics/prj/011/xprmnt/generating-philipp-unary-voc2010/unary-scaled/annotation/split_voc2010_philipp_Test_csv';
+png_dir = '/media/tor/46DAF35ADAF344A9/tor/robotics/prj/011/xprmnt/generating-philipp-unary-voc2010/unary-scaled/annotation/split_voc2010_philipp_Test_cls';
 mkdir(png_dir);
 
 %%
-%cmap = VOClabelcolormap(256);
-
-cmap_filepath = '/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-scaled-0.25/color_map.csv';
-cmap = csvread(cmap_filepath);
+% The VOClabelcolormap function creates the color map which has been used for all provided indexed images. 
+% You should use this color map for writing your own indexed images, for consistency. 
+% The size of the color map is given by N, which should generally be set to 256 to include a color for the `void' label.
+cmap = VOClabelcolormap(256);
 
 %%
 listing = dir(csv_dir);
