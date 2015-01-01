@@ -15,6 +15,7 @@ include_directories (${OpenGMDir}/src/external/MaxFlow-v3.02.src-patched)
 include_directories (${OpenGMDir}/src/external/QPBO-v1.3.src-patched)
 include_directories (../util/include)
 include_directories (../external)
+include_directories (../philipp-unary-mrf/include)
 
 include_directories (${EigenIncludeDir})
 include_directories (include)
@@ -23,6 +24,7 @@ include_directories (include)
 add_library( shotton_mrf 
   src/shotton.cc
   src/edge_potential.cc
+  ../philipp-unary-mrf/src/philipp_unary_mrf.cc
   ../util/src/util.cc
   ../util/src/color_map.cc
 )

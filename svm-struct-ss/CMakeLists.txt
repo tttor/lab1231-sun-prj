@@ -18,6 +18,7 @@ include_directories(../util/include)
 include_directories(${OpenGMDir}/include)
 include_directories (${OpenGMDir}/src/external/MaxFlow-v3.02.src-patched)
 include_directories (${OpenGMDir}/src/external/QPBO-v1.3.src-patched)
+include_directories (../philipp-unary-mrf/include)
 
 # make svm light lib
 add_library(svm_light
