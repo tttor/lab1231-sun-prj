@@ -8,8 +8,8 @@ VOCcode_dir = '/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOCcode';
 addpath(VOCcode_dir);
 
 %%
-gt_png_dirpath = '/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-scaled-0.25';
-gt_csv_dirpath = '/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv-0.25';
+gt_png_dirpath = '/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass';
+gt_csv_dirpath = '/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv';
 mkdir(gt_csv_dirpath);
 
 %%

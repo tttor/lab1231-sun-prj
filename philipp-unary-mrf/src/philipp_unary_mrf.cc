@@ -1,47 +1,9 @@
-#include "main.h"
+#include <philipp-unary-mrf/philipp_unary_mrf.h>
 
-int main(int argc, char* argv[]) {
-  using namespace std;
+namespace lab1231_sun_prj {
+namespace philipp_unary_mrf{
 
-  sun::util::DataParam data_param;
-
-  if (argc == 7) {
-    //
-    data_param["dataset_name"] = argv[1];
-    data_param["n_label"] = argv[2];
-    data_param["ori_img_dir"] = argv[3];
-    data_param["test_img_list_filepath"] = argv[4];
-    data_param["result_dir"] = argv[5];
-    data_param["unary_philipp_dir"] = argv[6];
-    // 
-    
-  }
-  else {
-    assert(false && "UNSUFFICIENT ARGUMENTS!");
-  }
-  cout << data_param["test_img_list_filepath"] << endl;
-
-  // Test: Annotate
-  vector<string> test_img_filenames;
-  test_img_filenames = sun::util::read_list(data_param["test_img_list_filepath"]);
-  
-  for (size_t i=0; i<test_img_filenames.size(); ++i) {
-    const string img_filename = test_img_filenames.at(i);
-    cout << "ANNOTATING: " << img_filename << " (" << i+1 << "/" << test_img_filenames.size() << ")" << endl;
-
-    Eigen::MatrixXi ann;
-    ann = annotate(img_filename, data_param);
-
-    const string ann_csv_filepath = string(data_param["result_dir"]+"/"+img_filename+".csv");
-    // const string ann_img_filepath = string(data_param["result_dir"]+img_filename+".bmp");
-    sun::util::csv_write<Eigen::MatrixXi>(ann, ann_csv_filepath);
-    // cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
-  }
-
-  return 0;
-}
-
-Eigen::MatrixXi annotate(const std::string& img_filename, sun::util::DataParam data_param) {
+Eigen::MatrixXi annotate(const std::string& img_filename, util::DataParam data_param) {
   using namespace std;
   // std::cout << "annotate(): BEGIN\n";
 
@@ -66,14 +28,27 @@ Eigen::MatrixXi annotate(const std::string& img_filename, sun::util::DataParam d
   return ann;
 }
 
-void set_1st_order(const std::string& img_filename, const size_t& n_label, const std::string& unary_prob_img_dir, GraphicalModel* gm) {
+double get_unary_potential_from_unary_prob_image(const ProbImage& prob_img, 
+                                                 const size_t& x, const size_t& y,
+                                                 const size_t& label) {
+  double potential;
+  const double eps = 0.0000000001;// for avoiding log(0)
+  potential = -1.0 * log( prob_img(x,y,label)+eps );// multiplied by -1.0 for E>=0 since (log p)<=0
+
+  return potential;
+}
+
+void set_1st_order(const std::string& img_filename, const size_t& n_label, 
+                   const std::string& unary_prob_img_dir, 
+                   GraphicalModel* gm) {
   using namespace std;
 
-  const string unary_prob_img_path = string( unary_prob_img_dir+"/"+img_filename+".c_unary" );
-  cout << "unary_prob_img_path= " << unary_prob_img_path << endl;
-
   ProbImage unary_prob_img;
-  unary_prob_img.decompress( unary_prob_img_path.c_str() );
+  // const string unary_prob_img_path = string( unary_prob_img_dir+"/"+img_filename+".c_unary" );
+  // unary_prob_img.decompress( unary_prob_img_path.c_str() );
+  const string unary_prob_img_path = string( unary_prob_img_dir+"/"+img_filename+".unary" );
+  unary_prob_img.load( unary_prob_img_path.c_str() );
+  // cout << "unary_prob_img_path= " << unary_prob_img_path << endl;
 
   // cout << "unary_prob_img.depth()= " << unary_prob_img.depth() << endl;
   // cout << "unary_prob_img.width()= " << unary_prob_img.width() << endl;
@@ -85,14 +60,14 @@ void set_1st_order(const std::string& img_filename, const size_t& n_label, const
       const size_t shape[] = {n_label};
       opengm::ExplicitFunction<double> energy(shape, shape+1);
 
-      for(int i = 0; i < n_label; i++) 
-        // energy(i) = -1 * log( unary_prob_img(x,y,i) );
-        energy(i) = -1 * unary_prob_img(x,y,i);
+      for(int i = 0; i < n_label; i++) {
+        energy(i) = get_unary_potential_from_unary_prob_image(unary_prob_img,x,y,i);
+      }
 
       GraphicalModel::FunctionIdentifier fid = gm->addFunction(energy);
       
       // add a factor
-      size_t flat_idxes[] = {sun::util::flat_idx(x, y, unary_prob_img.width())};
+      size_t flat_idxes[] = {util::flat_idx_xy(x, y, unary_prob_img.width())};
       gm->addFactor(fid, flat_idxes, flat_idxes+1);
     }
   }
@@ -101,7 +76,7 @@ void set_1st_order(const std::string& img_filename, const size_t& n_label, const
 void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_var, Eigen::MatrixXi* ann) {
   using namespace std;
   cout << "infer(): BEGIN\n";
-  cout << "method= " << method << endl;
+  cout << "method= " << method;
 
   vector<size_t> ann_vec(n_var);
   
@@ -120,7 +95,7 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
 
     MinAlphaExpansion inf_engine(gm);
 
-    cout << "Inferring ..." << endl;
+    cout << " is inferring ..." << endl;
     inf_engine.infer();
     inf_engine.arg(ann_vec);
   }
@@ -128,6 +103,7 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
     typedef opengm::ICM<GraphicalModel, opengm::Minimizer> IcmType;
     IcmType::VerboseVisitorType visitor;
 
+    cout << "is inferring ..." << endl;
     IcmType inf_engine(gm);
     inf_engine.infer(visitor);
   }
@@ -145,4 +121,7 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
   }
 
   std::cout << "infer(): END\n";
+}
+
+}
 }
