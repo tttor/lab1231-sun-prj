@@ -312,6 +312,12 @@ LABEL       find_most_violated_constraint_slackrescaling(PATTERN x, LABEL y,
   LABEL ybar;
 
   /* insert your code for computing the label ybar here */
+  // The slack-rescaling Hinge loss has found less use in computer vision as 
+  // it leads to a more complicated optimization problem, see [128].
+  // [128] S. Sarawagi and R. Gupta, “Accurate max-margin training for structured out-
+  // put spaces,” in International Conference on Machine Learing (ICML), 2008.
+
+
   assert(false && "NOT IMPLEMENTED YET: find_most_violated_constraint_slackrescaling");
 
   debug_out_msg("find_most_violated_constraint_slackrescaling");
