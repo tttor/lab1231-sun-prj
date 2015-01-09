@@ -38,6 +38,30 @@ class ZeroOneLossFunctor {
    bool active_;
 };
 
+template<typename T>
+class HammingLossFunctor {
+ public:
+   HammingLossFunctor(bool active, int y_true, int void_label, size_t y_size)
+      : active_(active), y_true_(y_true), void_label_(void_label), y_size_(y_size) { }
+   ~HammingLossFunctor() { }
+
+   template<typename Iterator>
+   inline const T operator()(Iterator begin) const {
+      if (!active_) return 0.0;
+      if (y_true_==void_label_) return 0.0;
+
+      const int y = begin[0];
+      if (y==y_true_) return 0.0;
+      else return (1.0/(float)y_size_);
+   }
+
+ private:
+   bool active_;
+   int y_true_;
+   int void_label_;
+   int y_size_;
+};
+
 }
 }
 
