@@ -249,7 +249,7 @@ double      loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
   double loss = 0.0;
   if(sparm->loss_function == 0) { /* type 0 loss: 0/1 loss */
                                   /* return 0, if y==ybar. return 1 else */
-    loss = svm_struct_ss::loss_function::zero_one_loss(y,ybar);
+    loss = svm_struct_ss::loss_function::hamming_loss(y,ybar);
   }
   else {
     /* Put your code for different loss functions here. But then

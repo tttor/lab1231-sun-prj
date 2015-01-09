@@ -51,7 +51,7 @@ Eigen::MatrixXi annotate(const std::string& img_filename, DataParam data_param, 
 
   set_1st_order(img, img_filename, data_param, unary_weight, &gm);
   set_2nd_order(img, n_label, energy_param, horizontal_pairwise_weight, vertical_pairwise_weight, &gm);
-  set_zero_one_loss(img.rows, img.cols, used_as_loss_augmented_inference, &gm);
+  set_hamming_loss(img_filename, data_param, used_as_loss_augmented_inference, &gm);
 
   Eigen::MatrixXi ann(img.rows, img.cols);
   const string method = "ICM";//: "AlphaExpansion", "ICM"
@@ -61,15 +61,24 @@ Eigen::MatrixXi annotate(const std::string& img_filename, DataParam data_param, 
   return ann;
 }
 
-void set_zero_one_loss(const size_t& n_row, const size_t& n_col, const bool& active, GraphicalModel* gm) {
+void set_hamming_loss(const std::string& id, DataParam data_param, const bool& active, 
+                      GraphicalModel* gm) {
+  // get GT annotation
+  const std::string gt_ann_filepath = std::string(data_param["gt_csv_dir"]+"/"+id+".csv");
+
+  Eigen::MatrixXi gt_ann;
+  gt_ann = util::csv_read<Eigen::MatrixXi>(gt_ann_filepath);
+
+  const int void_label = boost::lexical_cast<int>(data_param["void_label"]);
+
   // add factors
+  const size_t n_col = gt_ann.cols();
+  const size_t n_row = gt_ann.rows();
+  const size_t y_size = gt_ann.size();
+
   for (size_t x=0; x<n_col; ++x) {
     for (size_t y=0; y<n_row; ++y) {
-      bool last_node = false;
-      if ( (x==(n_col-1)) and (y==(n_row-1)) )
-        last_node = true;
-
-      ZeroOneLossFunctor<float> f(last_node, active);
+      HammingLossFunctor<float> f(active, gt_ann(y,x), void_label, y_size);
       GraphicalModel::FunctionIdentifier fid = gm->addFunction(f);
 
       size_t flat_idxes[] = {util::flat_idx_xy(x,y,n_col), util::flat_idx_xy(x+1,y,n_col)};
@@ -77,7 +86,25 @@ void set_zero_one_loss(const size_t& n_row, const size_t& n_col, const bool& act
       gm->addFactor(fid, flat_idxes, flat_idxes + 1);
     }
   }
-} 
+}
+
+// void set_zero_one_loss(const size_t& n_row, const size_t& n_col, const bool& active, GraphicalModel* gm) {
+//   // add factors
+//   for (size_t x=0; x<n_col; ++x) {
+//     for (size_t y=0; y<n_row; ++y) {
+//       bool last_node = false;
+//       if ( (x==(n_col-1)) and (y==(n_row-1)) )
+//         last_node = true;
+
+//       ZeroOneLossFunctor<float> f(last_node, active);
+//       GraphicalModel::FunctionIdentifier fid = gm->addFunction(f);
+
+//       size_t flat_idxes[] = {util::flat_idx_xy(x,y,n_col), util::flat_idx_xy(x+1,y,n_col)};
+//       std::sort(flat_idxes, flat_idxes + 1);
+//       gm->addFactor(fid, flat_idxes, flat_idxes + 1);
+//     }
+//   }
+// } 
 
 void set_1st_order(const cv::Mat& img, const std::string& img_filename, DataParam data_param, 
                    const Eigen::MatrixXd& weight, 

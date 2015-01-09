@@ -48,11 +48,19 @@ namespace shotton {
 //   opengm::SimpleDiscreteSpace<size_t, size_t> > 
 // GraphicalModel;
 
+// typedef 
+// opengm::GraphicalModel<
+//   float,
+//   opengm::Adder,
+//   OPENGM_TYPELIST_3(opengm::ExplicitFunction<float>, ZeroOneLossFunctor<float>,opengm::PottsFunction<float>),
+//   opengm::SimpleDiscreteSpace<size_t, size_t> > 
+// GraphicalModelWithZeroOneLoss;
+
 typedef 
 opengm::GraphicalModel<
   float,
   opengm::Adder,
-  OPENGM_TYPELIST_3(opengm::ExplicitFunction<float>, ZeroOneLossFunctor<float>,opengm::PottsFunction<float>),
+  OPENGM_TYPELIST_3(opengm::ExplicitFunction<float>, HammingLossFunctor<float>,opengm::PottsFunction<float>),
   opengm::SimpleDiscreteSpace<size_t, size_t> > 
 GraphicalModel;
 
@@ -100,7 +108,12 @@ void infer(const std::string& method, const GraphicalModel& gm, const size_t& n_
 /*!
  * @brief Used for loss augmented inference
  */
-void set_zero_one_loss(const size_t& n_row, const size_t& n_col, const bool& active, GraphicalModel* gm);
+// void set_zero_one_loss(const size_t& n_row, const size_t& n_col, const bool& active, GraphicalModel* gm);
+
+/*!
+ * @brief Used for loss augmented inference
+ */
+void set_hamming_loss(const std::string& id, DataParam data_param, const bool& active, GraphicalModel* gm);
 
 }// namespace shotton
 } // namespace lab1231_sun_prj

@@ -19,6 +19,8 @@ LABEL margin_rescaling(PATTERN x, LABEL y, const STRUCTMODEL& mrf_model) {
   data_param["n_label"] = svm_struct_ss::data_param::n_label;
   data_param["ori_img_dir"] = svm_struct_ss::data_param::ori_jpg_dir;
   data_param["unary_potential_dir"] = svm_struct_ss::data_param::unary_potential_dir;
+  data_param["gt_csv_dir"] = svm_struct_ss::data_param::gt_csv_dir;
+  data_param["void_label"] = boost::lexical_cast<std::string>(svm_struct_ss::data_param::void_label);
 
   sun::shotton::EnergyParam energy_internal_param;
   sun::shotton::train(data_param, &energy_internal_param);
