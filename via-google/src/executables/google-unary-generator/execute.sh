@@ -5,7 +5,7 @@ echo "Google Training List: $google_train_list"
 echo "DPM Image folder: $dpm_img_folder"
 echo "Images list: $google_object_file"
 echo "Normal Param: $normal_param"
-echo "Quota per class: $google_size"
+echo "Quota per class: $google_sampling_size"
 echo "##################################"
 `cut -d , -f 1 $google_object_file > objid_tmp`
 `cut -d , -f 2 $google_object_file > imgname_tmp`
@@ -25,6 +25,7 @@ do
 done
 
 image_size=${#imgname[@]}
+echo "Image Size: $image_size"
 c=0
 while [ $c -lt $image_size ]
 do
@@ -33,9 +34,10 @@ do
 	singlename="${filename%.*}"
 	if [[ -f "$dpm_img_folder/${imgname[$c]}" ]]; then
         #if ok
-        if [[ ${quota[${objid[$c]}]} -lt $google_size ]]; then
+        if [[ ${quota[${objid[$c]}]} -lt $google_sampling_size ]]; then
         	#id object, nama file dpm, source path, target img path, target xml path
-        	`echo "$singlename" >> $google_train_list`
+            echo "$singlename"
+        	echo "$singlename" >> $google_train_list
         	quota[${objid[$c]}]=`expr ${quota[${objid[$c]}]} + 1`
     	fi
     else

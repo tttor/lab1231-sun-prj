@@ -44,6 +44,8 @@ done
 
 #create google 
 echo "START TRAINING IMPROVED MODEL"
-`$train_bin $combined_train_list  $voc_img_folder $voc_png_folder $improved_param`
+
+#for TextonBoost
+#`$train_bin $combined_train_list  $voc_img_folder $voc_png_folder $improved_param`
 
 

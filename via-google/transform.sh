@@ -35,66 +35,81 @@ date +"%m-%d-%y %T" >> $logpath
 # cd ..
 # #train initial parameters START HERE
 
-echo "START GENERATING INITIAL MODEL" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
+# echo "START GENERATING INITIAL MODEL" >> $logpath
+# date +"%m-%d-%y %T" >> $logpath
 
-cd param-generator
-./execute.sh
-cd ..
-# #generate google unaries
+# cd param-generator
+# ./execute.sh 2>&1 | tee temp_log
+# cat temp_log >> $logpath
+# cd ..
 
-echo "START GENERATING GOOGLE UNARY" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
 
-cd google-unary-generator
-./execute.sh
-cd ..
-# # #commit F/G segmentation
+#FROM HERE
 
-echo "START F/G SEGMENTATION" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
+# echo "START GENERATING GOOGLE UNARY" >> $logpath
+# date +"%m-%d-%y %T" >> $logpath
 
-cd fgannotator
-./execute.sh
-cd ..
-# # #train voc with google/ COMBINATION
+# cd google-unary-generator
+# ./execute.sh 2>&1 | tee temp_log
+# cat temp_log >> $logpath
+# cd ..
 
-echo "START IMPROVING MODEL" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
+# echo "START F/G SEGMENTATION" >> $logpath
+# date +"%m-%d-%y %T" >> $logpath
 
-cd param-enhancer
-./execute.sh
-cd ..
-# # #generate test unary DTE
-echo "START TEST UNARY GENERATION" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
+# cd fgannotator
+# ./execute.sh 2>&1 | tee temp_log
+# cat temp_log >> $logpath
+# cd ..
 
-cd test-unary-generator
-./execute.sh
-cd ..
-# # #perform multiclass segmentation
-echo "START TESTSET ANNOTATION" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
 
-cd multiannotation
-./execute.sh
-cd ..
+# echo "START IMPROVING MODEL" >> $logpath
+# date +"%m-%d-%y %T" >> $logpath
 
-# #performance evaluation
+# cd param-enhancer
+# ./execute.sh 2>&1 | tee temp_log
+# cat temp_log >> $logpath
+# cd ..
 
-echo "START EVALUATION" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
+#echo "START SVM LEARNER" >> $logpath
+#date +"%m-%d-%y %T" >> $logpath
 
-cd evaluation
-./execute.sh
-cd ..
+#cd svm-learning
+#./execute.sh 2>&1 | tee temp_log
+#cat temp_log >> $logpath
+#cd ..
 
-echo "START BASELINE EVALUATION" >> $logpath
-date +"%m-%d-%y %T" >> $logpath
+#echo "START TEST UNARY GENERATION" >> $logpath
+#date +"%m-%d-%y %T" >> $logpath
 
-cd baseline-evaluation
-./execute.sh
-cd ..
+#cd test-unary-generator
+#./execute.sh 2>&1 | tee temp_log
+#cat temp_log >> $logpath
+#cd ..
+
+# echo "START TESTSET ANNOTATION" >> $logpath
+# date +"%m-%d-%y %T" >> $logpath
+
+# cd multiannotation
+# ./execute.sh 2>&1 | tee temp_log
+# cat temp_log >> $logpath
+# cd ..
+
+
+# echo "START EVALUATION" >> $logpath
+# date +"%m-%d-%y %T" >> $logpath
+
+# cd evaluation
+# ./execute.sh
+# cd ..
+
+echo "START BASELINE PREDICTION" >> $logpath
+ date +"%m-%d-%y %T" >> $logpath
+
+ cd baseline-prediction
+ ./execute.sh 2>&1 | tee temp_log
+ cat temp_log >> $logpath
+ cd ..
 
 
 cd ../..
