@@ -143,16 +143,18 @@ def main():
     list_param = [ line.strip('\n') for line in open(segmen_param_path)]
     
     print 'create best segment...'
-    n_segment_list = [50, 100, 150, 250, 300, 350]
+
+    # n_segment_list = [50, 100, 150, 250, 300, 350]
+    n_segment_list = [200]
     for name_file, ctr in zip(list_file, range(len(list_file))):
         print ctr+1,'/',len(list_file)
         for n_segment in n_segment_list:
             print n_segment,
-            ensure_path(output_dir+'cross-topic/'+str(n_segment)+'/')
-            sort_segment_cross_topic(name_file, segment_dir, corpus_meta, prob_topic_doc, n_topic, n_segment, output_dir+'cross-topic/'+str(n_segment), img_dir)
-            ensure_path(output_dir+'based-topic/'+str(n_segment)+'/')            
-            sort_segment_based_topic(name_file, segment_dir, corpus_meta, prob_topic_doc, n_topic, n_segment, output_dir+'based-topic/'+str(n_segment), img_dir)
-            ensure_path(output_dir+'all-topic/'+str(n_segment)+'/')                        
+            # ensure_path(output_dir+'cross-topic/'+str(n_segment)+'/')
+            # sort_segment_cross_topic(name_file, segment_dir, corpus_meta, prob_topic_doc, n_topic, n_segment, output_dir+'cross-topic/'+str(n_segment), img_dir)
+            # ensure_path(output_dir+'based-topic/'+str(n_segment)+'/')            
+            # sort_segment_based_topic(name_file, segment_dir, corpus_meta, prob_topic_doc, n_topic, n_segment, output_dir+'based-topic/'+str(n_segment), img_dir)
+            ensure_path(output_dir+'all-topic/'+str(n_segment)+'/')
             create_best_n_segment_image(name_file, segment_dir, corpus_meta, prob_topic_doc, n_topic, n_segment, output_dir+'all-topic/'+str(n_segment), img_dir)
         print '\n'
 
