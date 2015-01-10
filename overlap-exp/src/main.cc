@@ -4,13 +4,19 @@
 #include <ladicky/ladicky.h>
 #include <majority/majority.h>
 
+#include <unistd.h>
+#include <sys/time.h>
+
 int main(int argc, char* argv[]) {
   using namespace std;
   namespace sun = lab1231_sun_prj;
 
   sun::util::DataParam data_param;
   sun::util::EnergyParam energy_param;
-  cout << argc<< endl;
+  
+  struct timeval start, end;
+  long mtime, seconds, useconds;  
+
   if (argc == 10) {
     //
     data_param["dataset_name"] = argv[1];
@@ -50,11 +56,20 @@ int main(int argc, char* argv[]) {
       char buffer [50];
       sprintf(buffer, "%s-%s", img_filename.c_str(), param_superpixel_list.at(j).c_str() );
       const string filename = string(buffer);
-      const string superpixel_filename = filename + ".sup";
+      const string superpixel_filename = img_filename + ".sup";
            
       cout << "ANNOTATING: " << filename << ".bmp - (" << i*param_superpixel_list.size()+j+1 << "/" << test_img_filenames.size() * param_superpixel_list.size() << ")" << endl;
       Eigen::MatrixXi ann;
+
+      gettimeofday(&start, NULL);
       ann = sun::ladicky::annotate(img_filename+".bmp", img_filename+"/"+superpixel_filename, data_param, energy_param);
+      gettimeofday(&end, NULL);
+      
+      seconds  = end.tv_sec  - start.tv_sec;
+      useconds = end.tv_usec - start.tv_usec;
+      mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+
+      cout << "Elapsed time for annotate" << filename << " " << mtime <<" milliseconds\n";
 
       buffer_result = sun::majority::add_result_to_buffer(buffer_result, ann, img.rows, img.cols);
 

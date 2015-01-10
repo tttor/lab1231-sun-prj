@@ -8,13 +8,13 @@ echo $dataset_name
 n_label=21 # 20 object classes + 1 background class
 echo $n_label
 
-ori_img_dir=/home/tor/sun3/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages-ClassSegmented/
+ori_img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages-ClassSegmented-scaled-0.25
 echo $ori_img_dir
 
-gt_img_dir=/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2010/SegmentationClass-csv/
-echo $gt_img_dir
+# gt_csv_dir=/home/tor/sun3/dataset/pascal/VOC2012/VOCdevkit/VOC2010/SegmentationClass-csv-scaled-0.25/
+# echo $gt_csv_dir
 
-unary_philipp_dir=/home/tor/sun4/xprmnt/own-unary-voc2010/own-unaries-20141218-compressed/
+unary_philipp_dir=/home/tor/xprmnt/generating-philipp-unary-voc2010/unary-scaled/unary-scaled-0.25
 echo $unary_philipp_dir
 
 echo "-----------------------------------------------------------"

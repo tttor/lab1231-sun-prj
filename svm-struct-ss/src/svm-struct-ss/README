@@ -1,0 +1,97 @@
+===
+Learning settings: 
+@setting.h
+
+rank:
+-w 2 -c 1 -e 100
+
+===
+Debugging:
+
+problem:
+learning fails
+
+> svm_struct hyperparam
+> review the implementation
+> handle for diff. size of input examples
+> the inference: alpha-expansion, icm?
+> image resize-ing?
+> the loss function?
+> internal param for edge potential?
+> weight initialization?
+> investigate the learning statistic for each iteration?
+
+===
+doubts on rank's implementation:
+> 0/1 loss calculation, should not we treat a label y as one sample, instread of loss for each element of y?
+this also affects loss-augmented inference!
+Notice that in svm-struct-multiclass, the loss is multiplied by a magic 100; the loss itself is 0 or 1 for each sample
+Notice that in svm-struct-hmm, it computes per label element losses and sum them up to become loss for a label, similiar to what rank did
+> learned weights? sm.m or sm.lin_weights?
+> @init_struct_constraints(): why set c.m = sizePsi; in ? should w>0?
+> @inferWithLoss(); #pairwise_w? (x.width - 1) * (x.height - 1)? for N4?
+> @void set_2nd_order: unequal_pen *=  max(0.0,pair_weights[util::flat_idx(x, y, img_mat.cols - 1)]); 
+seem that the pairwise fea is uncomplete for N4
+but @psi():
+double *pair_psi = (double *)malloc(sizeof(double) * (2 * (x.width - 1) * (x.height - 1)));
+this cannot be right?
+but @get_2nd_order_psi():
+psi[x + y * (img_mat.cols - 1)] = annotation_matrix(y, x) == annotation_matrix(y, x + 1) ? equal_pen : unequal_pen; //horizontal psi
+psi[psioffset + x + y * (img_mat.cols - 1) ] = annotation_matrix(y, x) == annotation_matrix(y + 1, x) ? equal_pen : unequal_pen; //vertical psi
+> @set_1st_orderWithLoss(): 
+energy(i) =  (float)max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)]) * max(0.0,(double)-log(unary_matrix(5 * x, 5 * y, i)+DBL_EPSILON)) - hinge_loss;
+unnecessary outer max()?
+> @psi():
+energy_unary = max(0.0,(double)-log(unary_matrix(5 * xx, 5 * yy, y.annotation_matrix(yy, xx))+DBL_EPSILON));
+fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -energy_unary; //make sure it is potential invers
+why inverse energy_unary?
+> where do u handle missing feature values, due to diff size of input images
+> how do u initialiaze the mrf weights? ones? zeros?
+> meaning of learning output statistics
+
+===
+The flow of learning via learn.cc
+
+svm_struct_learn_api_init
+read_input_parameters
+Reading training examples
+svm_learn_struct_joint(...ONESLACK_DUAL_ALG)
+	init_struct_model()
+	init_struct_constraints()
+	set initial model and slack variables
+	create a cache of the feature vectors for the correct labels
+	if(USE_FYCACHE)
+		for each sample
+			api::psi():
+	initialize the constraint cache
+	main learning loop:
+		find a violated joint constraint
+		looping over example
+			find_most_violated_constraint_marginrescaling():
+				loss augmented inference 
+				get psi(x,y) and psi(x,ybar)
+				scale feature vector and margin by loss 
+			add current fy-fybar to lhs of constraint:begin
+			kparm->kernel_type == LINEAR
+			add current fy-fybar to lhs of constraint: end
+		get psi(x,y) and psi(x,ybar)
+		api::psi()
+		loss()
+	Final epsilon on KKT-Conditions: 0.00000
+	Upper bound on duality gap: -0.00000
+	Dual objective value: dval=0.00006
+	Primal objective value: pval=0.00006
+	Total number of constraints in final working set: 1 (of 1)
+	Number of iterations: 2
+	Number of calls to 'find_most_violated_constraint': 6
+	Number of SV: 1 
+	Norm of weight vector: |w|=0.01058
+	Value of slack variable (on working set): xi=0.00000
+	Value of slack variable (global): xi=-0.00000
+	Norm of longest difference vector: ||Psi(x,y)-Psi(x,ybar)||=94.52398
+	Runtime in cpu-seconds: 12.06
+
+===
+The flow of prediction via predict.cc
+
+...

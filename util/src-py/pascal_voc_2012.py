@@ -1,7 +1,11 @@
 '''
 http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2012/htmldoc/index.html
 
-For each test image pixel, predict the class of the object containing that pixel or 'background' if the pixel does not belong to one of the twenty specified classes. The output from your system should be an indexed image with each pixel index indicating the number of the inferred class (1-20) or zero, indicating background.
+For each test image pixel, predict the class of the object containing that pixel or 'background' 
+if the pixel does not belong to one of the twenty specified classes. 
+
+The output from your system should be an indexed image with each pixel index 
+indicating the number of the inferred class (1-20) or zero, indicating background.
 '''
 class_name_map = {
 	0 : 'background',

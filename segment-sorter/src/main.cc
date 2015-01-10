@@ -3,13 +3,19 @@
 #include <util/util.h>
 #include <ladicky/ladicky.h>
 
+#include <unistd.h>
+#include <sys/time.h>
+
 int main(int argc, char* argv[]) {
   using namespace std;
   namespace sun = lab1231_sun_prj;
 
   sun::util::DataParam data_param;
   sun::util::EnergyParam energy_param;
-  cout << argc<< endl;
+  
+  struct timeval start, end;
+  long mtime, seconds, useconds;  
+
   if (argc == 8) {
     //
     data_param["dataset_name"] = argv[1];
@@ -49,7 +55,16 @@ int main(int argc, char* argv[]) {
          
     cout << "ANNOTATING: " << filename << ".bmp - (" << i << "/" << test_img_filenames.size() << ")" << endl;
     Eigen::MatrixXi ann;
+
+    gettimeofday(&start, NULL);
     ann = sun::ladicky::annotate(img_filename, filename+".sup", data_param, energy_param);
+    gettimeofday(&end, NULL);
+
+    seconds  = end.tv_sec  - start.tv_sec;
+    useconds = end.tv_usec - start.tv_usec;
+    mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+
+    cout << "Elapsed time for annotate" << filename << " " << mtime <<" milliseconds\n";
 
     const string ann_filepath = string(data_param["result_dir"]+filename+".ann");
     const string ann_img_filepath = string(data_param["result_dir"]+filename+".bmp");

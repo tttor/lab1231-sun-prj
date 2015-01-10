@@ -15,6 +15,9 @@
 #include <opencv2/opencv.hpp>
 #include <math.h>
 
+#include <unistd.h>
+#include <sys/time.h>
+
 namespace lab1231_sun_prj {
 namespace ladicky {
 

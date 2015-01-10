@@ -1,0 +1,3 @@
+Goal
+> train the unary model (textonboost++) based on Philipp implementation: http://graphics.stanford.edu/projects/densecrf/textonboost/
+> generate the unary for test images
