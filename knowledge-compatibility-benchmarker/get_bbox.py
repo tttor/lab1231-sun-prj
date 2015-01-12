@@ -2,6 +2,7 @@
 import sys
 import cv2
 import numpy as np
+import json
 
 def make_bw_img_for_one_class(class_id, ann):
     img = np.zeros((ann.shape[0],ann.shape[1],1), np.uint8)
@@ -20,7 +21,7 @@ def get_bbox(ann_filepath):
     #
     contour_img = np.zeros((ann.shape[0],ann.shape[1],3), np.uint8)
     bbox_list = []
-
+    rectangle = []
     for each_class in contained_classes:
         if each_class==0: #background
             continue
@@ -50,11 +51,28 @@ def get_bbox(ann_filepath):
             bbox['rectangle'] = cv2.boundingRect(c)
             bbox['contour'] = c
             local_bbox_list.append(bbox)
+            
+            #ian's code
+            
+            x,y,w,h = bbox['rectangle']
+            coordinate = [x,y,x+w,y+h]
+            xcenter = (coordinate[0] + coordinate[2]) / 2
+            ycenter = (coordinate[1] + coordinate[3]) / 2
+            center_rect_class = each_class
+            rectangle.append([x,y,x+w,y+h,center_rect_class])
+            
         bbox_list = bbox_list + local_bbox_list
-        
-    return bbox_list
+    return bbox_list, rectangle
+    #return bbox_list
 
-def write_bbox(bbox_list, png_ann_filepath, bbox_img_filepath):
+#def write_bbox(bbox_list, png_ann_filepath, bbox_img_filepath):
+def write_bbox(bbox_list, png_ann_filepath, bbox_img_filepath, rect_list, filename):
+    
+    out_filename = filename + ".json"
+    keyval_for_json = {'pa_bbox' : rect_list}
+    with open(out_filename, 'w') as f:
+        json.dump(keyval_for_json, f)
+    
     bbox_img = cv2.imread(png_ann_filepath)
 
     #
@@ -68,12 +86,16 @@ def write_bbox(bbox_list, png_ann_filepath, bbox_img_filepath):
 
     #
     cv2.imwrite(bbox_img_filepath,bbox_img)
-
+    
 def main(argv):
-    list_filepath = '/home/tor/sun4/xprmnt/bbox/meta/test.list'
-    csv_ann_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/result/merged_test_csv'
-    png_ann_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/result/merged_Test_cls'
-    out_dir = '/home/tor/sun4/xprmnt/bbox/bbox-overlayed'
+    #list_filepath = '/home/tor/sun4/xprmnt/bbox/meta/test.list'
+    list_filepath = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/meta/split-voc2010-ian/ann_img.list'
+    #csv_ann_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/result/merged_test_csv'
+    csv_ann_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/annotation/annotation-philippunary'
+    #png_ann_dir = '/home/tor/sun4/xprmnt/philipp-unary-voc2010/result/merged_Test_cls'
+    png_ann_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/annotation/annotation-philippunary'
+    #out_dir = '/home/tor/sun4/xprmnt/bbox/bbox-overlayed'
+    out_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/knowledge/philip_voc2010_boundingbox/boundingbox_data_tor'
 
     # read list
     with open(list_filepath) as f:
@@ -85,11 +107,13 @@ def main(argv):
         print('Processing %s (%i/%i)' % (ann_filename,i+1,len(ann_filename_list)))
 
         ann_filepath = csv_ann_dir + '/' + ann_filename + '.csv'
-        bbox_list = get_bbox(ann_filepath)
+        bbox_list, rect_list = get_bbox(ann_filepath)
 
-        png_ann_filepath = png_ann_dir + '/' + ann_filename + '.png'
-        bbox_img_filepath = out_dir+'/' + ann_filename + '.bbox.png'
-        write_bbox(bbox_list,png_ann_filepath,bbox_img_filepath)
+        png_ann_filepath = png_ann_dir + '/' + ann_filename + '.bmp'
+        bbox_img_filepath = out_dir+'/bbox_img/' + ann_filename + '.bbox.png'
+        filename = out_dir+'/' + ann_filename
+        #write_bbox(bbox_list,png_ann_filepath,bbox_img_filepath)
+        write_bbox(bbox_list,png_ann_filepath,bbox_img_filepath, rect_list, filename)
 
 if __name__ == '__main__':
     main(sys.argv)

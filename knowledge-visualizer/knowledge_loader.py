@@ -59,7 +59,6 @@ def load_relativeposition_knowledge(filepath):
 
 def load_sceneproperty_knowledge(filepath):
     knowledge = {}
-
     tree = etree.parse(filepath)
     root = tree.getroot()
 
