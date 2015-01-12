@@ -13,7 +13,6 @@
 #include <boost/tokenizer.hpp>
 #include <Eigen/Dense>
 
-
 namespace lab1231_sun_prj {
   namespace util {
 
@@ -121,7 +120,7 @@ MatType csv_read(const std::string& csv_path) {
 /*!
  * @brief get the one dim vector idx
  */
- size_t flat_idx(const size_t& x, const size_t& y, const size_t& n_col);
+ size_t flat_idx_xy(const size_t& x, const size_t& y, const size_t& n_col);
 
 /*!
  * @brief
@@ -167,6 +166,9 @@ Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
  * @brief
  */
  cv::Mat ann2img(const Eigen::MatrixXi& ann, const std::string& dataset);
+
+
+ float energy_probability(double probability);
 
 
 

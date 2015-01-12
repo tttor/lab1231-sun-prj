@@ -10,6 +10,7 @@ set(PROBIMAGE_DIR ../external/prob-image)
 set(EIGEN_DIR /usr/local/include/eigen3)
 
 #
+include_directories(include)
 include_directories(../external)
 include_directories(../util/include)
 include_directories(${OPENGM_DIR}/include)
@@ -28,7 +29,8 @@ add_library(util
 # 
 add_definitions(-DDEBUG_OFF)
 add_executable(main 
-  main.cc
+  src/main.cc
+  src/philipp_unary_mrf.cc
   ${PROBIMAGE_DIR}/probimage.cpp
 )
 

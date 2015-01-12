@@ -1,0 +1,2 @@
+Here, we follow (Shotton, 2009) in implementing unary and pairwise CRFs for semantic segmentation.
+This implementation accomodates loss augmented inference.

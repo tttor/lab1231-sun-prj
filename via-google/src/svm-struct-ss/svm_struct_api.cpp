@@ -28,6 +28,7 @@
 
 #include "ssvm_ss_dataset_constraint.h"
 using namespace std;
+using namespace lab1231_sun_prj::util;
 
 inline size_t var_idx(size_t x, size_t y, size_t width)
 {
@@ -86,7 +87,7 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
         while (getline(reader, id))
         {
             printf("Reading: ");
-            string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".c_unary";
+            string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".unary";
             string png_path = ssvm_ss::dataset::png_directory + "/" + id + ".png";
             string image_path = ssvm_ss::dataset::jpg_directory + "/" + id + ".jpg";
             string dumping_path = ssvm_ss::dataset::dumping_directory + "/" + id + ".png";
@@ -120,12 +121,13 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
             strcpy(examples[exampleIndex].x.unary_path, unary_path.c_str());
             strcpy(examples[exampleIndex].x.dumping_path, dumping_path.c_str());
             strcpy(examples[exampleIndex].y.dumping_path, dumping_path.c_str());
+            
             examples[exampleIndex].y.annotation_matrix = annotation_matrix;
             examples[exampleIndex].y.n_label = ssvm_ss::image_constraint::n_label;
             examples[exampleIndex].x.bypass = annotation_matrix;
             exampleIndex++;
 
-            printf("done. %d read.\n",exampleIndex);
+            printf("done. %d read.\n", exampleIndex);
         }
     }
     else
@@ -138,6 +140,16 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     if (struct_verbosity >= 0)
         printf(" (%d examples) ", sample.n);
     return (sample);
+}
+
+void checkIfExists(char *filepath)
+{
+    QFile f( filepath );
+    if (!f.open(QFile::ReadOnly))
+    {
+        qFatal( "Failed to open file '%s'!", filepath);
+        exit(1);
+    }
 }
 void set_unary_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
 {
@@ -158,8 +170,8 @@ void set_unary_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
         for (int yy = 0; yy < x.height; yy++)
         {
 
-            //weights[xx + (yy * x.width)] = model->lin_weights[(windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
-            weights[xx + (yy * x.width)] = 1.0;
+            weights[xx + (yy * x.width)] = model->lin_weights[(windowoffsetx + xx) + (windowoffsety + yy) * windowwidth];
+            // weights[xx + (yy * x.width)] = 1.0;
         }
     }
 }
@@ -185,39 +197,22 @@ void set_pair_weights(STRUCTMODEL *sm, PATTERN x, double *weights)
     for (int xx = 0; xx < x.width - 1; xx++)
         for (int yy = 0; yy < x.height - 1; yy++)
         {
-            //weights[xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
-            //weights[targetoffsetpair + xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + windowoffsetpair + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
-            weights[xx + (yy * (x.width - 1))] = 1.0;
-            weights[targetoffsetpair + xx + (yy * (x.width - 1))] = 1.0;
+            weights[xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
+            weights[targetoffsetpair + xx + (yy * (x.width - 1))] = model->lin_weights[windowoffset + windowoffsetpair + (windowoffsetx + xx) + (windowoffsety + yy) * (windowwidth - 1)];
+            // weights[xx + (yy * (x.width - 1))] = 1.0;
+            // weights[targetoffsetpair + xx + (yy * (x.width - 1))] = 1.0;
         }
 }
 
-
-void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
+LABEL inferWithLoss(PATTERN x, STRUCTMODEL *sm, LABEL &ytrue)
 {
-    //set target png
-    // QImage output_png;
-
-    printf("Infering %s ", x.image_path);
+    LABEL y;
+    // printf("Infering with loss%s ", x.image_path);
     Eigen::MatrixXi annotation_matrix(x.height, x.width);
-    // y.annotation_matrix = annotation_matrix;
     y.height = x.height;
     y.width = x.width;
     strcpy(y.dumping_path, x.dumping_path);
     y.n_label = ssvm_ss::image_constraint::n_label;
-    //     QString colorfile = "VOC2010.ct";
-    // QVector<QRgb> colorTable;
-    // QFile file(colorfile);
-    // if (!file.open(QFile::ReadOnly))
-    //     qFatal( "Failed to load '%s'", qPrintable( colorfile ) );
-    // QDataStream s(&file);
-    // s >> colorTable;
-    // file.close();
-    // y.png_matrix.setColorTable(colorTable);
-    
-    // printf("w h %d %d\n", y.width, y.height);
-
-
 
 
     double *unary_weights = (double *) malloc(sizeof(double) * x.width * x.height);
@@ -232,33 +227,68 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
     // printf("ok 3\n");fflush(stdout);
 
     ProbImage unary_matrix;
-    {
-        QFile file(x.unary_path);
-        if (!file.open(QFile::ReadOnly))
-            qFatal( "Failed to load '%s'", qPrintable( x.unary_path ) );
-    }
-    unary_matrix.decompress(x.unary_path);
+    checkIfExists(x.unary_path);
+    unary_matrix.load(x.unary_path);
 
     cv::Mat image_matrix;
-    {
-        QFile file(x.image_path);
-        if (!file.open(QFile::ReadOnly))
-            qFatal( "Failed to load '%s'", qPrintable( x.image_path ) );
-    }
+    checkIfExists(x.image_path);
+    image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
+
+    size_t n_label = y.n_label;
+    y.annotation_matrix = lab1231_sun_prj::shotton::annotateWithAugmentedLoss(n_label, image_matrix, unary_matrix, unary_weights, pair_weights, ytrue.annotation_matrix);
+
+    // printf("Saving to %s\n", x.dumping_path);
+    // y.png_matrix.save(x.dumping_path,"png",0);
+
+
+    lab1231_sun_prj::shotton::save_image(y.dumping_path, y.annotation_matrix);
+    // printf("done inferring\n"); //fflush(stdout);
+
+    return y;
+
+    // y.png_matrix = x.bypass;
+    // x.bypass.save("temp_output","png",0);
+}
+
+
+void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
+{
+    printf("Infering %s ", x.image_path);
+    Eigen::MatrixXi annotation_matrix(x.height, x.width);
+    y.height = x.height;
+    y.width = x.width;
+    strcpy(y.dumping_path, x.dumping_path);
+    y.n_label = ssvm_ss::image_constraint::n_label;
+
+
+    double *unary_weights = (double *) malloc(sizeof(double) * x.width * x.height);
+    double *pair_weights = (double *) malloc(2 * sizeof(double) * (x.width - 1) * (x.height - 1));
+
+
+
+    // printf("ok 1\n");fflush(stdout);
+    set_unary_weights(sm, x, unary_weights);
+    // printf("ok 2\n");fflush(stdout);
+    set_pair_weights(sm, x, pair_weights);
+    // printf("ok 3\n");fflush(stdout);
+
+    ProbImage unary_matrix;
+    checkIfExists(x.unary_path);
+    unary_matrix.load(x.unary_path);
+
+    cv::Mat image_matrix;
+    checkIfExists(x.image_path);
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
 
     size_t n_label = y.n_label;
     y.annotation_matrix = lab1231_sun_prj::shotton::annotate(n_label, image_matrix, unary_matrix, unary_weights, pair_weights);
-
-
-
 
     // printf("Saving to %s\n", x.dumping_path);
     // y.png_matrix.save(x.dumping_path,"png",0);
 
     printf("done\n"); fflush(stdout);
 
-    lab1231_sun_prj::shotton::save_image(y.dumping_path,y.annotation_matrix);
+    //lab1231_sun_prj::shotton::save_image(y.dumping_path,y.annotation_matrix);
 
 
     // y.png_matrix = x.bypass;
@@ -406,7 +436,7 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
        Psi(x,ybar)>Psi(x,y)-1. If the function cannot find a label, it
        shall return an empty label as recognized by the function
        empty_label(y). */
-    LABEL ybar = classify_struct_example(x, sm, sparm);
+    LABEL ybar = inferWithLoss(x, sm, y);
 
     /* insert your code for computing the label ybar here */
 
@@ -447,7 +477,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
        loss + margin/slack rescaling method. See that paper for details. */
 
     /* insert code for computing the feature vector for x and y here */
-    
+
     // printf("in psi "); fflush(stdout);
     SVECTOR *fvec = (SVECTOR *) my_malloc(sizeof(SVECTOR));
     fvec->words = (WORD *) my_malloc(sizeof(WORD) * (sm->sizePsi + 1));
@@ -474,9 +504,11 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     size_t windowoffset = windowheight * windowwidth;
 
     ProbImage unary_matrix;
-    unary_matrix.decompress(x.unary_path);
+    checkIfExists(x.unary_path);
+    unary_matrix.load(x.unary_path);
 
     cv::Mat image_matrix;
+    checkIfExists(x.image_path);
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
 
 
@@ -485,8 +517,12 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
         for (size_t yy = 0; yy < x.height; yy++)
         {
             //reduce dimensions
-            assert((windowoffsetx + xx) + (windowoffsety + yy)*windowwidth < ssvm_ss::image_constraint::unary_size);
-            fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = unary_matrix(xx*5, yy*5, y.annotation_matrix(yy,xx)); //make sure it is potential invers //resize
+          //if(!((windowoffsetx + xx) + (windowoffsety + yy)*windowwidth < ssvm_ss::image_constraint::unary_size))printf("winoffsetx %d winoffsety %d xx %d yy %d winwidth %d imagemiddlex %d imagemiddley %d path %s\n",windowoffsetx,windowoffsety,xx,yy,windowwidth,imagemiddlex,imagemiddley,x.image_path);
+            //assert((windowoffsetx + xx) + (windowoffsety + yy)*windowwidth < ssvm_ss::image_constraint::unary_size);
+	float energy_unary = 0.0;
+	if(y.annotation_matrix(yy,xx)!=255)
+		energy_unary=energy_probability(unary_matrix(xx, yy, y.annotation_matrix(yy, xx)));
+            fvec->words[(windowoffsetx + xx) + (windowoffsety + yy)*windowwidth].weight = -energy_unary; //make sure it is potential invers
         }
 
     assert(sm->sizePsi - windowoffset > 0);
@@ -517,7 +553,7 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
 {
     /* loss for correct label y and predicted label ybar. The loss for
        y==ybar has to be zero. sparm->loss_function is set with the -l option. */
-    
+
     // printf("Finding loss"); fflush(stdout);
     if (sparm->loss_function == 0)  /* type 0 loss: 0/1 loss */
     {
@@ -526,13 +562,13 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
         // ybar.png_matrix.save("temp_output_bar", "png", 0);
         assert(y.height == ybar.height && y.width == ybar.width);
         double sum = 0.0;
-        
+
         // printf("w h %d %d\n", y.width, y.height); fflush(stdout);
         for (int xx = 0; xx < y.width; xx++)
             for (int yy = 0; yy < y.height; yy++)
             {
                 if (y.annotation_matrix(yy, xx) != 255)
-                    sum += (y.annotation_matrix(yy, xx) != ybar.annotation_matrix(yy,xx)) ? 1.0 : 0.0;
+                    sum += (y.annotation_matrix(yy, xx) != ybar.annotation_matrix(yy, xx)) ? 1.0 : 0.0;
             }
         printf("Loss : %f\n", sum);
         return sum;
@@ -762,7 +798,7 @@ void        write_label(FILE *fp, LABEL y)
     /* Writes label y to file handle fp. */
     // y.png_matrix.save(y.dumping_path, "png", 0);
     // printf("Saving to %s\n", y.dumping_path);
-  lab1231_sun_prj::shotton::save_image(y.dumping_path,y.annotation_matrix);
+    lab1231_sun_prj::shotton::save_image(y.dumping_path, y.annotation_matrix);
 }
 
 void        free_pattern(PATTERN x)

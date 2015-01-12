@@ -12,15 +12,14 @@ int main(int argc, char* argv[]) {
 
   // Set the dataset param
   shotton::DataParam data_param;
-  data_param["name"] = argv[1];//string("MSRC");
-  data_param["n_label"] = argv[2];//string("21");// inc. the background
-  // data_param["gt_img_dir"] = "/home/tor/sun3/dataset/msrc/spt/GroundTruth/";
-  data_param["ori_img_dir"] = argv[3];//"/home/tor/sun3/dataset/msrc/spt/Images/";  
-  data_param["test_img_list_filepath"] = argv[4];// "/home/tor/sun3/dataset/msrc/meta/test.list";
+  data_param["name"] = argv[1];
+  data_param["n_label"] = argv[2];
+  data_param["ori_img_dir"] = argv[3];
+  data_param["test_img_list_filepath"] = argv[4];
 
   // Train
-  shotton::EnergyParam energy_param;
-  shotton::train(data_param, &energy_param);
+  shotton::EnergyParam internal_energy_param;
+  shotton::train(data_param, &internal_energy_param);
 
   // Annotate
   vector<string> test_img_filenames;
@@ -34,17 +33,26 @@ int main(int argc, char* argv[]) {
     test_img_list_file.close();
   }
 
-  const string ann_results_dir = argv[5];//"/home/tor/sun4/exp/rep-shotton-msrc/ann-csv/";
+  const string ann_results_dir = argv[5];
   std::vector<Eigen::MatrixXi> ann_results;
 
   for (size_t i=0; i<test_img_filenames.size(); ++i) {
     const string img_filename = test_img_filenames.at(i);
     cout << "ANNOTATING img_filename" << img_filename << endl;
 
-    Eigen::MatrixXi ann;
-    ann = shotton::annotate(img_filename, data_param, energy_param);
+    // Dummy empty weight matrices
+    Eigen::MatrixXd unary_weight = Eigen::MatrixXd::Ones(0,0);
+    Eigen::MatrixXd h_pairwise_weight = Eigen::MatrixXd::Ones(0,0);
+    Eigen::MatrixXd v_pairwise_weight = Eigen::MatrixXd::Ones(0,0);
 
-    const string ann_filepath = string(ann_results_dir+img_filename.substr(0,img_filename.size()-4)+".ann");
+    bool used_as_loss_augmented_inference = false;
+
+    Eigen::MatrixXi ann;
+    ann = shotton::annotate(img_filename, data_param, internal_energy_param, 
+                            unary_weight, h_pairwise_weight, v_pairwise_weight,
+                            used_as_loss_augmented_inference);
+
+    const string ann_filepath = string(ann_results_dir+img_filename+".ann");
     util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
     
     // ann_results.push_back(ann);
