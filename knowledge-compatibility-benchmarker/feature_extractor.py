@@ -97,7 +97,8 @@ def extract_fea_r(filename, knowledge):
     
     below_th = 20
     around_th = 60
-    philip_bbox_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/knowledge/philip_voc2010_boundingbox/boundingbox_data'
+    #philip_bbox_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/knowledge/philip_voc2010_boundingbox/boundingbox_data'
+    philip_bbox_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/knowledge/philip_voc2010_boundingbox/boundingbox_data_tor'
 
     file_to_process = philip_bbox_dir + filename + '.json'
     probs = []
@@ -206,7 +207,7 @@ def extract_fea(ann_filepaths, knowledge_dir):
         s = extract_fea_s(ann, knowledge['s'])
         p = extract_fea_p(ann, knowledge['p'], ann_filepath.split('/')[-1][0:-4])
         r = extract_fea_r(filename, knowledge['r'])
-        fea = c + s + p + r
+        fea = r
         fea_list.append(fea)
         
     return fea_list

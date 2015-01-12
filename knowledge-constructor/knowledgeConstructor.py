@@ -99,32 +99,32 @@ class KnowledgeConstructor:
     
     def writePrintC(self):
         # Print cooccurrence frequency info into system and file
-        print("")
-        print("")
-        print("Cooccurrence Frequency from your array :")
-        print("")
+        #print("")
+        #print("")
+        #print("Cooccurrence Frequency from your array :")
+        #print("")
         # column label
-        print("%11s"%"", end=" ")
+        #print("%11s"%"", end=" ")
         self.cOutFile.write(" ,")
         for x in range (1,self.cArraySize):
             lbl = self.cooccurArray[0][x]
-            print("%11s"%lbl, end=" ")
+            #print("%11s"%lbl, end=" ")
             self.cOutFile.write("%s,"%lbl)  
-        print("")
+        #print("")
         self.cOutFile.write("\n")
         # row label and value
         for x in range (1,self.cArraySize):
             lbl = self.cooccurArray[x][0]
-            print("%11s"%lbl, end=" ")
+            #print("%11s"%lbl, end=" ")
             self.cOutFile.write("%s,"%lbl)
             for y in range (1,self.cArraySize):
                 val = self.cooccurArray[x][y]
-                print(("%11d"%val),end=" ")
+                #print(("%11d"%val),end=" ")
                 self.cOutFile.write("%d,"%val)
-            print("")
+            #print("")
             self.cOutFile.write("\n")
         self.cOutFile.close()
-        print("")
+        #print("")
     
     def writePrintP(self):
         print()
@@ -323,7 +323,7 @@ class KnowledgeConstructor:
         
             #TOP
             pixelLabelListPart = [pixel[i,j] for i in range(0,imageWidth) for j in range (0,top_end_point) if pixel[i, j] != 0 and pixel[i, j] != 255] #read value
-            setListPart = pixelLabelListPart
+            setListPart = list((pixelLabelListPart))
             setSize= len(setListPart)
             for x in range(0, setSize): #compute frequency
                 self.spatialArray[setListPart[x]][1] = self.spatialArray[setListPart[x]][1] + 1
@@ -349,7 +349,7 @@ class KnowledgeConstructor:
             for x in range(0, setSize):
                 self.spatialArray[setListPart[x]][4] = self.spatialArray[setListPart[x]][4] + 1
                 
-        self.writePrintS()
+        #self.writePrintS()
         self.sXML()
             
     def cooccurrence_knowledge(self):
@@ -431,7 +431,7 @@ class KnowledgeConstructor:
                 index_b = int(checked_b)
                 self.cooccurArray[index_a][index_b] = self.cooccurArray[index_a][index_b] + 1
         
-        self.writePrintC()
+        #self.writePrintC()
         self.cXML()
         
     def scene_properties_knowledge(self):
