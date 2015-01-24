@@ -33,7 +33,7 @@ const int CACHE_SIZE = 1000;
 static const int N_TEXTONS = 50;
 static const float FILTER_BANK_SIZE = 1.0;
 // Boosting parameters
-static const int N_BOOSTING_ROUNDS  = 3000; // Number of boosting rounds
+static const int N_BOOSTING_ROUNDS  = 10000; // Number of boosting rounds
 static const int N_CLASSIFIERS      = 200; // Number of random classifiers to test [per round]
 static const int N_THRESHOLDS       = 100; // Number of thresholds to test [per round]
 #ifdef USE_MSRC
@@ -47,7 +47,7 @@ static const int MAX_RECT_SIZE      = 200; // Maximum size of texton rectangle
 
 static const std::string VOC2010_DIRECTORY = "/home/rizkivmaster/ws/datasets/smallVOC2010";
 static const std::string VOC2010_COLOR_PATH = VOC2010_DIRECTORY+"/VOC2010.ct";
-static const std::string EXPERIMENT_FOLDER = "/home/rizkivmaster/ws/results/14736";
+static const std::string EXPERIMENT_FOLDER = "/home/rizkivmaster/ws/results/ssvmVM";
 static const std::string VOC2010_PNG_FOLDER = VOC2010_DIRECTORY+"/SegmentationClass";
 static const std::string VOC2010_JPG_FOLDER = VOC2010_DIRECTORY+"/JPEGImages";
 static const std::string VOC2010_UNARY_FOLDER = EXPERIMENT_FOLDER+"/unaries";

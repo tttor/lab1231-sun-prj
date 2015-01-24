@@ -126,12 +126,12 @@ void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double *unar
                         hinge_loss = 1.0;
                 }
 
-                energy(i) =  (float)max(0.0,unary_weights[util::flat_idx(x, y, img_mat.cols)]) * energy_probability(unary_matrix(x, y,i))-hinge_loss;
+                energy(i) =  (float)max(0.0,unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * energy_probability(unary_matrix(x, y,i))-hinge_loss;
 
                 //energy(i) =  max(0.0, unary_weights[util::flat_idx(x, y, img_mat.cols)]) * energy_probability(unary_matrix(5 * x, 5 * y, i)) - (i != ytrue(y, x) ? 1.0 : 0.0);
             }
             GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
-            size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols)};
+            size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols)};
             gm.addFactor(fid, var_idxes, var_idxes + 1);
         }
     }
@@ -210,7 +210,7 @@ void set_1st_order(const cv::Mat img_mat, ProbImage unary_matrix, const size_t n
             GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
 
             // add a factor
-            size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols)};
+            size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols)};
             gm.addFactor(fid, var_idxes, var_idxes + 1);
         }
     }
@@ -238,11 +238,11 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_matrix, double *unary_weight
             {
 
                 // assert(unary_weights[util::flat_idx(x, y, img_mat.cols)]==1.0);
-                energy(i) = max(0.0, unary_weights[util::flat_idx(x, y, img_mat.cols)]) * -unary_matrix(x, y, i);
+                energy(i) = max(0.0, unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * -unary_matrix(x, y, i);
             }
             GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
             // add a factor
-            size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols)};
+            size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols)};
             gm.addFactor(fid, var_idxes, var_idxes + 1);
         }
     }
@@ -286,7 +286,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
                 GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
                 // add a factor
-                size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols), util::flat_idx(x + 1, y, img_mat.cols)};
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x + 1, y, img_mat.cols)};
                 sort(var_idxes, var_idxes + 2);
                 gm.addFactor(fid, var_idxes, var_idxes + 2);
             }
@@ -307,7 +307,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
                 GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
                 // add a factor
-                size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols), util::flat_idx(x, y + 1, img_mat.cols)};
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x, y + 1, img_mat.cols)};
                 sort(var_idxes, var_idxes + 2);
                 gm.addFactor(fid, var_idxes, var_idxes + 2);
             }
@@ -347,8 +347,8 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
 
                 float unequal_pen;
                 unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
-                equal_pen *= max(0.0, pair_weights[util::flat_idx(x, y, img_mat.cols - 1)]);
-                unequal_pen *=  max(0.0, pair_weights[util::flat_idx(x, y, img_mat.cols - 1)]);
+                equal_pen *= max(0.0, pair_weights[util::flat_idx_xy(x, y, img_mat.cols - 1)]);
+                unequal_pen *=  max(0.0, pair_weights[util::flat_idx_xy(x, y, img_mat.cols - 1)]);
 
 
                 // assert(pair_weights[util::flat_idx(x,y,img_mat.cols-1)]==1.0);
@@ -357,7 +357,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
                 GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
                 // add a factor
-                size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols), util::flat_idx(x + 1, y, img_mat.cols)};
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x + 1, y, img_mat.cols)};
                 sort(var_idxes, var_idxes + 2);
                 gm.addFactor(fid, var_idxes, var_idxes + 2);
             }
@@ -372,8 +372,8 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
                 float unequal_pen;
                 unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
 
-                unequal_pen *= max(0.0, pair_weights[psioffset + util::flat_idx(x, y, img_mat.cols - 1)]);
-                equal_pen *= max(0.0, pair_weights[psioffset + util::flat_idx(x, y, img_mat.cols - 1)]);
+                unequal_pen *= max(0.0, pair_weights[psioffset + util::flat_idx_xy(x, y, img_mat.cols - 1)]);
+                equal_pen *= max(0.0, pair_weights[psioffset + util::flat_idx_xy(x, y, img_mat.cols - 1)]);
 
                 // assert(pair_weights[psioffset+util::flat_idx(x,y,img_mat.cols-1)]==1.0);
 
@@ -381,7 +381,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
                 GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
                 // add a factor
-                size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols), util::flat_idx(x, y + 1, img_mat.cols)};
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x, y + 1, img_mat.cols)};
                 sort(var_idxes, var_idxes + 2);
                 gm.addFactor(fid, var_idxes, var_idxes + 2);
             }

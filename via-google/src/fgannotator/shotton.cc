@@ -205,7 +205,7 @@ void set_1st_order(const cv::Mat img_mat, const cv::Mat_<double> saliency_mat, P
 
 
             // add a factor
-            size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols)};
+            size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols)};
             gm.addFactor(fid, var_idxes, var_idxes + 1);
         }
     }
@@ -249,7 +249,7 @@ void set_2nd_order(cv::Mat img_mat, EnergyParam energy_param, GraphicalModel &gm
                 GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
                 // add a factor
-                size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols), util::flat_idx(x + 1, y, img_mat.cols)};
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x + 1, y, img_mat.cols)};
                 sort(var_idxes, var_idxes + 2);
                 gm.addFactor(fid, var_idxes, var_idxes + 2);
             }
@@ -270,7 +270,7 @@ void set_2nd_order(cv::Mat img_mat, EnergyParam energy_param, GraphicalModel &gm
                 GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
 
                 // add a factor
-                size_t var_idxes[] = {util::flat_idx(x, y, img_mat.cols), util::flat_idx(x, y + 1, img_mat.cols)};
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x, y + 1, img_mat.cols)};
                 sort(var_idxes, var_idxes + 2);
                 gm.addFactor(fid, var_idxes, var_idxes + 2);
             }
