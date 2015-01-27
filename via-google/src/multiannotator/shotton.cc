@@ -91,6 +91,18 @@ Eigen::MatrixXi annotate(size_t n_label, cv::Mat &image_matrix, ProbImage &unary
     return ann;
 }
 
+Eigen::MatrixXi annotate(size_t n_label, cv::Mat &image_matrix, ProbImage &unary_matrix, double unaryWeight, double pairWiseWeight){
+    EnergyParam energy_param;
+    train("VOC", &energy_param);
+    size_t n_var = image_matrix.rows * image_matrix.cols;
+    GraphicalModel gm( opengm::SimpleDiscreteSpace<size_t, size_t>(n_var, n_label) );
+    set_1st_order( image_matrix , unary_matrix, unaryWeight, n_label, gm);
+    set_2nd_order( image_matrix , n_label, energy_param, pairWiseWeight, gm);
+    Eigen::MatrixXi annotation(image_matrix.rows, image_matrix.cols);
+    infer("AlphaExpansion", gm, n_var, annotation);
+    return annotation;
+}
+
 //svm with augmented loss
 Eigen::MatrixXi annotateWithAugmentedLoss(size_t n_label, cv::Mat &image_matrix, ProbImage &unary_matrix, double *unary_weights, double *pair_weights, Eigen::MatrixXi &ytrue)
 {
@@ -105,6 +117,50 @@ Eigen::MatrixXi annotateWithAugmentedLoss(size_t n_label, cv::Mat &image_matrix,
     return ann;
 }
 
+Eigen::MatrixXi annotateWithAugmentedLoss(size_t n_label, cv::Mat &image_matrix, ProbImage &unary_matrix, double unaryWeight, double pairWiseWeight,Eigen::MatrixXi& ytrue){
+    EnergyParam energy_param;
+    train("VOC", &energy_param);
+    size_t n_var = image_matrix.rows * image_matrix.cols;
+    GraphicalModel gm( opengm::SimpleDiscreteSpace<size_t, size_t>(n_var, n_label) );
+    set_1st_orderWithLoss( image_matrix , unary_matrix, unaryWeight, n_label, gm, ytrue);
+    set_2nd_order( image_matrix , n_label, energy_param, pairWiseWeight, gm);
+    Eigen::MatrixXi annotation(image_matrix.rows, image_matrix.cols);
+    infer("AlphaExpansion", gm, n_var, annotation);
+    return annotation;
+}
+
+//for svm2
+void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double unaryWeight, const size_t n_label, GraphicalModel &gm,Eigen::MatrixXi &ytrue){
+    using namespace std;
+    for (size_t x = 0; x < img_mat.cols; ++x)
+    {
+        for (size_t y = 0; y < img_mat.rows; ++y)
+        {
+            const size_t shape[] = {n_label};
+            opengm::ExplicitFunction<float> energy(shape, shape + 1);
+
+            for (size_t i = 0; i < n_label; i++)
+            {
+                float hinge_loss = 0;
+                //make sure target pixel is not void, void gains zero loss
+                if(ytrue(y,x) != 255)
+                {
+                    //different labels apply
+                    if(i!=ytrue(y,x))
+                        hinge_loss = 1.0;
+                }
+                //debug
+                energy(i) =  (float)(std::max(DBL_EPSILON,unaryWeight) * energy_probability(unary_matrix(x*5, y*5,i)))-hinge_loss;
+
+                //energy(i) =  max(0.0, unary_weights[util::flat_idx(x, y, img_mat.cols)]) * energy_probability(unary_matrix(5 * x, 5 * y, i)) - (i != ytrue(y, x) ? 1.0 : 0.0);
+            }
+            GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
+            size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols)};
+            gm.addFactor(fid, var_idxes, var_idxes + 1);
+        }
+    }
+}
+//for svm1
 void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double *unary_weights, const size_t n_label, GraphicalModel &gm, Eigen::MatrixXi &ytrue)
 {
     using namespace std;
@@ -117,7 +173,7 @@ void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double *unar
 
             for (size_t i = 0; i < n_label; i++)
             {
-		float hinge_loss = 0;
+		float hinge_loss = 0.0;
                 //make sure target pixel is not void, void gains zero loss
                 if(ytrue(y,x) != 255)
                 {
@@ -126,7 +182,7 @@ void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double *unar
                         hinge_loss = 1.0;
                 }
 
-                energy(i) =  (float)max(0.0,unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * energy_probability(unary_matrix(x, y,i))-hinge_loss;
+                energy(i) =  (float)(max(0.0,unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * energy_probability(unary_matrix(x, y,i)))-hinge_loss;
 
                 //energy(i) =  max(0.0, unary_weights[util::flat_idx(x, y, img_mat.cols)]) * energy_probability(unary_matrix(5 * x, 5 * y, i)) - (i != ytrue(y, x) ? 1.0 : 0.0);
             }
@@ -206,7 +262,7 @@ void set_1st_order(const cv::Mat img_mat, ProbImage unary_matrix, const size_t n
 
             for (size_t i = 0; i < n_label; i++)
                 // energy(i) = -unary_matrix(x, y, i);
-                energy(i) = energy_probability(unary_matrix(x, y,i));
+            energy(i) = energy_probability(unary_matrix(x, y, i));
             GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
 
             // add a factor
@@ -219,6 +275,33 @@ void set_1st_order(const cv::Mat img_mat, ProbImage unary_matrix, const size_t n
 
 //for svm
 void set_1st_order(cv::Mat img_mat, ProbImage unary_matrix, double *unary_weights, const size_t n_label, GraphicalModel &gm)
+{
+    using namespace std;
+
+
+    for (size_t x = 0; x < img_mat.cols; ++x)
+    {
+        for (size_t y = 0; y < img_mat.rows; ++y)
+        {
+            const size_t shape[] = {n_label};
+            opengm::ExplicitFunction<float> energy(shape, shape + 1);
+
+            for (size_t i = 0; i < n_label; i++)
+            {
+
+                // assert(unary_weights[util::flat_idx(x, y, img_mat.cols)]==1.0);
+                energy(i) = max(0.0, unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * energy_probability(unary_matrix(x, y, i));
+            }
+            GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
+            // add a factor
+            size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols)};
+            gm.addFactor(fid, var_idxes, var_idxes + 1);
+        }
+    }
+}
+
+//for svm2
+void set_1st_order(cv::Mat img_mat, ProbImage unary_matrix, double unaryWeight, const size_t n_label, GraphicalModel &gm)
 {
     using namespace std;
 
@@ -236,9 +319,8 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_matrix, double *unary_weight
 
             for (size_t i = 0; i < n_label; i++)
             {
-
-                // assert(unary_weights[util::flat_idx(x, y, img_mat.cols)]==1.0);
-                energy(i) = max(0.0, unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * -unary_matrix(x, y, i);
+                //debug
+                energy(i) = (float)(max(DBL_EPSILON, unaryWeight) * energy_probability(unary_matrix(x*5, y*5, i)));
             }
             GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
             // add a factor
@@ -316,6 +398,79 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
 }
 
 //for svm
+
+void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_param,double pairWiseWeight, GraphicalModel& gm)
+{
+    // Params needed by the Pott model
+    float equal_pen = 0.0;
+
+    //
+    float beta;
+    beta = edge_potential::get_beta(img_mat);
+
+    Eigen::MatrixXd theta_phi(2, 1);
+    theta_phi << energy_param["theta_phi_1"],
+              energy_param["theta_phi_2"];
+
+    size_t psioffset = (img_mat.cols - 1) * (img_mat.rows - 1);
+
+    for (size_t x = 0; x < img_mat.cols - 1; ++x)
+    {
+        for (size_t y = 0; y < img_mat.rows - 1; ++y)
+        {
+            cv::Point2i p1;
+            p1.x = x; p1.y = y;
+
+            // (x, y) -- (x + 1, y)
+            if (x + 1 < img_mat.cols)
+            {
+                // add a function
+                cv::Point2i p2;
+                p2.x = x + 1; p2.y = y;
+
+                float unequal_pen;
+                unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
+                equal_pen *= max(0.0, pairWiseWeight);
+                unequal_pen *=  max(0.0, pairWiseWeight);
+
+
+                // assert(pair_weights[util::flat_idx(x,y,img_mat.cols-1)]==1.0);
+
+                opengm::PottsFunction<float> pott(n_label, n_label, equal_pen, unequal_pen);
+                GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
+
+                // add a factor
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x + 1, y, img_mat.cols)};
+                sort(var_idxes, var_idxes + 2);
+                gm.addFactor(fid, var_idxes, var_idxes + 2);
+            }
+
+            // (x, y) -- (x, y + 1)
+            if (y + 1 < img_mat.rows)
+            {
+                // add a function
+                cv::Point2i p2;
+                p2.x = x; p2.y = y + 1;
+
+                float unequal_pen;
+                unequal_pen = edge_potential::potential(img_mat.at<cv::Vec3b>(p1), img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
+
+                equal_pen *= max(0.0, pairWiseWeight);
+                unequal_pen *=  max(0.0, pairWiseWeight);
+
+                // assert(pair_weights[psioffset+util::flat_idx(x,y,img_mat.cols-1)]==1.0);
+
+                opengm::PottsFunction<float> pott(n_label, n_label, equal_pen, unequal_pen);
+                GraphicalModel::FunctionIdentifier fid = gm.addFunction(pott);
+
+                // add a factor
+                size_t var_idxes[] = {util::flat_idx_xy(x, y, img_mat.cols), util::flat_idx_xy(x, y + 1, img_mat.cols)};
+                sort(var_idxes, var_idxes + 2);
+                gm.addFactor(fid, var_idxes, var_idxes + 2);
+            }
+        }
+    }
+}
 void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_param, double *pair_weights, GraphicalModel &gm)
 {
     // Params needed by the Pott model
@@ -451,6 +606,65 @@ void get_2nd_order_psi(cv::Mat &img_mat, Eigen::MatrixXi &annotation_matrix, dou
         }
     }
 }
+
+
+
+float getPairWisePotentialSum(cv::Mat &img_mat, Eigen::MatrixXi &annotation_matrix)
+{
+    //initiate energy param
+    EnergyParam energy_param;
+    train("VOC", &energy_param);
+
+    //set beta
+    float beta;
+    beta = edge_potential::get_beta(img_mat);
+
+    //set energy param value
+    Eigen::MatrixXd theta_phi(2, 1);
+    theta_phi << energy_param["theta_phi_1"],
+              energy_param["theta_phi_2"];
+
+
+    float pairwiseSum = 0.0;
+
+    //horizontal potential
+    for(size_t xx = 0; xx < img_mat.cols -1; ++xx)
+        for(size_t yy = 0; yy < img_mat.rows; ++yy)
+        {
+            cv::Point2i p1;
+            p1.x = xx; p1.y = yy;
+            cv::Point2i p2;
+            p2.x = xx + 1; p2.y = yy;
+
+            float penalty;
+            penalty = edge_potential::potential(img_mat.at<cv::Vec3b>(p1),img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
+
+            if(annotation_matrix(yy,xx)==255 || annotation_matrix(yy,xx+1)==255)
+                pairwiseSum += annotation_matrix(yy,xx) == annotation_matrix(yy, xx+1) ? 0.0: penalty;
+
+        }
+
+    //vertical potential
+    for(size_t xx = 0; xx < img_mat.cols; ++xx)
+        for(size_t yy = 0; yy < img_mat.rows - 1; ++yy)
+        {
+            cv::Point2i p1;
+            p1.x = xx; p1.y = yy;
+            cv::Point2i p2;
+            p2.x = xx; p2.y = yy + 1;
+
+            float penalty;
+            penalty = edge_potential::potential(img_mat.at<cv::Vec3b>(p1),img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
+
+            if(annotation_matrix(yy,xx) == 255 || annotation_matrix(yy+1,xx)==255)
+                pairwiseSum += annotation_matrix(yy,xx) == annotation_matrix(yy+1,xx) ? 0.0: penalty;
+        }
+
+    return pairwiseSum;
+
+}
+
+
 
 }// namespace shotton
 } // namespace lab1231_sun_prj
