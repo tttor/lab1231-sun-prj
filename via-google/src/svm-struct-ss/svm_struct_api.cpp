@@ -355,7 +355,6 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     }
     //set the last one with 0
     fvec->words[sm->sizePsi].wnum = 0;
-    fvec->words[sm->sizePsi].weight = 0.0;
     //check unary matrix
     ProbImage unary_matrix;
     checkIfExists(x.unary_path);
@@ -376,13 +375,13 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
           {
             unaryPotentialSum += energy_probability(unary_matrix(xx*5,yy*5,y.annotation_matrix(yy,xx)));
           }
-
-    fvec->words[0].weight = -unaryPotentialSum;
+          //debug
 
     float pairWisePotentialSum = 0.0;
 
     pairWisePotentialSum = getPairWisePotentialSum(image_matrix, y.annotation_matrix);
 
+    fvec->words[0].weight = -unaryPotentialSum;
     fvec->words[1].weight = -pairWisePotentialSum;
     printf("potentials: %f %f\n",unaryPotentialSum,pairWisePotentialSum);
 
@@ -418,7 +417,21 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
         /* Put your code for different loss functions here. But then
            find_most_violated_constraint_???(x, y, sm) has to return the
            highest scoring label with the largest loss. */
+        // double sum = 0.0;
+        // for (int xx = 0; xx < y.width; xx++)
+        //     for (int yy = 0; yy < y.height; yy++)
+        //     {
+        //         if (y.annotation_matrix(yy, xx) != 255)
+        //             sum += (y.annotation_matrix(yy, xx) != ybar.annotation_matrix(yy, xx)) ? 1.0 : 0.0;
+        //     }
+        // printf("Loss : %f\n", sum);
+        // return sum * sum;
+        // exit(1);
+
+        assert(y.height == ybar.height && y.width == ybar.width);
         double sum = 0.0;
+
+        // printf("w h %d %d\n", y.width, y.height); fflush(stdout);
         for (int xx = 0; xx < y.width; xx++)
             for (int yy = 0; yy < y.height; yy++)
             {
@@ -426,8 +439,7 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
                     sum += (y.annotation_matrix(yy, xx) != ybar.annotation_matrix(yy, xx)) ? 1.0 : 0.0;
             }
         printf("Loss : %f\n", sum);
-        return sum * sum;
-        // exit(1);
+        return sum;
     }
 }
 
@@ -749,11 +761,11 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
     y.n_label = ssvm_ss::image_constraint::n_label;
 
     //prepare the weights
-    MODEL *model = sm->svm_model;
+    // MODEL *model = sm->w[];
     float unaryWeight =0.0;
     float pairWiseWeight = 0.0;
-    unaryWeight = model->lin_weights[0];
-    pairWiseWeight = model->lin_weights[1];
+    unaryWeight = sm->w[1];
+    pairWiseWeight = sm->w[2];
 
     //prepare the unary potential
     ProbImage unary_matrix;
@@ -766,6 +778,7 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
     checkIfExists(x.image_path);
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
     //do inference
+    printf("weights: %f %f\n",unaryWeight,pairWiseWeight);
     y.annotation_matrix = lab1231_sun_prj::shotton::annotate(n_label, image_matrix, unary_matrix, unaryWeight, pairWiseWeight);
 
     printf("done\n");
@@ -783,12 +796,12 @@ LABEL inferAugmentedLoss(PATTERN x, STRUCTMODEL *sm, LABEL &ytrue)
 
 
     //prepare the weights
-    MODEL *model = sm->svm_model;
+    // MODEL *model = sm->svm_m odel;
     double unaryWeight =0.0;
     double pairWiseWeight = 0.0;
-    unaryWeight = model->lin_weights[0];
-    pairWiseWeight = model->lin_weights[1];
-        printf("weights: %f %f\n",unaryWeight,pairWiseWeight);
+    unaryWeight = sm->w[1];
+    pairWiseWeight = sm->w[2];
+        printf("weights: %f %f %f\n",unaryWeight,pairWiseWeight,sm->w[0]);
 
 
     //prepare the unary potential

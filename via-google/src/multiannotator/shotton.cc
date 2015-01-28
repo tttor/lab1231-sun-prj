@@ -117,6 +117,7 @@ Eigen::MatrixXi annotateWithAugmentedLoss(size_t n_label, cv::Mat &image_matrix,
     return ann;
 }
 
+//svm2
 Eigen::MatrixXi annotateWithAugmentedLoss(size_t n_label, cv::Mat &image_matrix, ProbImage &unary_matrix, double unaryWeight, double pairWiseWeight,Eigen::MatrixXi& ytrue){
     EnergyParam energy_param;
     train("VOC", &energy_param);
@@ -141,16 +142,16 @@ void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double unary
 
             for (size_t i = 0; i < n_label; i++)
             {
-                float hinge_loss = 0;
+                float hamming_loss = 0;
                 //make sure target pixel is not void, void gains zero loss
                 if(ytrue(y,x) != 255)
                 {
                     //different labels apply
                     if(i!=ytrue(y,x))
-                        hinge_loss = 1.0;
+                        hamming_loss = 1.0;
                 }
                 //debug
-                energy(i) =  (float)(std::max(DBL_EPSILON,unaryWeight) * energy_probability(unary_matrix(x*5, y*5,i)))-hinge_loss;
+                energy(i) =  (float)(std::max(0.0,unaryWeight) * energy_probability(unary_matrix(x*5, y*5,i)))-hamming_loss;
 
                 //energy(i) =  max(0.0, unary_weights[util::flat_idx(x, y, img_mat.cols)]) * energy_probability(unary_matrix(5 * x, 5 * y, i)) - (i != ytrue(y, x) ? 1.0 : 0.0);
             }
@@ -173,16 +174,16 @@ void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double *unar
 
             for (size_t i = 0; i < n_label; i++)
             {
-		float hinge_loss = 0.0;
+		float hamming_loss = 0.0;
                 //make sure target pixel is not void, void gains zero loss
                 if(ytrue(y,x) != 255)
                 {
                     //different labels apply
                     if(i!=ytrue(y,x))
-                        hinge_loss = 1.0;
+                        hamming_loss = 1.0;
                 }
 
-                energy(i) =  (float)(max(0.0,unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * energy_probability(unary_matrix(x, y,i)))-hinge_loss;
+                energy(i) =  (float)(max(0.0,unary_weights[util::flat_idx_xy(x, y, img_mat.cols)]) * energy_probability(unary_matrix(x, y,i)))-hamming_loss;
 
                 //energy(i) =  max(0.0, unary_weights[util::flat_idx(x, y, img_mat.cols)]) * energy_probability(unary_matrix(5 * x, 5 * y, i)) - (i != ytrue(y, x) ? 1.0 : 0.0);
             }
@@ -320,7 +321,7 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_matrix, double unaryWeight, 
             for (size_t i = 0; i < n_label; i++)
             {
                 //debug
-                energy(i) = (float)(max(DBL_EPSILON, unaryWeight) * energy_probability(unary_matrix(x*5, y*5, i)));
+                energy(i) = (float)(max(0.0, unaryWeight) * energy_probability(unary_matrix(x*5, y*5, i)));
             }
             GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
             // add a factor
@@ -397,8 +398,7 @@ void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_par
     }
 }
 
-//for svm
-
+//for svm2
 void set_2nd_order(cv::Mat img_mat, const size_t n_label, EnergyParam energy_param,double pairWiseWeight, GraphicalModel& gm)
 {
     // Params needed by the Pott model
@@ -639,7 +639,9 @@ float getPairWisePotentialSum(cv::Mat &img_mat, Eigen::MatrixXi &annotation_matr
             float penalty;
             penalty = edge_potential::potential(img_mat.at<cv::Vec3b>(p1),img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
 
+
             if(annotation_matrix(yy,xx)==255 || annotation_matrix(yy,xx+1)==255)
+                penalty = 0.0;
                 pairwiseSum += annotation_matrix(yy,xx) == annotation_matrix(yy, xx+1) ? 0.0: penalty;
 
         }
@@ -657,7 +659,8 @@ float getPairWisePotentialSum(cv::Mat &img_mat, Eigen::MatrixXi &annotation_matr
             penalty = edge_potential::potential(img_mat.at<cv::Vec3b>(p1),img_mat.at<cv::Vec3b>(p2), beta, theta_phi);
 
             if(annotation_matrix(yy,xx) == 255 || annotation_matrix(yy+1,xx)==255)
-                pairwiseSum += annotation_matrix(yy,xx) == annotation_matrix(yy+1,xx) ? 0.0: penalty;
+                penalty=0.0;
+            pairwiseSum += annotation_matrix(yy,xx) == annotation_matrix(yy+1,xx) ? 0.0: penalty;
         }
 
     return pairwiseSum;
