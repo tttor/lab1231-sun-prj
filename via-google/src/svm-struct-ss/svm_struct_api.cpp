@@ -371,11 +371,9 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     for(size_t xx = 0; xx < x.width; xx++)
       for(size_t yy = 0; yy < x.height; yy++)
         if(y.annotation_matrix(yy,xx)!=255)
-          //debug
           {
-            unaryPotentialSum += energy_probability(unary_matrix(xx*5,yy*5,y.annotation_matrix(yy,xx)));
+            unaryPotentialSum += energy_probability(unary_matrix(xx,yy,y.annotation_matrix(yy,xx)));
           }
-          //debug
 
     float pairWisePotentialSum = 0.0;
 

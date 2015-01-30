@@ -51,7 +51,7 @@ void makeAnnotation(const int n_label, const QString img_path,const QString unar
         qDebug("Annotating image paralelly %d %s",i, qPrintable(names[i].first));
         // const int object_label = names[i].first.toInt();
         const QString image_path = image_directory + "/" + names[i].second + ".jpg";
-        const QString unary_path = unary_directory +"/" + names[i].second + ".unary";
+        const QString unary_path = unary_directory +"/" + names[i].second + ".c_unary";//phillip
         const QString png_path = png_directory + "/" + names[i].second + ".png";
         qDebug("Write to %s",qPrintable(png_path));
         makeAnnotation(n_label,image_path,unary_path,png_path);
@@ -140,7 +140,7 @@ QVector< QPair< QString,QString > >  listImageNames(QString path, QString JPEGDi
       // QStringList idname = namestring.split(",");
       QString name = filename;
       QString jpgname = JPEGDirectory+"/"+name+".jpg";
-      QString unaryname = UnaryDirectory+"/"+name+".unary";
+      QString unaryname = UnaryDirectory+"/"+name+".c_unary";
       if( !QFile::exists( jpgname ) )qWarning( "File not found %s" , qPrintable( jpgname ) );
       if( !QFile::exists( unaryname ) ) qWarning( "File not found %s", qPrintable( unaryname ) );
       

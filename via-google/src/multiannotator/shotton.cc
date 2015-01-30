@@ -59,7 +59,8 @@ Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const strin
     cv::Mat img_mat = cv::imread(img_dir, CV_LOAD_IMAGE_COLOR);
     //read unary
     ProbImage unary_matrix;
-    unary_matrix.load( unary_dir.c_str() );
+    //philip's case
+    unary_matrix.decompress( unary_dir.c_str() );
 
     const size_t n_var = img_mat.rows * img_mat.cols;
 
@@ -150,8 +151,7 @@ void set_1st_orderWithLoss(cv::Mat img_mat, ProbImage unary_matrix, double unary
                     if(i!=ytrue(y,x))
                         hamming_loss = 1.0;
                 }
-                //debug
-                energy(i) =  (float)(std::max(0.0,unaryWeight) * energy_probability(unary_matrix(x*5, y*5,i)))-hamming_loss;
+                energy(i) =  (float)(std::max(0.0,unaryWeight) * energy_probability(unary_matrix(x, y,i)))-hamming_loss;
 
                 //energy(i) =  max(0.0, unary_weights[util::flat_idx(x, y, img_mat.cols)]) * energy_probability(unary_matrix(5 * x, 5 * y, i)) - (i != ytrue(y, x) ? 1.0 : 0.0);
             }
@@ -320,8 +320,7 @@ void set_1st_order(cv::Mat img_mat, ProbImage unary_matrix, double unaryWeight, 
 
             for (size_t i = 0; i < n_label; i++)
             {
-                //debug
-                energy(i) = (float)(max(0.0, unaryWeight) * energy_probability(unary_matrix(x*5, y*5, i)));
+                energy(i) = (float)(max(0.0, unaryWeight) * energy_probability(unary_matrix(x, y, i)));
             }
             GraphicalModel::FunctionIdentifier fid = gm.addFunction(energy);
             // add a factor
