@@ -76,14 +76,14 @@ static const int IMAGE_MAX_LENGTH = 500;
 // Shall we return the raw boosting results H or P = 1/Z * exp(-H)
 //#define RAW_BOOSTING_OUTPUT
 // Dataset parameters
-static const char MSRC_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/datasets";
-static const char MSRC_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Train.txt";
-static const char MSRC_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Validation.txt";
-static const char MSRC_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Test.txt";
-// Dataset parameters
-// static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/google/datasets";
-static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
-static const char VOC2010_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Validation.txt";
-static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Test.txt";
-// VOC Cache
-static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";
+// static const char MSRC_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/datasets";
+// static const char MSRC_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Train.txt";
+// static const char MSRC_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Validation.txt";
+// static const char MSRC_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/split/Test.txt";
+// // Dataset parameters
+// // static const char VOC2010_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/google/datasets";
+// static const char VOC2010_TRAIN_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Train.txt";
+// static const char VOC2010_VALID_FILE [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Validation.txt";
+// static const char VOC2010_TEST_FILE  [] = "/home/rizkivmaster/ws/TextonBoost/google/split/Test.txt";
+// // VOC Cache
+// static const char VOC2010_BBOX_DIRECTORY [] = "data/VOC2010_BBox/";

@@ -84,51 +84,77 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     string id;
     int exampleIndex = 0;
     ifstream reader(file);
+    printf("OK 1\n");
     if (reader.is_open())
     {
-        while (getline(reader, id))
+      // getline(reader, id);
+      printf("OK 2s\n");
+        for(int ii = 0; ii < n_sample;ii++)
         {
+
             printf("Reading: ");
+            getline(reader, id);
             //debug
+            printf("OK 30\n");
             string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".c_unary";
             string png_path = ssvm_ss::dataset::png_directory + "/" + id + ".png";
             string image_path = ssvm_ss::dataset::jpg_directory + "/" + id + ".jpg";
             string dumping_path = ssvm_ss::dataset::dumping_directory + "/" + id + ".png";
-
+            // printf("%s\n %s\n %s\n %s\n",unary_path.c_str(), png_path.c_str(), image_path.c_str(), dumping_path.c_str());
+            printf("OK 31\n");
 
             QImage png_matrix;
             printf("%s ", png_path.c_str());
+            printf("OK 31a\n");
             QFile f( png_path.c_str() );
-            if (!f.open(QFile::ReadOnly))
-            {
-                qFatal( "Failed to open file '%s'!",  png_path.c_str());
-                exit(1);
-            }
+            printf("OK 31b\n");
+            // if (!f.open(QFile::ReadOnly))
+            // {
+            //   printf("OK 31c\n");
+            //     qFatal( "Failed to open file '%s'!",  png_path.c_str());
+            //     exit(1);
+            // }
+            printf("OK 32\n");
             png_matrix.load(png_path.c_str(), "png");
 
+            printf("OK 33\n");
+
             Eigen::MatrixXi annotation_matrix(png_matrix.height(), png_matrix.width());
+            examples[exampleIndex].y.annotation_matrix = annotation_matrix;
 
             for (size_t xx = 0; xx < png_matrix.width(); xx++)
                 for (size_t yy = 0; yy < png_matrix.height(); yy++)
-                    annotation_matrix(yy, xx) = png_matrix.pixelIndex(xx, yy);
+                    examples[exampleIndex].y.annotation_matrix(yy, xx) = png_matrix.pixelIndex(xx, yy);
 
-
+                  printf("OK 4\n");
 
 
             examples[exampleIndex].x.height = png_matrix.height();
             examples[exampleIndex].x.width = png_matrix.width();
             examples[exampleIndex].y.height = png_matrix.height();
             examples[exampleIndex].y.width = png_matrix.width();
+            printf("OK 5\n");
 
             strcpy(examples[exampleIndex].x.image_path, image_path.c_str());
             strcpy(examples[exampleIndex].x.unary_path, unary_path.c_str());
             strcpy(examples[exampleIndex].x.dumping_path, dumping_path.c_str());
             strcpy(examples[exampleIndex].y.dumping_path, dumping_path.c_str());
+
+            printf("OK 6\n");
             
-            examples[exampleIndex].y.annotation_matrix = annotation_matrix;
+            // examples[exampleIndex].y.annotation_matrix = annotation_matrix;
+
+            printf("OK 6a\n");
             examples[exampleIndex].y.n_label = ssvm_ss::image_constraint::n_label;
-            examples[exampleIndex].x.bypass = annotation_matrix;
+
+            printf("OK 6b\n");
+            // examples[exampleIndex].x.bypass = annotation_matrix;
+
+            printf("OK 6c\n");
             exampleIndex++;
+
+            printf("OK 7\n");
+
 
             printf("done. %d read.\n", exampleIndex);
         }

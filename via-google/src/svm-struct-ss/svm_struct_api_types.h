@@ -79,7 +79,7 @@ typedef struct label
     /* this defines the y-part (the label) of a training example,
        e.g. the parse tree of the corresponding sentence. */
     // A row-wise flatten version of 2D label
-    Eigen::MatrixXi annotation_matrix;
+    Eigen::MatrixXi &annotation_matrix;
     char dumping_path[100];
     int height;
     int width;
