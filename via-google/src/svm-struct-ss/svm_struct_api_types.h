@@ -25,6 +25,8 @@
 #include "svm_light/svm_learn.h"
 #include "ssvm_ss_image_constraint.h"
 #include "ssvm_ss_dataset_constraint.h"
+
+
 #define __(x,y) printf("%s %d\n",x,y)
 #define _(x) printf("%s\n",x)
 
@@ -68,10 +70,11 @@ typedef struct pattern
     int width;
     char unary_path[100];
     char image_path[100];
+    char png_path[100];
     char dumping_path[100];
     //ProbImage unary_matrix;
     //cv::Mat *image_matrix;
-    Eigen::MatrixXi bypass;
+    // Eigen::MatrixXi bypass;
 } PATTERN;
 
 typedef struct label
@@ -79,8 +82,8 @@ typedef struct label
     /* this defines the y-part (the label) of a training example,
        e.g. the parse tree of the corresponding sentence. */
     // A row-wise flatten version of 2D label
-    Eigen::MatrixXi &annotation_matrix;
-    char dumping_path[100];
+    char png_path[100];
+    // char dumping_path[100];
     int height;
     int width;
     int n_label;

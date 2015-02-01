@@ -22,9 +22,39 @@
 #include "svm_struct_common.h"
 #include "../svm_struct_api.h"
 #include <assert.h>
+//tbb headers
+#include <tbb/tbb.h>
 
 #define MAX(x,y)      ((x) < (y) ? (y) : (x))
 #define MIN(x,y)      ((x) > (y) ? (y) : (x))
+
+
+using namespace tbb;
+void classify(PATTERN& x,LABEL& ytrue, STRUCTMODEL* model)
+{
+    printf("Infering: %s\n",x.image_path);
+    LABEL y = inferAugmentedLoss(x,model,ytrue);
+    printf("%s is inferred.\n",x.image_path);
+}
+
+class TBBInference{
+    EXAMPLE * const examples;
+    STRUCTMODEL* model;
+    public:
+        TBBInference(EXAMPLE * const examples, STRUCTMODEL* model):examples(examples),model(model){}
+        void operator()(tbb::blocked_range<int> rng) const{
+            for(int ii = rng.begin(); ii<rng.end();ii++)
+            {
+                classify(examples[ii].x,examples[ii].y,model);
+            }
+        }
+
+};
+
+void classify_all(EXAMPLE * const examples, STRUCTMODEL* model,long n)
+{
+    parallel_for(blocked_range<int>(0,n), TBBInference(examples,model));
+}
 
 
 void svm_learn_struct(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
@@ -808,7 +838,11 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
             progress = 0;
             rt_total += MAX(get_runtime() - rt1, 0);
 
-            
+            //here infer first parallelly
+            printf("Augmented Loss Inference Stage\n");
+            classify_all(ex,sm,n);
+            printf("Optimize Weight Stage\n");
+
             for (i = 0; i < n; i++)
             {
                 rt1 = get_runtime();

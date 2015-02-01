@@ -23,13 +23,12 @@
 #include "svm_struct_api.h"
 #include <fstream>
 #include <iostream>
-
-
-
 #include "ssvm_ss_dataset_constraint.h"
+
 using namespace std;
 using namespace lab1231_sun_prj::util;
 using namespace lab1231_sun_prj::shotton;
+using namespace Eigen;
 
 
 const int FEATURE_SIZE = 2;
@@ -37,8 +36,11 @@ const int FEATURE_SIZE = 2;
 
 
 long countFileLine(char* filename);
-void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm);
-LABEL inferAugmentedLoss(PATTERN x, STRUCTMODEL *sm, LABEL &ytrue);
+LABEL infer(PATTERN& x, STRUCTMODEL *sm);
+LABEL readAugmentedLossPrediction(PATTERN& x, STRUCTMODEL *sm);
+void checkIfExists(const char *filepath);
+void write_label(LABEL& y,MatrixXi& annotation_matrix);
+MatrixXi read_annotation(char* filename);
 
 
 void        svm_struct_learn_api_init(int argc, char *argv[])
@@ -84,102 +86,72 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
     string id;
     int exampleIndex = 0;
     ifstream reader(file);
-    printf("OK 1\n");
-    if (reader.is_open())
-    {
-      // getline(reader, id);
-      printf("OK 2s\n");
-        for(int ii = 0; ii < n_sample;ii++)
-        {
 
+        while (getline(reader, id))
+        {
             printf("Reading: ");
-            getline(reader, id);
             //debug
-            printf("OK 30\n");
             string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".c_unary";
             string png_path = ssvm_ss::dataset::png_directory + "/" + id + ".png";
             string image_path = ssvm_ss::dataset::jpg_directory + "/" + id + ".jpg";
             string dumping_path = ssvm_ss::dataset::dumping_directory + "/" + id + ".png";
-            // printf("%s\n %s\n %s\n %s\n",unary_path.c_str(), png_path.c_str(), image_path.c_str(), dumping_path.c_str());
-            printf("OK 31\n");
 
-            QImage png_matrix;
-            printf("%s ", png_path.c_str());
-            printf("OK 31a\n");
-            QFile f( png_path.c_str() );
-            printf("OK 31b\n");
+
+            // QImage png_matrix;
+
+            // printf("%s ", png_path.c_str());
+
+            //make sure that the datasets are good
+            // QFile f( png_path.c_str() );
             // if (!f.open(QFile::ReadOnly))
             // {
-            //   printf("OK 31c\n");
             //     qFatal( "Failed to open file '%s'!",  png_path.c_str());
             //     exit(1);
             // }
-            printf("OK 32\n");
+
+            checkIfExists(png_path.c_str());
+            checkIfExists(image_path.c_str());
+            checkIfExists(unary_path.c_str());
+            // png_matrix.load(png_path.c_str(), "png");
+
+            
+
+            QImage png_matrix;
             png_matrix.load(png_path.c_str(), "png");
-
-            printf("OK 33\n");
-
-            Eigen::MatrixXi annotation_matrix(png_matrix.height(), png_matrix.width());
-            examples[exampleIndex].y.annotation_matrix = annotation_matrix;
-
-            for (size_t xx = 0; xx < png_matrix.width(); xx++)
-                for (size_t yy = 0; yy < png_matrix.height(); yy++)
-                    examples[exampleIndex].y.annotation_matrix(yy, xx) = png_matrix.pixelIndex(xx, yy);
-
-                  printf("OK 4\n");
-
-
-            examples[exampleIndex].x.height = png_matrix.height();
-            examples[exampleIndex].x.width = png_matrix.width();
-            examples[exampleIndex].y.height = png_matrix.height();
-            examples[exampleIndex].y.width = png_matrix.width();
-            printf("OK 5\n");
 
             strcpy(examples[exampleIndex].x.image_path, image_path.c_str());
             strcpy(examples[exampleIndex].x.unary_path, unary_path.c_str());
+            strcpy(examples[exampleIndex].x.png_path, png_path.c_str());
             strcpy(examples[exampleIndex].x.dumping_path, dumping_path.c_str());
-            strcpy(examples[exampleIndex].y.dumping_path, dumping_path.c_str());
+            examples[exampleIndex].x.height = png_matrix.height();
+            examples[exampleIndex].x.width = png_matrix.width();
 
-            printf("OK 6\n");
-            
-            // examples[exampleIndex].y.annotation_matrix = annotation_matrix;
-
-            printf("OK 6a\n");
+            strcpy(examples[exampleIndex].y.png_path,png_path.c_str());
+            examples[exampleIndex].y.height = png_matrix.height();
+            examples[exampleIndex].y.width = png_matrix.width();
             examples[exampleIndex].y.n_label = ssvm_ss::image_constraint::n_label;
-
-            printf("OK 6b\n");
+            // examples[exampleIndex].y.annotation_matrix = annotation_matrix;
             // examples[exampleIndex].x.bypass = annotation_matrix;
-
-            printf("OK 6c\n");
             exampleIndex++;
-
-            printf("OK 7\n");
-
 
             printf("done. %d read.\n", exampleIndex);
         }
-    }
-    else
-    {
-        throw invalid_argument("file not found");
-    }
-    printf("Reading done\n");
+
     sample.n = n_sample;
     sample.examples = examples;
+
+
     if (struct_verbosity >= 0)
-        printf(" (%d examples) ", sample.n);
+    {
+      printf("Reading done\n");
+      printf(" (%d examples) ", sample.n);
+    }
+        
     return (sample);
+    exit(0);
 }
 
-void checkIfExists(char *filepath)
-{
-    QFile f( filepath );
-    if (!f.open(QFile::ReadOnly))
-    {
-        qFatal( "Failed to open file '%s'!", filepath);
-        exit(1);
-    }
-}
+
 
 
 
@@ -257,8 +229,7 @@ LABEL       classify_struct_example(PATTERN x, STRUCTMODEL *sm,
        recognized by the function empty_label(y). */
 
     /* insert your code for computing the predicted label y here */
-    LABEL y;
-    infer(x, y, sm);
+    LABEL y = infer(x, sm);
     return (y);
 }
 
@@ -323,7 +294,7 @@ LABEL       find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y,
        Psi(x,ybar)>Psi(x,y)-1. If the function cannot find a label, it
        shall return an empty label as recognized by the function
        empty_label(y). */
-    LABEL ybar = inferAugmentedLoss(x, sm, y);
+    LABEL ybar = readAugmentedLossPrediction(x, sm);
 
     /* insert your code for computing the label ybar here */
 
@@ -381,29 +352,30 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
     }
     //set the last one with 0
     fvec->words[sm->sizePsi].wnum = 0;
-    //check unary matrix
+
+    //read unary matrix
     ProbImage unary_matrix;
-    checkIfExists(x.unary_path);
     unary_matrix.decompress(x.unary_path);
 
-    //check image matrix
+    //read image matrix
     cv::Mat image_matrix;
-    checkIfExists(x.image_path);
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
 
+    //read png file
+    MatrixXi y_annotation_matrix = read_annotation(y.png_path);
 
     float unaryPotentialSum = 0.0;
 
     for(size_t xx = 0; xx < x.width; xx++)
       for(size_t yy = 0; yy < x.height; yy++)
-        if(y.annotation_matrix(yy,xx)!=255)
+        if(y_annotation_matrix(yy,xx)!=255)
           {
-            unaryPotentialSum += energy_probability(unary_matrix(xx,yy,y.annotation_matrix(yy,xx)));
+            unaryPotentialSum += energy_probability(unary_matrix(xx,yy,y_annotation_matrix(yy,xx)));
           }
 
     float pairWisePotentialSum = 0.0;
 
-    pairWisePotentialSum = getPairWisePotentialSum(image_matrix, y.annotation_matrix);
+    pairWisePotentialSum = getPairWisePotentialSum(image_matrix, y_annotation_matrix);
 
     fvec->words[0].weight = -unaryPotentialSum;
     fvec->words[1].weight = -pairWisePotentialSum;
@@ -418,6 +390,8 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
        y==ybar has to be zero. sparm->loss_function is set with the -l option. */
 
     // printf("Finding loss"); fflush(stdout);
+    MatrixXi y_annotation_matrix =  read_annotation(y.png_path);
+    MatrixXi ybar_annotation_matrix =  read_annotation(ybar.png_path);
     if (sparm->loss_function == 0)  /* type 0 loss: 0/1 loss */
     {
         /* return 0, if y==ybar. return 1 else */
@@ -430,8 +404,8 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
         for (int xx = 0; xx < y.width; xx++)
             for (int yy = 0; yy < y.height; yy++)
             {
-                if (y.annotation_matrix(yy, xx) != 255)
-                    sum += (y.annotation_matrix(yy, xx) != ybar.annotation_matrix(yy, xx)) ? 1.0 : 0.0;
+                if (y_annotation_matrix(yy, xx) != 255)
+                    sum += (y_annotation_matrix(yy, xx) != ybar_annotation_matrix(yy, xx)) ? 1.0 : 0.0;
             }
         printf("Loss : %f\n", sum);
         return sum;
@@ -459,8 +433,8 @@ double loss(LABEL y, LABEL ybar, STRUCT_LEARN_PARM *sparm)
         for (int xx = 0; xx < y.width; xx++)
             for (int yy = 0; yy < y.height; yy++)
             {
-                if (y.annotation_matrix(yy, xx) != 255)
-                    sum += (y.annotation_matrix(yy, xx) != ybar.annotation_matrix(yy, xx)) ? 1.0 : 0.0;
+                if (y_annotation_matrix(yy, xx) != 255)
+                    sum += (y_annotation_matrix(yy, xx) != ybar_annotation_matrix(yy, xx)) ? 1.0 : 0.0;
             }
         printf("Loss : %f\n", sum);
         return sum;
@@ -674,7 +648,7 @@ void        write_label(FILE *fp, LABEL y)
     /* Writes label y to file handle fp. */
     // y.png_matrix.save(y.dumping_path, "png", 0);
     // printf("Saving to %s\n", y.dumping_path);
-    lab1231_sun_prj::shotton::save_image(y.dumping_path, y.annotation_matrix);
+    // lab1231_sun_prj::shotton::save_image(y.png_path, y.annotation_matrix);
 }
 
 void        free_pattern(PATTERN x)
@@ -764,24 +738,24 @@ void         parse_struct_parameters_classify(STRUCT_LEARN_PARM *sparm)
 
 long countFileLine(char* filename)
 {
+    checkIfExists(filename);
     ifstream file(filename);
     long counter = 0;
     string filetext;
-    if (file.is_open())
-      while (getline(file, filetext))
+    while (getline(file, filetext))
         ++counter;
     return counter;
 }
 
-void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
+LABEL infer(PATTERN& x, STRUCTMODEL *sm)
 {
     printf("Infering %s ", x.image_path);
-
+    LABEL y;
     //make a new prediction based on the data x
-    Eigen::MatrixXi annotation_matrix(x.height, x.width);
+    // Eigen::MatrixXi annotation_matrix(x.height, x.width);
     y.height = x.height;
     y.width = x.width;
-    strcpy(y.dumping_path, x.dumping_path);
+    strcpy(y.png_path, x.dumping_path);
     y.n_label = ssvm_ss::image_constraint::n_label;
 
     //prepare the weights
@@ -793,29 +767,48 @@ void infer(PATTERN x, LABEL &y, STRUCTMODEL *sm)
 
     //prepare the unary potential
     ProbImage unary_matrix;
-    checkIfExists(x.unary_path);
     unary_matrix.decompress(x.unary_path);
-    size_t n_label = y.n_label;
 
     //prepare the image
     cv::Mat image_matrix;
-    checkIfExists(x.image_path);
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
+    
     //do inference
-    printf("weights: %f %f\n",unaryWeight,pairWiseWeight);
-    y.annotation_matrix = lab1231_sun_prj::shotton::annotate(n_label, image_matrix, unary_matrix, unaryWeight, pairWiseWeight);
-
+    // printf("weights: %f %f ",unaryWeight,pairWiseWeight);
+    MatrixXi y_annotation_matrix = lab1231_sun_prj::shotton::annotate(y.n_label, image_matrix, unary_matrix, unaryWeight, pairWiseWeight);
+    write_label(y, y_annotation_matrix);
     printf("done\n");
+    return y;
 }
 
-LABEL inferAugmentedLoss(PATTERN x, STRUCTMODEL *sm, LABEL &ytrue)
+LABEL readAugmentedLossPrediction(PATTERN& x, STRUCTMODEL *sm)
 {
     LABEL y;
     // printf("Infering with loss%s ", x.image_path);
-    Eigen::MatrixXi annotation_matrix(x.height, x.width);
+    // Eigen::MatrixXi annotation_matrix(x.height, x.width);
     y.height = x.height;
     y.width = x.width;
-    strcpy(y.dumping_path, x.dumping_path);
+    strcpy(y.png_path,x.dumping_path);
+    y.n_label = ssvm_ss::image_constraint::n_label;
+
+    checkIfExists(y.png_path);
+    // MatrixXi y_annotation_matrix = read_annotation(y.png_path);
+
+    // write_label(y,y_annotation_matrix);
+    // lab1231_sun_prj::shotton::save_image(y.dumping_path, y.annotation_matrix);
+    // printf("done inferring\n"); //fflush(stdout);
+
+    return y;
+}
+
+LABEL inferAugmentedLoss(PATTERN& x, STRUCTMODEL *sm, LABEL &ytrue)
+{
+    LABEL y;
+    // printf("Infering with loss%s ", x.image_path);
+    // Eigen::MatrixXi annotation_matrix(x.height, x.width);
+    y.height = x.height;
+    y.width = x.width;
+    strcpy(y.png_path,x.dumping_path);
     y.n_label = ssvm_ss::image_constraint::n_label;
 
 
@@ -825,28 +818,52 @@ LABEL inferAugmentedLoss(PATTERN x, STRUCTMODEL *sm, LABEL &ytrue)
     double pairWiseWeight = 0.0;
     unaryWeight = sm->w[1];
     pairWiseWeight = sm->w[2];
-        printf("weights: %f %f %f\n",unaryWeight,pairWiseWeight,sm->w[0]);
+    printf("weights: %f %f %f\n",unaryWeight,pairWiseWeight,sm->w[0]);
 
 
-    //prepare the unary potential
+    //read unary potential
     ProbImage unary_matrix;
-    checkIfExists(x.unary_path);
-    //debug
     unary_matrix.decompress(x.unary_path);
-    size_t n_label = y.n_label;
 
-    //prepare the image
+    //read the image
     cv::Mat image_matrix;
-    checkIfExists(x.image_path);
     image_matrix = cv::imread(x.image_path, CV_LOAD_IMAGE_COLOR);
 
-    y.annotation_matrix = lab1231_sun_prj::shotton::annotateWithAugmentedLoss(n_label, image_matrix, unary_matrix, unaryWeight, pairWiseWeight, ytrue.annotation_matrix);
+    //read the png_matrix of ytrue
+    MatrixXi ytrue_annotation_matrix = read_annotation(ytrue.png_path);
 
-    lab1231_sun_prj::shotton::save_image(y.dumping_path, y.annotation_matrix);
+    MatrixXi y_annotation_matrix = lab1231_sun_prj::shotton::annotateWithAugmentedLoss(y.n_label, image_matrix, unary_matrix, unaryWeight, pairWiseWeight, ytrue_annotation_matrix);
+
+    write_label(y,y_annotation_matrix);
+    // lab1231_sun_prj::shotton::save_image(y.dumping_path, y.annotation_matrix);
     // printf("done inferring\n"); //fflush(stdout);
 
     return y;
+}
 
-    // y.png_matrix = x.bypass;
-    // x.bypass.save("temp_output","png",0);
+void checkIfExists(const char *filepath)
+{
+    QFile f( filepath );
+    if (!f.open(QFile::ReadOnly))
+    {
+        qFatal( "Failed to open file '%s'!", filepath);
+        exit(1);
+    }
+}
+
+void write_label(LABEL& y,MatrixXi& annotation_matrix)
+{
+  lab1231_sun_prj::shotton::save_image(y.png_path, annotation_matrix);
+} 
+
+MatrixXi read_annotation(char* filename)
+{
+  QImage png_matrix;
+  png_matrix.load(filename, "png");
+  Eigen::MatrixXi annotation_matrix(png_matrix.height(), png_matrix.width());
+  for (size_t xx = 0; xx < png_matrix.width(); xx++)
+    for (size_t yy = 0; yy < png_matrix.height(); yy++)
+                    annotation_matrix(yy, xx) = png_matrix.pixelIndex(xx, yy);
+
+  return annotation_matrix;
 }

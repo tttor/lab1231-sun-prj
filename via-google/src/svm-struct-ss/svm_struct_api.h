@@ -18,6 +18,7 @@
 /***********************************************************************/
 
 
+
 #include "svm_struct_api_types.h"
 #include "util/util.h"
 #include "svm_struct/svm_struct_common.h"
@@ -76,5 +77,6 @@ void        svm_learn_struct_joint_custom(SAMPLE sample,
 				   STRUCT_LEARN_PARM *sparm,
 				   LEARN_PARM *lparm, KERNEL_PARM *kparm, 
 				   STRUCTMODEL *sm);
+LABEL inferAugmentedLoss(PATTERN& x, STRUCTMODEL *sm, LABEL &ytrue);
 
 #endif

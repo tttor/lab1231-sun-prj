@@ -27,9 +27,12 @@ extern "C" {
 #include "../svm_struct_api.h"
 #include "svm_struct_common.h"
 
+//tbb headers
+#include <tbb/tbb.h>
 // #include <tbb/task_scheduler-init.h>
 // #include <tbb/parallel_for.h>
 // #include <tbb/blocked_range.h>
+
 
 char testfile[200];
 char modelfile[200];
@@ -39,56 +42,56 @@ void read_input_parameters(int, char **, char *, char *, char *,
   STRUCT_LEARN_PARM *, long*, long *);
 void print_help(void);
 
-// void classify_all(SAMPLE& testsample,STRUCTMODEL& model,STRUCT_LEARN_PARM& sparm)
-// {
+//parallelization
 
-// }
+using namespace tbb;
+void classify(PATTERN& x,LABEL& ytrue,STRUCTMODEL& model,STRUCT_LEARN_PARM& sparm,double& avgloss)
+{
+  printf("Inferring : %s\n",x.image_path);
+  long correct= 0,incorrect=0,no_accuracy=0;
+  double t1,runtime=0;
+  LABEL y;
+  double l;
 
-// //y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
-// class TBBInference{
-//   const SAMPLE& testsample;
-//   const STRUCTMODEL& model;
-//   const STRUCT_LEARN_PARM& sparm;
-//   const STRUCT_TEST_STATS& teststats;
-//   const FILE *predfl;
-//   double avgloss=0,l;
-//   long struct_verbosity;
-//   long no_accuracy;
+  t1=get_runtime();
+  y=classify_struct_example(x,&model,&sparm);
+  runtime+=(get_runtime()-t1);
+  write_label(NULL,y);
+  l=loss(ytrue,y,&sparm);
+  avgloss+=l;
+  if(l==0)
+    correct++;
+  else
+    incorrect++;
 
+  if(empty_label(ytrue))
+  {
+    no_accuracy=1;
+  }
+  free_label(y);
+  printf("%s is inferred.\n",x.image_path);
+}
 
-// public:
-//   TBBInference(const PATTERN &x, const STRUCTMODEL* model, const STRUCT_LEARN_PARM* sparm):x(x),model(&model),sparm(&sparm){}
-//   void operator()(tbb::blocked_range<int> rng) const{
-//     for(int ii = rng.begin();ii<rng.end();ii++)
-//     {
-//       LABEL y;
-//       double t1,runtime = 0;
+//y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
+class TBBInference{
+  SAMPLE& testsample;
+  STRUCTMODEL& model;
+  STRUCT_LEARN_PARM& sparm;
+  double& avgloss;
 
+public:
+  TBBInference(SAMPLE& testsample,STRUCTMODEL& model,STRUCT_LEARN_PARM& sparm,double& avgloss):testsample(testsample),model(model),sparm(sparm),avgloss(avgloss){}
+  void operator()(blocked_range<int> rng) const{
+    for(int ii = rng.begin();ii<rng.end();ii++)
+    {
+      classify(testsample.examples[ii].x,testsample.examples[ii].y,model,sparm,avgloss);
+    }
+  };
+};
 
-//       t1=get_runtime();
-//       y=classify_struct_example(testsample.examples[ii],model,sparm);
-//       runtime+=(get_runtime()-t1);
-
-//       write_label(predfl,y);
-//       l=loss(testsample.examples[ii].y,y,sparm);
-//       avgloss+=l;
-//       if(l == 0) 
-//         correct++;
-//       else
-//         incorrect++;
-//       eval_prediction(ii,testsample.examples[ii],y,&model,sparm,teststats);
-
-//       if(empty_label(testsample.examples[ii].y)) 
-//               { no_accuracy=1; } /* test data is not labeled */
-//         if(struct_verbosity>=2) {
-//           if((ii+1) % 100 == 0) {
-//             printf("%ld..",ii+1); fflush(stdout);
-//           }
-//         }
-//         free_label(y);
-//       }
-//     }
-//   };
+void classify_all(SAMPLE& testsample,STRUCTMODEL& model,STRUCT_LEARN_PARM& sparm,double& avgloss){
+  parallel_for(blocked_range<int>(0,testsample.n), TBBInference(testsample,model,sparm,avgloss));
+}
 
   int main (int argc, char* argv[])
   {
@@ -137,29 +140,31 @@ void print_help(void);
   if ((predfl = fopen (predictionsfile, "w")) == NULL)
     { perror (predictionsfile); exit (1); }
 
-  for(i=0;i<testsample.n;i++) {
-    t1=get_runtime();
-    y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
-    runtime+=(get_runtime()-t1);
+  // for(i=0;i<testsample.n;i++) {
+  //   t1=get_runtime();
+  //   y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
+  //   runtime+=(get_runtime()-t1);
 
-    write_label(predfl,y);
-    l=loss(testsample.examples[i].y,y,&sparm);
-    avgloss+=l;
-    if(l == 0) 
-      correct++;
-    else
-      incorrect++;
-    eval_prediction(i,testsample.examples[i],y,&model,&sparm,&teststats);
+  //   write_label(predfl,y);
+  //   l=loss(testsample.examples[i].y,y,&sparm);
+  //   avgloss+=l;
+  //   if(l == 0) 
+  //     correct++;
+  //   else
+  //     incorrect++;
+  //   eval_prediction(i,testsample.examples[i],y,&model,&sparm,&teststats);
 
-    if(empty_label(testsample.examples[i].y)) 
-      { no_accuracy=1; } /* test data is not labeled */
-      if(struct_verbosity>=2) {
-        if((i+1) % 100 == 0) {
-         printf("%ld..",i+1); fflush(stdout);
-       }
-     }
-     free_label(y);
-   }  
+  //   if(empty_label(testsample.examples[i].y)) 
+  //     { no_accuracy=1; } /* test data is not labeled */
+  //     if(struct_verbosity>=2) {
+  //       if((i+1) % 100 == 0) {
+  //        printf("%ld..",i+1); fflush(stdout);
+  //      }
+  //    }
+  //    free_label(y);
+  //  }  
+    classify_all(testsample,model,sparm,avgloss);
+  
    avgloss/=testsample.n;
    fclose(predfl);
 
