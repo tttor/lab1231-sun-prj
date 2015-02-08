@@ -159,6 +159,11 @@ int main(int argc, char* argv[]) {
 
   // Set the dataset param
   // const string datasets_name = argv[1];
+
+  if(argc < 6){
+    printf("format: n_label list_path img_dir unary_dir png_dir");
+    exit(1);
+  }
   const size_t n_label = atoi(argv[1]);
   QString list_path = argv[2];
   QString img_dir = argv[3];

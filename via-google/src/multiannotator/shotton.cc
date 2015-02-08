@@ -60,7 +60,7 @@ Eigen::MatrixXi annotate(const size_t n_label, const string img_dir, const strin
     //read unary
     ProbImage unary_matrix;
     //philip's case
-    unary_matrix.decompress( unary_dir.c_str() );
+    unary_matrix.load( unary_dir.c_str() );
 
     const size_t n_var = img_mat.rows * img_mat.cols;
 

@@ -8,6 +8,12 @@ add_executable (
   pmain.cc
 )
 
+add_executable (
+  smain
+  smain.cc
+)
+
+
 add_executable ( 
   dumper
   dumper.cpp
@@ -34,6 +40,22 @@ target_link_libraries (
   ${TBB_LIBRARIES}
 )
 
+target_link_libraries (
+  smain
+  shotton2
+  probimage
+  color_map
+  util
+  ${OpenCV_LIBS}
+  ${saliency_libs}
+  ${OpenGMDir}/build/src/external/libexternal-library-maxflow.a
+  ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
+  ${QT_QTGUI_LIBRARY}
+  ${QT_QTCORE_LIBRARY}
+  ${TBB_LIBRARIES}
+)
+
+
 
 target_link_libraries ( 
   fgmain
@@ -47,7 +69,6 @@ target_link_libraries (
   ${OpenGMDir}/build/src/external/libexternal-library-qpbo.a
   ${QT_QTGUI_LIBRARY} 
   ${QT_QTCORE_LIBRARY}
-  ${TBB_LIBRARIES}
 )
 
 target_link_libraries ( 

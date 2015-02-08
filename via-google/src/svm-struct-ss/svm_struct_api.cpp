@@ -24,6 +24,7 @@
 #include <fstream>
 #include <iostream>
 #include "ssvm_ss_dataset_constraint.h"
+//#include <mpi.h>
 
 using namespace std;
 using namespace lab1231_sun_prj::util;
@@ -90,8 +91,7 @@ SAMPLE      read_struct_examples(char *file, STRUCT_LEARN_PARM *sparm)
         while (getline(reader, id))
         {
             printf("Reading: ");
-            //debug
-            string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".c_unary";
+            string unary_path = ssvm_ss::dataset::unary_directory + "/" + id + ".unary";
             string png_path = ssvm_ss::dataset::png_directory + "/" + id + ".png";
             string image_path = ssvm_ss::dataset::jpg_directory + "/" + id + ".jpg";
             string dumping_path = ssvm_ss::dataset::dumping_directory + "/" + id + ".png";
@@ -355,7 +355,7 @@ SVECTOR     *psi(PATTERN x, LABEL y, STRUCTMODEL *sm,
 
     //read unary matrix
     ProbImage unary_matrix;
-    unary_matrix.decompress(x.unary_path);
+    unary_matrix.load(x.unary_path);
 
     //read image matrix
     cv::Mat image_matrix;
@@ -762,12 +762,15 @@ LABEL infer(PATTERN& x, STRUCTMODEL *sm)
     // MODEL *model = sm->w[];
     float unaryWeight =0.0;
     float pairWiseWeight = 0.0;
-    unaryWeight = sm->w[1];
-    pairWiseWeight = sm->w[2];
+    //debug
+//    unaryWeight = sm->w[1];
+    unaryWeight = 0.330290;
+//    pairWiseWeight = sm->w[2];
+    pairWiseWeight = 3.863559;
 
     //prepare the unary potential
     ProbImage unary_matrix;
-    unary_matrix.decompress(x.unary_path);
+    unary_matrix.load(x.unary_path);
 
     //prepare the image
     cv::Mat image_matrix;
@@ -823,7 +826,7 @@ LABEL inferAugmentedLoss(PATTERN& x, STRUCTMODEL *sm, LABEL &ytrue)
 
     //read unary potential
     ProbImage unary_matrix;
-    unary_matrix.decompress(x.unary_path);
+    unary_matrix.load(x.unary_path);
 
     //read the image
     cv::Mat image_matrix;

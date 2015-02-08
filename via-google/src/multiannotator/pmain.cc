@@ -51,7 +51,7 @@ void makeAnnotation(const int n_label, const QString img_path,const QString unar
         qDebug("Annotating image paralelly %d %s",i, qPrintable(names[i].first));
         // const int object_label = names[i].first.toInt();
         const QString image_path = image_directory + "/" + names[i].second + ".jpg";
-        const QString unary_path = unary_directory +"/" + names[i].second + ".c_unary";//phillip
+        const QString unary_path = unary_directory +"/" + names[i].second + ".unary";//phillip
         const QString png_path = png_directory + "/" + names[i].second + ".png";
         qDebug("Write to %s",qPrintable(png_path));
         makeAnnotation(n_label,image_path,unary_path,png_path);
@@ -140,7 +140,7 @@ QVector< QPair< QString,QString > >  listImageNames(QString path, QString JPEGDi
       // QStringList idname = namestring.split(",");
       QString name = filename;
       QString jpgname = JPEGDirectory+"/"+name+".jpg";
-      QString unaryname = UnaryDirectory+"/"+name+".c_unary";
+      QString unaryname = UnaryDirectory+"/"+name+".unary";
       if( !QFile::exists( jpgname ) )qWarning( "File not found %s" , qPrintable( jpgname ) );
       if( !QFile::exists( unaryname ) ) qWarning( "File not found %s", qPrintable( unaryname ) );
       
@@ -159,6 +159,7 @@ int main(int argc, char* argv[]) {
 
   // Set the dataset param
   // const string datasets_name = argv[1];
+  if(argc <6) printf("format input: n_label list_path img_dir unary_dir pn_dir\n");
   const size_t n_label = atoi(argv[1]);
   QString list_path = argv[2];
   QString img_dir = argv[3];

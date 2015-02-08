@@ -22,13 +22,17 @@
 #include "svm_struct_common.h"
 #include "../svm_struct_api.h"
 #include <assert.h>
+
 //tbb headers
 #include <tbb/tbb.h>
+
+//mpi header
+//#include <mpi.h>
 
 #define MAX(x,y)      ((x) < (y) ? (y) : (x))
 #define MIN(x,y)      ((x) > (y) ? (y) : (x))
 
-
+//static int numprocs;
 using namespace tbb;
 void classify(PATTERN& x,LABEL& ytrue, STRUCTMODEL* model)
 {
@@ -55,6 +59,15 @@ void classify_all(EXAMPLE * const examples, STRUCTMODEL* model,long n)
 {
     parallel_for(blocked_range<int>(0,n), TBBInference(examples,model));
 }
+
+//void classify_all_mpi(EXAMPLE * const examples, STRUCTMODEL* model,long n,int my_rank )
+//{
+//    int chunk_size = n/numprocs;
+//        for(int ii=my_rank*chunk_size; ii < (my_rank+1)*chunk_size && ii<n;ii++)
+//        {
+//            classify(examples[ii].x,examples[ii].y, model);
+ //       }
+//}
 
 
 void svm_learn_struct(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
@@ -838,9 +851,15 @@ void svm_learn_struct_joint(SAMPLE sample, STRUCT_LEARN_PARM *sparm,
             progress = 0;
             rt_total += MAX(get_runtime() - rt1, 0);
 
+            //int my_rank;
+            //MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+            //MPI_Comm_rank (MPI_COMM_WORLD, &my_rank); 
+ 
+	    // MPI_Status status;
             //here infer first parallelly
             printf("Augmented Loss Inference Stage\n");
             classify_all(ex,sm,n);
+            //classify_all_mpi(ex,sm,n,my_rank);
             printf("Optimize Weight Stage\n");
 
             for (i = 0; i < n; i++)
