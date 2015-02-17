@@ -31,8 +31,11 @@ class_name_map = {
     20 : 'tvmonitor',
     255: 'void'
 }
-
 id2name_map = class_name_map
+class_id2name_map = class_name_map
+
+ori_img_format = '.jpg'
+ignored_class_name_list = ['void','background']
 
 def translate(numeric_classes):
     string_classes = [id2name_map[i] for i in numeric_classes]

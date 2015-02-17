@@ -20,7 +20,100 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
-import msrc
+import pascal_voc_2012 as dataset
+
+def construct(argv):
+    '''
+    the relative location knowledge is represented in the prop_map.
+    '''
+    #
+    chosen_cprime = argv[1]
+    dirichlet_noise = argv[2]
+    img_list_filepath = argv[3]
+    gt_csv_dir = argv[4]
+    img_dir = argv[5]
+    prob_map_out_dir = argv[6]
+
+    #
+    relative_location_matrix_shape = (200,200) # following [Gould, 2008]
+    variance_factor = 0.10 # following [Gould, 2008]
+    dirichlet_noise_alpha = (5.0,5.0) # following [Gould, 2008]
+
+    #
+    c_labels = [{'id':key, 'name':val} for key,val in dataset.class_id2name_map.iteritems() if val not in dataset.ignored_class_name_list]
+    cprime_labels = c_labels
+    if chosen_cprime is not 'all':
+        cprime_labels = [{'id':key, 'name':val} for key,val in dataset.class_id2name_map.iteritems() if val==chosen_cprime]
+
+    prob_map = init_prob_map([i['name'] for i in cprime_labels], [i['name'] for i in c_labels], relative_location_matrix_shape)
+    print('Processing for c_prime= %s') % (prob_map.keys())
+
+    with open(img_list_filepath) as f:
+        img_ids = f.readlines()
+    img_ids = [x.strip('\n') for x in img_ids]
+
+    for i, img_id in enumerate(img_ids):
+        img_filepath = img_dir + '/' + img_id + dataset.ori_img_format
+        img = img_as_float(io.imread(img_filepath))
+        img_height = img.shape[0] 
+        img_width = img.shape[1]
+
+        segmentation = get_segment(img)
+        segment_list = get_segment_list(segmentation)
+
+        gt_ann_filepath = gt_csv_dir + '/' + img_id + '.csv'
+        gt_annotation = np.genfromtxt(gt_ann_filepath, delimiter=',')
+        # print('gt_ann_filepath= %s' % (gt_ann_filepath))
+        assert img_height==gt_annotation.shape[0] 
+        assert img_width==gt_annotation.shape[1]
+
+        for j, segment in enumerate(segment_list):
+            centroid = get_centroid(segment)
+            centroid_label = get_label(centroid, gt_annotation)
+            centroid_weight = get_weight(segment)
+
+            if centroid_label['name'] in dataset.ignored_class_name_list:
+                continue
+
+            if centroid_label['name'] not in prob_map.keys():
+                continue
+
+            for label in c_labels:
+                # Force to only consider one certain object-class as the pair
+                if label['name'] is not 'dog':
+                    continue                
+
+                pixels = get_pixel_of_label(label, gt_annotation)
+                print ('Processing img_id=%s (%i/%i): segment_id=%i (%i/%i): centroid_label=%s: pair_label=%s (n_pixel=%i)' \
+                % (img_id,i+1,len(img_ids),j,j+1,len(segment_list),centroid_label['name'], label['name'],len(pixels)))
+
+                for pixel in pixels:
+                    #
+                    offset = get_offset(centroid,pixel)
+                    if dirichlet_noise=='True':
+                        offset = add_dirichlet_noise(offset, dirichlet_noise_alpha, relative_location_matrix_shape)
+                    norm_offset = normalize_offset(offset, relative_location_matrix_shape, gt_annotation.shape)
+
+                    #
+                    count = prob_map[centroid_label['name']][label['name']][norm_offset[0]][norm_offset[1]]
+                    count = count + centroid_weight
+                    # print 'count=', count
+                    # print ('local_prob_map[%i][%i] has count= %i' % (norm_offset[0],norm_offset[1],count))
+
+                    prob_map[centroid_label['name']][label['name']][norm_offset[0]][norm_offset[1]] = count
+
+    #
+    print('normalize_prob_map()...')
+    norm_prob_map = normalize_prob_map(prob_map, relative_location_matrix_shape)
+    
+    #
+    print('apply_gaussian_filter() ...')
+    sigma = (np.sqrt(variance_factor*img_height),np.sqrt(variance_factor*img_width))
+    filtered_norm_prob_map = apply_gaussian_filter(sigma, norm_prob_map, relative_location_matrix_shape)
+
+    #
+    print('write_prob_map()...')
+    write_prob_map(filtered_norm_prob_map, prob_map_out_dir)
 
 def init_prob_map(cprime_labels, c_labels, size):
     prob_map = dict.fromkeys(cprime_labels)
@@ -33,7 +126,7 @@ def init_prob_map(cprime_labels, c_labels, size):
     return prob_map
 
 def get_segment(img):
-    segmentation = slic(img, n_segments=140, compactness=13, sigma=4, enforce_connectivity=True)
+    segmentation = slic(img, n_segments=75, compactness=13, sigma=4, enforce_connectivity=True)
     segmentation_img = mark_boundaries(img, segmentation)
     # io.imsave('slic.jpg', segmentation_img)
 
@@ -57,7 +150,7 @@ def get_centroid(segment):
 
 def get_label(centroid, annotation):
     label_id = annotation[centroid]
-    label_name = msrc.class_id2name_map[label_id]
+    label_name = dataset.class_id2name_map[label_id]
 
     return {'id': label_id, 'name': label_name}
 
@@ -190,93 +283,8 @@ def write_prob_map(prob_map, out_dir):
             plt.savefig(mat_img_filepath)
 
 def main(argv):
-    #
     assert len(argv)==7, 'INSUFFICIENT NUMBER OF ARGVs'
-    chosen_cprime = argv[1]
-    dirichlet_noise = argv[2]
-    img_list_filepath = argv[3]
-    gt_csv_dir = argv[4]
-    img_dir = argv[5]
-    prob_map_out_dir = argv[6]
-
-    #
-    relative_location_matrix_shape = (200,200) # following [Gould, 2008]
-    variance_factor = 0.10 # following [Gould, 2008]
-    dirichlet_noise_alpha = (5.0,5.0) # following [Gould, 2008]
-
-    #
-    c_labels = [{'id':key, 'name':val} for key,val in msrc.class_id2name_map.iteritems() if val is not 'void']
-    cprime_labels = c_labels
-    if chosen_cprime is not 'all':
-        cprime_labels = [{'id':key, 'name':val} for key,val in msrc.class_id2name_map.iteritems() if val==chosen_cprime]
-
-    prob_map = init_prob_map([i['name'] for i in cprime_labels], [i['name'] for i in c_labels], relative_location_matrix_shape)
-    print('Processing for c_prime= %s') % (prob_map.keys())
-
-    with open(img_list_filepath) as f:
-        img_ids = f.readlines()
-    img_ids = [x.strip('\n') for x in img_ids]
-
-    for i, img_id in enumerate(img_ids):
-        img_filepath = img_dir + '/' + img_id +'.bmp'
-        img = img_as_float(io.imread(img_filepath))
-        img_height = img.shape[0] 
-        img_width = img.shape[1]
-
-        segmentation = get_segment(img)
-        segment_list = get_segment_list(segmentation)
-
-        gt_ann_filepath = gt_csv_dir + '/' + img_id + '.csv'
-        gt_annotation = np.genfromtxt(gt_ann_filepath, delimiter=',')
-        # print('gt_ann_filepath= %s' % (gt_ann_filepath))
-        assert img_height==gt_annotation.shape[0] 
-        assert img_width==gt_annotation.shape[1]
-
-        for j, segment in enumerate(segment_list):
-            centroid = get_centroid(segment)
-            centroid_label = get_label(centroid, gt_annotation)
-            centroid_weight = get_weight(segment)
-
-            if centroid_label['name'] is 'void':
-                continue
-
-            if centroid_label['name'] not in prob_map.keys():
-                continue
-
-            for label in c_labels:
-                # if label['name'] is not 'grass':# TODO remove me
-                #     continue                
-
-                pixels = get_pixel_of_label(label, gt_annotation)
-                print ('Processing img_id=%s (%i/%i): segment_id=%i (%i/%i): centroid_label=%s: pair_label=%s (n_pixel=%i)' % (img_id,i+1,len(img_ids),j,j+1,len(segment_list),centroid_label['name'], label['name'],len(pixels)))
-
-                for pixel in pixels:
-                    #
-                    offset = get_offset(centroid,pixel)
-                    if dirichlet_noise=='True':
-                        offset = add_dirichlet_noise(offset, dirichlet_noise_alpha, relative_location_matrix_shape)
-                    norm_offset = normalize_offset(offset, relative_location_matrix_shape, gt_annotation.shape)
-
-                    #
-                    count = prob_map[centroid_label['name']][label['name']][norm_offset[0]][norm_offset[1]]
-                    count = count + centroid_weight
-                    # print 'count=', count
-                    # print ('local_prob_map[%i][%i] has count= %i' % (norm_offset[0],norm_offset[1],count))
-
-                    prob_map[centroid_label['name']][label['name']][norm_offset[0]][norm_offset[1]] = count
-
-    #
-    print('normalize_prob_map()...')
-    norm_prob_map = normalize_prob_map(prob_map, relative_location_matrix_shape)
-    
-    #
-    print('apply_gaussian_filter() ...')
-    sigma = (np.sqrt(variance_factor*img_height),np.sqrt(variance_factor*img_width))
-    filtered_norm_prob_map = apply_gaussian_filter(sigma, norm_prob_map, relative_location_matrix_shape)
-
-    #
-    print('write_prob_map()...')
-    write_prob_map(filtered_norm_prob_map, prob_map_out_dir)
+    construct(argv)
 
 if __name__ == '__main__':
     main(sys.argv)
