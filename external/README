@@ -64,6 +64,17 @@ http://sourceforge.net/projects/rapidxml/files/latest/download
 VOCdevkit
 http://pascallin.ecs.soton.ac.uk/challenges/VOC/voc2012/VOCdevkit_18-May-2011.tar
 
+Some modifications include:
+(1)
+% function [accuracies,avacc,conf,rawcounts] = VOCevalseg(VOCopts,id)
+function [accuracies,avacc,conf,rawcounts,overall_acc] = VOCevalseg(VOCopts,id)
+
+(2)
+% Percentage correct labels measure is no longer being used.  Uncomment if
+% you wish to see it anyway
+overall_acc = 100*sum(diag(confcounts)) / sum(confcounts(:));
+fprintf('Percentage of pixels correctly labelled overall: %6.3f%%\n',overall_acc);
+
 ===
 Region Detector - Harris-Affine & Hessian-Affine
 http://www.robots.ox.ac.uk/~vgg/research/affine/det_eval_files/h_affine.ln.gz

@@ -139,7 +139,7 @@ def main():
     n_sample = data.shape[0]
 
     #
-    target_col = -1
+    target_col = -1# the last column
     X = data[:,0:target_col]
     y = data[:,target_col]
 
