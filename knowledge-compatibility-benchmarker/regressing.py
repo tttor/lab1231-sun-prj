@@ -84,12 +84,12 @@ def tune_NuSVR(X_tr, y_tr):
                    'degree': [3, 5, 7], 
                    'gamma': [0.0, 0.1, 0.3, 0.5, 0.7]}
 
-    # # dummy
-    # param_space = {'C': [1.0],
-    #                'nu': [0.5], 
-    #                'kernel': ['rbf'], 
-    #                'degree': [3], 
-    #                'gamma': [0.7]}
+    # dummy
+    param_space = {'C': [1.0],
+                   'nu': [0.5], 
+                   'kernel': ['rbf'], 
+                   'degree': [3], 
+                   'gamma': [0.7]}
 
     #
     regressor = NuSVR()
@@ -194,6 +194,9 @@ def main(argv):
         plt.xlim(xlim)
         plt.ylim(ylim)
         ax.grid(True)
+
+        plt.savefig(regression_output_dir + '/best_ypred_vs_ytrue_wrt_'+scoring+'.png')
+        plt.close
 
         with PdfPages(regression_output_dir + '/best_ypred_vs_ytrue_wrt_'+scoring+'.pdf') as pdf:
             pdf.savefig(fig)
