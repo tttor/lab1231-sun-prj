@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import sys
 from sklearn.svm import NuSVR
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -77,21 +78,21 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 def tune_NuSVR(X_tr, y_tr):
     print 'tune_nuSVR(X_tr, y_tr):'
 
-    regressor = NuSVR()
-    # param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
-    #                'nu': [0.1, 0.3, 0.5, 0.7, 1.0], 
-    #                'kernel': ['linear', 'rbf', 'poly'], 
-    #                'degree': [3, 5, 7], 
-    #                'gamma': [0.0, 0.1, 0.3, 0.5, 0.7]}
+    param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
+                   'nu': [0.1, 0.3, 0.5, 0.7, 1.0], 
+                   'kernel': ['linear', 'rbf', 'poly'], 
+                   'degree': [3, 5, 7], 
+                   'gamma': [0.0, 0.1, 0.3, 0.5, 0.7]}
 
-    # dummy
-    param_space = {'C': [1.0],
-                   'nu': [0.5], 
-                   'kernel': ['rbf'], 
-                   'degree': [3], 
-                   'gamma': [0.7]}
+    # # dummy
+    # param_space = {'C': [1.0],
+    #                'nu': [0.5], 
+    #                'kernel': ['rbf'], 
+    #                'degree': [3], 
+    #                'gamma': [0.7]}
 
     #
+    regressor = NuSVR()
     kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
     grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
     grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
@@ -128,37 +129,28 @@ def get_best_perf(perfs, scoring):
 
     return perfs[best_idx]
 
-def main():
-    #
-    regression_data_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/regression-data'
-    out_dir = '/home/ian-djakman/Documents/data/output/knowledge-compatibility-benchmarker/regression-eval'
-
-    regression_data_filename  = 'voc2010_philippunary.csv'
-    regression_data_filepath = regression_data_dir + '/' + regression_data_filename
-    data = np.genfromtxt(regression_data_filepath, delimiter=',')
-    n_sample = data.shape[0]
+def main(argv):
+    assert len(argv)==3, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    regression_data_dir = argv[1]
+    regression_output_dir = argv[2]
 
     #
-    target_col = -1# the last column
-    X = data[:,0:target_col]
-    y = data[:,target_col]
+    X_filepath = regression_data_dir+'/input.cooccurrence_fea.csv'
+    X = np.genfromtxt(X_filepath, delimiter=',')
 
+    y_filepath = regression_data_dir+'/output.ca.csv'
+    y = np.genfromtxt(y_filepath, delimiter=',')
 
-    fig = plt.figure()
-    plt.scatter(range(len(y)), y)
-    plt.grid(True)
-    plt.xlabel('$i^{th}$ sample')
-    plt.ylabel('$y_{true}$')
-    if out_dir!=None:
-        with PdfPages(out_dir+'/target_scatter_plot.pdf') as pdf:
-            pdf.savefig(fig)
+    assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
+    n_sample = X.shape[0]
+    print 'n_sample=', n_sample
 
     # Shuffle n_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
     n_clone = 1
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
-    #
+    # Tune, train and test
     perf_of_datasets = []
     regressors = []
     for dataset in datasets:
@@ -168,26 +160,26 @@ def main():
         regressor = train(meta_regressor, X_tr, y_tr)
         regressors.append(regressor)
 
-        #  
-        print 'plot_learning_curve()'
-        title = 'Learning curve'
-        ylim = (0.0, 1.0)
-        fig = plot_learning_curve(regressor, title, X_tr, y_tr, ylim, cv=10, n_jobs=4)
-        if out_dir!=None:
-            with PdfPages(out_dir+'/learning_curve.pdf') as pdf:
-                pdf.savefig(fig)
+        # #  
+        # print 'plot_learning_curve()'
+        # title = 'Learning curve'
+        # ylim = (0.0, 1.0)
+        # fig = plot_learning_curve(regressor, title, X_tr, y_tr, ylim, cv=10, n_jobs=4)
+        # if regression_output_dir!=None:
+        #     with PdfPages(regression_output_dir+'/learning_curve.pdf') as pdf:
+        #         pdf.savefig(fig)
 
         #
         perf = test(regressor, X_te, y_te)
         perf_of_datasets.append(perf)
 
     #
-    best_perf_basedon = {}
-    best_perf_basedon['mse'] = get_best_perf(perf_of_datasets, 'mse')
-    best_perf_basedon['r2'] = get_best_perf(perf_of_datasets, 'r2')
+    best_perf = {}
+    best_perf['mse'] = get_best_perf(perf_of_datasets, 'mse')
+    best_perf['r2'] = get_best_perf(perf_of_datasets, 'r2')
 
     #
-    for scoring, perf in best_perf_basedon.iteritems():
+    for scoring, perf in best_perf.iteritems():
         #
         fig, ax = plt.subplots()
         scatter_plot = ax.scatter(perf['y_true'], perf['y_pred'])
@@ -203,12 +195,12 @@ def main():
         plt.ylim(ylim)
         ax.grid(True)
 
-        with PdfPages(out_dir + '/best_ypred_vs_ytrue_based_on_'+scoring+'.pdf') as pdf:
+        with PdfPages(regression_output_dir + '/best_ypred_vs_ytrue_wrt_'+scoring+'.pdf') as pdf:
             pdf.savefig(fig)
 
         #
-        with open(out_dir+'/best_regressor_based_on_'+scoring+'.param', 'w') as f:
+        with open(regression_output_dir+'/best_regressor_wrt_'+scoring+'.param', 'w') as f:
             f.write(str(perf['estimator']))
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

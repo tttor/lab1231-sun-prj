@@ -19,8 +19,6 @@ ann_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/result/split_voc2010_philipp_
 eval_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/eval
 
 regression_data_dir=$root_dir/regression-data/philippunarymrf_voc2010
-
-rm -rf $regression_data_dir
 mkdir -p $regression_data_dir
 
 #

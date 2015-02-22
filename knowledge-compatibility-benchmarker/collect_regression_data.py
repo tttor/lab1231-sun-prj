@@ -44,9 +44,11 @@ def get_output(sample_id_list, eval_dir, regression_data_dir):
     for i,eval_dirpath in enumerate(eval_dirpaths):
         ca_filepath = eval_dirpath+'/'+sample_id_list[i]+'.avg_class_acc'
         ca = np.genfromtxt(ca_filepath, delimiter=',')
+        ca = float(ca)/100.0# percent normalization
 
         ga_filepath = eval_dirpath+'/'+sample_id_list[i]+'.global_acc'
         ga = np.genfromtxt(ga_filepath, delimiter=',')
+        ga = float(ga)/100.0# percent normalization
 
         regression_output[i,0] = ca
         regression_output[i,1] = ga
@@ -102,7 +104,7 @@ def main(argv):
     sample_id_list = [x.strip('\n') for x in sample_id_list]
 
     #
-    get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir)
+    # get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir)
     get_output(sample_id_list, eval_dir, regression_data_dir)
     
 if __name__ == '__main__':
