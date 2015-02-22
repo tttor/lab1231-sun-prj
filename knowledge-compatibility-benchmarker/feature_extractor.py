@@ -8,8 +8,6 @@ from lxml import etree
 
 from pascal_voc_2012 import translate
 from pascal_voc_2012 import class_name_map
-from positionSearcher import PositionSearcher
-from knowledge_loader import load_knowledge
 
 def get_prob_list_representation(prob_list):
     prob_series = np.asarray(prob_list)
