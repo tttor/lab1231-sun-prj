@@ -1,6 +1,7 @@
 import sys
 sys.path.append('../util/src-py')
 
+import cPickle
 import numpy as np
 import numpy as np
 import matplotlib.pyplot as plt
@@ -95,31 +96,42 @@ def write_xml(cooccurrence, xml_filepath):
         for subkey, subval in inner_dict.items():
             if subkey != key:
                 total = total + subval
-                subsubsub = etree.SubElement(subsub_2, subkey)
-                subsubsub.set('freq', str(subval))
         subsub_2.set('total',str(total))
 
+        for subkey, subval in inner_dict.items():
+            if subkey != key:                
+                subsubsub = etree.SubElement(subsub_2, subkey)
+                subsubsub.set('freq', str(subval))
+                subsubsub.set('norm_freq',str( float(subval)/total ))
+        
     writer = etree.ElementTree(root)
     writer.write(xml_filepath, pretty_print=True)
 
-# def read_xml(xml_filepath):
-#     '''
-#     Read the xml containing the cooccurrence knowledge.
-#     '''
-#     cooccurrence = {}
+def write(cooccurrence, filepath):
+    with open(filepath, 'wb') as fid:
+        cPickle.dump(cooccurrence, fid) 
 
-#     tree = etree.parse(xml_filepath)
-#     root = tree.getroot()
+def read(xml_filepath, normalized=True):
+    '''
+    Read the xml containing the cooccurrence knowledge.
+    Read only the normalized frequency.
+    '''
+    assert normalized,'normalized != True'
+    cooccurrence = {}
+
+    tree = etree.parse(xml_filepath)
+    root = tree.getroot()
     
-#     for sub in root:
-#         local_knowledge = {}
-#         for sub_2 in sub:
-#             for sub_3 in sub_2:
-#                 local_knowledge[sub_3.tag] = float(sub_3.attrib['norm_freq'])
+    for sub in root:
+        local_knowledge = {}
+        for sub_2 in sub:
+            if sub_2.tag=='occurrence':
+                continue
+            for sub_3 in sub_2:
+                local_knowledge[sub_3.tag] = float(sub_3.attrib['norm_freq'])
+        cooccurrence[sub.attrib['name']] = local_knowledge
 
-#         knowledge[sub.attrib['name']] = local_knowledge
-
-#     return cooccurrence
+    return cooccurrence
 
 # def normalize(raw_cooccurrence):
 #     '''
@@ -144,8 +156,11 @@ def write_xml(cooccurrence, xml_filepath):
 #     return cooccurrence
 
 def main(argv):
-    csv_ann_dir = '/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv'
-    ann_list_filepath = '/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/Train.txt'
+    assert len(argv)==4, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    ann_list_filepath = argv[1]
+    csv_ann_dir = argv[2]
+    knowledge_dir = argv[3]
+    
     obj_names = voc.translate( [key for key in voc.id2name_map if key!=0 and key!=255] )
 
     with open(ann_list_filepath) as f:
@@ -154,8 +169,9 @@ def main(argv):
 
     cooccurrence = {}
     cooccurrence = construct(ann_ids,obj_names,csv_ann_dir)
-    write_xml(cooccurrence, 'cooccurrence.xml')
-    write_matrix(cooccurrence, 'cooccurrence.png')
+    write_xml(cooccurrence, knowledge_dir+'/cooccurrence.xml')
+    write_matrix(cooccurrence, knowledge_dir+'/cooccurrence.png')
+    write(cooccurrence, knowledge_dir+'/cooccurrence.pickle')
 
 if __name__ == '__main__':
     main(sys.argv)

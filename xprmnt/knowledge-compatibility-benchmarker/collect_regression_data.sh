@@ -24,6 +24,8 @@ rm -rf $regression_data_dir
 mkdir -p $regression_data_dir
 
 #
+export PYTHONPATH=$PYTHONPATH:/home/tor/lab1231-sun-prj/util/src-py
+export PYTHONPATH=$PYTHONPATH:/home/tor/lab1231-sun-prj/knowledge-constructor
 exe=/home/tor/lab1231-sun-prj/knowledge-compatibility-benchmarker/collect_regression_data.py
 python $exe \
 		$ann_list_filepath \

@@ -1,16 +1,39 @@
 #!/usr/bin/python
 
+import sys
 import numpy as np 
 import json
+import itertools
 from lxml import etree
-from knowledge_loader import load_knowledge
-import sys
-sys.path.append("../util/src-py")
+
 from pascal_voc_2012 import translate
 from pascal_voc_2012 import class_name_map
 from positionSearcher import PositionSearcher
+from knowledge_loader import load_knowledge
 
+def get_prob_list_representation(prob_list):
+    prob_series = np.asarray(prob_list)
+    rep = []
 
+    # mean
+    rep.append( np.mean(prob_series) )   
+
+    # quartile    
+    for i in [25,50,75]:
+        rep.append( np.percentile(prob_series,i) )
+
+    return rep
+
+def extract_cooccurrence_fea(ann, knowledge):
+    numeric_classes = list( set(ann.flatten()) )    
+    classes = [i for i in translate(numeric_classes) if i!='background' and i!='void']
+
+    prob_list = [0]
+    if len(classes) > 1:
+        prob_list = [knowledge[i][j] for i,j in itertools.combinations(classes,2)]
+
+    fea = get_prob_list_representation(prob_list)
+    return fea
 
 def get_spatial(i, height, param):
     top_height = int( round(param['ratio_top']*height) )
@@ -42,24 +65,7 @@ def get_scene_class(filename):
 
     return scene_class
 
-def extract_fea_c(ann, knowledge):
-    numeric_classes = list( set(ann.flatten()) )
-    raw_classes = translate(numeric_classes)
-    classes = [i for i in raw_classes if i!='background' and i!='void']
 
-    probs = [knowledge[classes[i]][classes[j]] for i in range(len(classes)-1) for j in range(i+1,len(classes))]
-    probs = np.asarray(probs)
-    #print(probs)
-    c = []
-    if len(probs) != 0:
-        c = [np.mean(probs), 
-             np.percentile(probs, 25), 
-             np.percentile(probs, 50), 
-             np.percentile(probs, 75)]
-    else:
-        c = [0.0] * 4
-
-    return c
 
 def extract_fea_s(ann, knowledge):
     '''
