@@ -47,6 +47,7 @@
     int main( int argc, char * argv[]){
 //need folder of parameters
       //set thou folder to put all your parameter
+	printf("param: list_path img_folder png_folder param_dir\n");
       
       QString list_path = argv[1];
       QString img_folder = argv[2];

@@ -97,7 +97,7 @@ void png_write(Eigen::MatrixXi m, QString png_path,size_t label) {
   for(int  ii=0; ii<m.rows(); ii++){
     for(int jj=0; jj<m.cols(); jj++){
       if(m(ii,jj)==1) targetPNG.setPixel(jj,ii,label);
-      if(m(ii,jj)==0) targetPNG.setPixel(jj,ii,255);
+      if(m(ii,jj)==0) targetPNG.setPixel(jj,ii,0);
     }
   }
   targetPNG.save(png_path,"png",0);
@@ -159,6 +159,11 @@ int main(int argc, char* argv[]) {
 
   // Set the dataset param
   // const string datasets_name = argv[1];
+
+  if(argc < 6){
+    printf("format: n_label list_path img_dir unary_dir png_dir");
+    exit(1);
+  }
   const size_t n_label = atoi(argv[1]);
   QString list_path = argv[2];
   QString img_dir = argv[3];

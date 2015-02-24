@@ -34,6 +34,8 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+
+//#include <mpi.h>
 /* } */
 
 char trainfile[200];           /* file with training examples */
@@ -46,8 +48,15 @@ void   wait_any_key();
 void   print_help();
 
 
+
 int main (int argc, char* argv[])
-{  
+{ 
+
+
+
+              // MPI initializations
+
+//      MPI_Init (&argc, &argv);
   SAMPLE sample;  /* training sample */
   LEARN_PARM learn_parm;
   KERNEL_PARM kernel_parm;
@@ -107,6 +116,9 @@ int main (int argc, char* argv[])
 
   svm_struct_learn_api_exit();
 
+            //MPI_Finalize (); 
+
+         
   return 0;
 }
 
@@ -416,6 +428,7 @@ void print_help()
   printf("    2002.\n");
   printf("[5] T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural\n");
   printf("    SVMs, Machine Learning Journal, to appear.\n");
+  
 }
 
 

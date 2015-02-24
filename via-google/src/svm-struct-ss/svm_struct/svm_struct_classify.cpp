@@ -27,40 +27,97 @@ extern "C" {
 #include "../svm_struct_api.h"
 #include "svm_struct_common.h"
 
+//tbb headers
+#include <tbb/tbb.h>
+// #include <tbb/task_scheduler-init.h>
+// #include <tbb/parallel_for.h>
+// #include <tbb/blocked_range.h>
+
+
 char testfile[200];
 char modelfile[200];
 char predictionsfile[200];
 
 void read_input_parameters(int, char **, char *, char *, char *, 
-			   STRUCT_LEARN_PARM *, long*, long *);
+  STRUCT_LEARN_PARM *, long*, long *);
 void print_help(void);
 
+//parallelization
 
-int main (int argc, char* argv[])
+using namespace tbb;
+void classify(PATTERN& x,LABEL& ytrue,STRUCTMODEL& model,STRUCT_LEARN_PARM& sparm,double& avgloss)
 {
-  long correct=0,incorrect=0,no_accuracy=0;
-  long i;
+  printf("Inferring : %s\n",x.image_path);
+  long correct= 0,incorrect=0,no_accuracy=0;
   double t1,runtime=0;
-  double avgloss=0,l;
-  FILE *predfl;
-  STRUCTMODEL model; 
-  STRUCT_LEARN_PARM sparm;
-  STRUCT_TEST_STATS teststats;
-  SAMPLE testsample;
   LABEL y;
+  double l;
 
-  svm_struct_classify_api_init(argc,argv);
+  t1=get_runtime();
+  y=classify_struct_example(x,&model,&sparm);
+  runtime+=(get_runtime()-t1);
+  write_label(NULL,y);
+  l=loss(ytrue,y,&sparm);
+  avgloss+=l;
+  if(l==0)
+    correct++;
+  else
+    incorrect++;
 
-  read_input_parameters(argc,argv,testfile,modelfile,predictionsfile,&sparm,
-			&verbosity,&struct_verbosity);
-
-  if(struct_verbosity>=1) {
-    printf("Reading model..."); fflush(stdout);
+  if(empty_label(ytrue))
+  {
+    no_accuracy=1;
   }
-  model=read_struct_model(modelfile,&sparm);
-  if(struct_verbosity>=1) {
-    fprintf(stdout, "done.\n");
-  }
+  free_label(y);
+  printf("%s is inferred.\n",x.image_path);
+}
+
+//y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
+class TBBInference{
+  SAMPLE& testsample;
+  STRUCTMODEL& model;
+  STRUCT_LEARN_PARM& sparm;
+  double& avgloss;
+
+public:
+  TBBInference(SAMPLE& testsample,STRUCTMODEL& model,STRUCT_LEARN_PARM& sparm,double& avgloss):testsample(testsample),model(model),sparm(sparm),avgloss(avgloss){}
+  void operator()(blocked_range<int> rng) const{
+    for(int ii = rng.begin();ii<rng.end();ii++)
+    {
+      classify(testsample.examples[ii].x,testsample.examples[ii].y,model,sparm,avgloss);
+    }
+  };
+};
+
+void classify_all(SAMPLE& testsample,STRUCTMODEL& model,STRUCT_LEARN_PARM& sparm,double& avgloss){
+  parallel_for(blocked_range<int>(0,testsample.n), TBBInference(testsample,model,sparm,avgloss));
+}
+
+  int main (int argc, char* argv[])
+  {
+    long correct=0,incorrect=0,no_accuracy=0;
+    long i;
+    double t1,runtime=0;
+    double avgloss=0,l;
+    FILE *predfl;
+    STRUCTMODEL model; 
+    STRUCT_LEARN_PARM sparm;
+    STRUCT_TEST_STATS teststats;
+    SAMPLE testsample;
+    LABEL y;
+
+    svm_struct_classify_api_init(argc,argv);
+
+    read_input_parameters(argc,argv,testfile,modelfile,predictionsfile,&sparm,
+     &verbosity,&struct_verbosity);
+
+    if(struct_verbosity>=1) {
+      printf("Reading model..."); fflush(stdout);
+    }
+    model=read_struct_model(modelfile,&sparm);
+    if(struct_verbosity>=1) {
+      fprintf(stdout, "done.\n");
+    }
 
   if(model.svm_model->kernel_parm.kernel_type == LINEAR) { /* linear kernel */
     /* compute weight vector */
@@ -81,38 +138,40 @@ int main (int argc, char* argv[])
   }
 
   if ((predfl = fopen (predictionsfile, "w")) == NULL)
-  { perror (predictionsfile); exit (1); }
+    { perror (predictionsfile); exit (1); }
 
-  for(i=0;i<testsample.n;i++) {
-    t1=get_runtime();
-    y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
-    runtime+=(get_runtime()-t1);
+  // for(i=0;i<testsample.n;i++) {
+  //   t1=get_runtime();
+  //   y=classify_struct_example(testsample.examples[i].x,&model,&sparm);
+  //   runtime+=(get_runtime()-t1);
 
-    write_label(predfl,y);
-    l=loss(testsample.examples[i].y,y,&sparm);
-    avgloss+=l;
-    if(l == 0) 
-      correct++;
-    else
-      incorrect++;
-    eval_prediction(i,testsample.examples[i],y,&model,&sparm,&teststats);
+  //   write_label(predfl,y);
+  //   l=loss(testsample.examples[i].y,y,&sparm);
+  //   avgloss+=l;
+  //   if(l == 0) 
+  //     correct++;
+  //   else
+  //     incorrect++;
+  //   eval_prediction(i,testsample.examples[i],y,&model,&sparm,&teststats);
 
-    if(empty_label(testsample.examples[i].y)) 
-      { no_accuracy=1; } /* test data is not labeled */
-    if(struct_verbosity>=2) {
-      if((i+1) % 100 == 0) {
-	printf("%ld..",i+1); fflush(stdout);
-      }
-    }
-    free_label(y);
-  }  
-  avgloss/=testsample.n;
-  fclose(predfl);
+  //   if(empty_label(testsample.examples[i].y)) 
+  //     { no_accuracy=1; } /* test data is not labeled */
+  //     if(struct_verbosity>=2) {
+  //       if((i+1) % 100 == 0) {
+  //        printf("%ld..",i+1); fflush(stdout);
+  //      }
+  //    }
+  //    free_label(y);
+  //  }  
+    classify_all(testsample,model,sparm,avgloss);
+  
+   avgloss/=testsample.n;
+   fclose(predfl);
 
-  if(struct_verbosity>=1) {
+   if(struct_verbosity>=1) {
     printf("done\n");
     printf("Runtime (without IO) in cpu-seconds: %.2f\n",
-	   (float)(runtime/100.0));    
+      (float)(runtime/100.0));    
   }
   if((!no_accuracy) && (struct_verbosity>=1)) {
     printf("Average loss on test set: %.4f\n",(float)avgloss);
@@ -128,9 +187,9 @@ int main (int argc, char* argv[])
 }
 
 void read_input_parameters(int argc,char *argv[],char *testfile,
-			   char *modelfile,char *predictionsfile,
-			   STRUCT_LEARN_PARM *struct_parm,
-			   long *verbosity,long *struct_verbosity)
+  char *modelfile,char *predictionsfile,
+  STRUCT_LEARN_PARM *struct_parm,
+  long *verbosity,long *struct_verbosity)
 {
   long i;
   
@@ -143,16 +202,16 @@ void read_input_parameters(int argc,char *argv[],char *testfile,
 
   for(i=1;(i<argc) && ((argv[i])[0] == '-');i++) {
     switch ((argv[i])[1]) 
-      { 
+    { 
       case 'h': print_help(); exit(0);
       case '?': print_help(); exit(0);
       case '-': strcpy(struct_parm->custom_argv[struct_parm->custom_argc++],argv[i]);i++; strcpy(struct_parm->custom_argv[struct_parm->custom_argc++],argv[i]);break; 
       case 'v': i++; (*struct_verbosity)=atol(argv[i]); break;
       case 'y': i++; (*verbosity)=atol(argv[i]); break;
       default: printf("\nUnrecognized option %s!\n\n",argv[i]);
-	       print_help();
-	       exit(0);
-      }
+      print_help();
+      exit(0);
+    }
   }
   if((i+1)>=argc) {
     printf("\nNot enough input parameters!\n\n");

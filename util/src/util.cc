@@ -113,5 +113,7 @@ cv::Mat sun::util::ann2img(const Eigen::MatrixXi& ann, const std::string& datase
 }
 
 double sun::util::energy_probability(double probability){
+  //DBL _EPSILON prevents ln(0) when the probability is 0
+  //max(0,.) prevents -log(.) < 0 when probability is 1
   return std::max(0.0,(double) -log(probability+DBL_EPSILON));
 }

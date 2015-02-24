@@ -45,14 +45,14 @@ static const int MIN_RECT_SIZE      = BOOSTING_SUBSAMPLE; // Minimum size of tex
 static const int MAX_RECT_SIZE      = 200; // Maximum size of texton rectangle
 #define GAUSSIAN_OFFSET // Use Sample the offset from a gaussian centered at 0
 
-static const std::string VOC2010_DIRECTORY = "/home/rizkivmaster/ws/datasets/miniVOC2010";
+static const std::string VOC2010_DIRECTORY = "/mirror/datasets/smallVOC2010";
 static const std::string VOC2010_COLOR_PATH = VOC2010_DIRECTORY+"/VOC2010.ct";
-static const std::string EXPERIMENT_FOLDER = "/home/rizkivmaster/ws/results/ssvmVM";
+static const std::string EXPERIMENT_FOLDER = "/mirror/results/G";
 static const std::string VOC2010_PNG_FOLDER = VOC2010_DIRECTORY+"/SegmentationClass";
 static const std::string VOC2010_JPG_FOLDER = VOC2010_DIRECTORY+"/JPEGImages";
-static const std::string VOC2010_UNARY_FOLDER = "/home/rizkivmaster/ws/datasets/voc2010/voc2010_compressed";
-static const std::string TESTING_PNG_FOLDER = EXPERIMENT_FOLDER+"/test_png";
-static const int IMAGE_MAX_LENGTH = 100;
+static const std::string VOC2010_UNARY_FOLDER = EXPERIMENT_FOLDER+"/unaries";
+static const std::string TESTING_PNG_FOLDER = EXPERIMENT_FOLDER+"/GS_png";
+static const int IMAGE_MAX_LENGTH = 500;
 
 
 
@@ -73,7 +73,7 @@ static const int IMAGE_MAX_LENGTH = 100;
 
 
 
-// Shall we return the raw boosting results H or P = 1/Z * exp(-H)
+//Shall we return the raw boosting results H or P = 1/Z * exp(-H)
 //#define RAW_BOOSTING_OUTPUT
 // Dataset parameters
 static const char MSRC_DIRECTORY  [] = "/home/rizkivmaster/ws/TextonBoost/msrc/datasets";
