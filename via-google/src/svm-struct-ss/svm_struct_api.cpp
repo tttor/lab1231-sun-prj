@@ -763,10 +763,10 @@ LABEL infer(PATTERN& x, STRUCTMODEL *sm)
     float unaryWeight =0.0;
     float pairWiseWeight = 0.0;
     //debug
-//    unaryWeight = sm->w[1];
-    unaryWeight = 0.330290;
-//    pairWiseWeight = sm->w[2];
-    pairWiseWeight = 3.863559;
+    unaryWeight = sm->w[1];
+//    unaryWeight = 0.330290;
+    pairWiseWeight = sm->w[2];
+//    pairWiseWeight = 3.863559;
 
     //prepare the unary potential
     ProbImage unary_matrix;

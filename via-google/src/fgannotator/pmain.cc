@@ -97,7 +97,7 @@ void png_write(Eigen::MatrixXi m, QString png_path,size_t label) {
   for(int  ii=0; ii<m.rows(); ii++){
     for(int jj=0; jj<m.cols(); jj++){
       if(m(ii,jj)==1) targetPNG.setPixel(jj,ii,label);
-      if(m(ii,jj)==0) targetPNG.setPixel(jj,ii,255);
+      if(m(ii,jj)==0) targetPNG.setPixel(jj,ii,0);
     }
   }
   targetPNG.save(png_path,"png",0);
