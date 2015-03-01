@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 import feature_extractor as xtt
 import cooccurrence_knowledge as kc
+import scene_property_knowledge as ks
 
 def get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir):
     '''
@@ -18,18 +19,28 @@ def get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir):
     cooccurrence_knowledge = kc.read(knowledge_dir+'/cooccurrence-knowledge/cooccurrence.xml')
     cooccurrence_fea = []
 
+    sceneprop_knowledge = ks.read(knowledge_dir+'/scene-property-knowledge/scene_property.xml')
+    sceneprop_fea = []
+
     for i, ann_filepath in enumerate(ann_filepaths):
-        print 'Extracting feature:', str(i+1), 'of', str(len(ann_filepaths))
-        ann = np.loadtxt(ann_filepath, delimiter=',')
+        print 'Extracting feature:', str(i+1), 'of', str(len(ann_filepaths)), 'id=',sample_id_list[i]
+        ann = {}
+        ann['ann'] = np.loadtxt(ann_filepath, delimiter=',')
+        ann['filename'] = sample_id_list[i]
                 
         #
         ith_cooccurrence_fea = xtt.extract_cooccurrence_fea(ann,cooccurrence_knowledge)
         cooccurrence_fea.append(ith_cooccurrence_fea)
 
+        ith_sceneprop_fea = xtt.extract_sceneprop_fea(ann,sceneprop_knowledge)
+        sceneprop_fea.append(ith_sceneprop_fea)
+
     #
     cooccurrence_fea_filepath = regression_data_dir+'/'+'input.cooccurrence_fea.csv'
     np.savetxt(cooccurrence_fea_filepath, cooccurrence_fea, delimiter=",")
 
+    sceneprop_fea_filepath = regression_data_dir+'/'+'input.sceneprop_fea.csv'
+    np.savetxt(sceneprop_fea_filepath, sceneprop_fea, delimiter=",")
 
 def get_output(sample_id_list, eval_dir, regression_data_dir):
     '''
@@ -104,7 +115,7 @@ def main(argv):
     sample_id_list = [x.strip('\n') for x in sample_id_list]
 
     #
-    # get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir)
+    get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir)
     get_output(sample_id_list, eval_dir, regression_data_dir)
     
 if __name__ == '__main__':

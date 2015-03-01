@@ -76,7 +76,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     return fig
 
 def tune_NuSVR(X_tr, y_tr):
-    print 'tune_nuSVR(X_tr, y_tr):'
+    print 'tune_nuSVR(X_tr, y_tr)...'
 
     param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
                    'nu': [0.1, 0.3, 0.5, 0.7, 1.0], 
@@ -100,10 +100,12 @@ def tune_NuSVR(X_tr, y_tr):
     return grid_search.best_estimator_
 
 def train(estimator, X_tr, y_tr):
+    print 'train estimator ...'
     estimator.fit(X_tr, y_tr)
     return estimator
 
 def test(estimator, X_te, y_te):
+    print 'test estimator ...'
     y_pred = estimator.predict(X_te)
     y_true = y_te
 
@@ -135,8 +137,13 @@ def main(argv):
     regression_output_dir = argv[2]
 
     #
-    X_filepath = regression_data_dir+'/input.cooccurrence_fea.csv'
-    X = np.genfromtxt(X_filepath, delimiter=',')
+    X_cooccurrence_fea_filepath = regression_data_dir+'/input.cooccurrence_fea.csv'
+    X_cooccurrence_fea = np.genfromtxt(X_cooccurrence_fea_filepath, delimiter=',')
+
+    X_sceneprop_fea_filepath = regression_data_dir+'/input.sceneprop_fea.csv'
+    X_sceneprop_fea = np.genfromtxt(X_sceneprop_fea_filepath, delimiter=',')
+
+    X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea), axis=1)
 
     y_filepath = regression_data_dir+'/output.ca.csv'
     y = np.genfromtxt(y_filepath, delimiter=',')
@@ -144,10 +151,11 @@ def main(argv):
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
     print 'n_sample=', n_sample
+    print 'n_input_fea=', X.shape[1]
 
     # Shuffle n_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
-    n_clone = 1
+    n_clone = 5
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
     # Tune, train and test

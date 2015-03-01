@@ -58,6 +58,22 @@ def write(scene_prop, filepath):
     with open(filepath, 'wb') as fid:
         cPickle.dump(scene_prop, fid) 
 
+def read(xml_filepath, normalized=True):
+    assert normalized,'normalized != True'
+    scene_prop = {}
+
+    tree = etree.parse(xml_filepath)
+    root = tree.getroot()
+    
+    for sub in root:
+        obj_freq_dict = {}
+        for sub_2 in sub:
+            for sub_3 in sub_2:
+                obj_freq_dict[sub_3.tag] = float(sub_3.attrib['norm_freq'])            
+        scene_prop[sub.attrib['name']] = obj_freq_dict
+
+    return scene_prop
+
 def main(argv):
     assert len(argv)==4, 'INSUFFICENT NUMBER OF ARGUMENTS'
     img_id_list_filepath = argv[1]
@@ -70,8 +86,8 @@ def main(argv):
 
     #
     scene_prop = construct(img_ids, scepe_prop_ann_dir)
-    write(scene_prop, knowledge_output_dir+'/scene_prop.pickle')
-    write_xml(scene_prop, knowledge_output_dir+'/scene_prop.xml')
+    write(scene_prop, knowledge_output_dir+'/scene_property.pickle')
+    write_xml(scene_prop, knowledge_output_dir+'/scene_property.xml')
 
 if __name__ == '__main__':
     main(sys.argv)
