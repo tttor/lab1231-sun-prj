@@ -4,13 +4,13 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-root_dir=/home/tor/xprmnt/knowledge-construction/relative-location
+root_dir=/home/tor/xprmnt/knowledge-construction/relative-location-knowledge
 timestamp="$(date +'%Y%m%d.%H%M%S')"
 
 #
 chosen_cprime=$1
 dirichlet_noise=False
-img_list_filepath=/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/Train.txt
+img_list_filepath=/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/All_1928.txt
 gt_csv_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv
 img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages
 
