@@ -24,3 +24,10 @@ python  $exe \
 		$chosen_cprime $dirichlet_noise \
 		$img_list_filepath $gt_csv_dir $img_dir \
 		$prob_map_out_dir
+
+#
+pdf_map_dir=$prob_map_out_dir/$chosen_cprime
+for f in "$pdf_map_dir"/*.pdf; do
+    echo $f.png
+    convert $f $f.png
+done
