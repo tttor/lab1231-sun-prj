@@ -1,4 +1,10 @@
 function ann_ids = run_VOCevalseg_per_annotation()
+    util_dir = '/home/tor/lab1231-sun-prj/util/src-m';
+    addpath(util_dir);
+
+    VOCcode_dir = '/home/tor/lab1231-sun-prj/external/VOCdevkit/VOCcode';
+    addpath(VOCcode_dir);
+
     eval_dirpath = '/home/tor/robotics/prj/011/xprmnt/philipp-unary-mrf-voc2010/eval';    
     ann_id_list_dirpath = '/home/tor/robotics/prj/011/xprmnt/philipp-unary-mrf-voc2010/meta/split_voc2010_philipp';
     ann_id_list_filename = 'Test';
