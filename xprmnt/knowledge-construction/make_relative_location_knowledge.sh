@@ -30,4 +30,5 @@ pdf_map_dir=$prob_map_out_dir/$chosen_cprime
 for f in "$pdf_map_dir"/*.pdf; do
     echo $f.png
     convert $f $f.png
+    convert -crop 340x340+125+45 $f.png $f.png
 done
