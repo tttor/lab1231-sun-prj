@@ -126,7 +126,7 @@ def init_prob_map(cprime_labels, c_labels, size):
     return prob_map
 
 def get_segment(img):
-    segmentation = slic(img, n_segments=75, compactness=13, sigma=4, enforce_connectivity=True)
+    segmentation = slic(img, n_segments=100, compactness=13, sigma=4, enforce_connectivity=True)
     segmentation_img = mark_boundaries(img, segmentation)
     # io.imsave('slic.jpg', segmentation_img)
 
