@@ -11,7 +11,7 @@
 #
 root_dir=/home/tor/xprmnt/knowledge-compatibility-benchmarker
 
-ann_list_filename=ann_img.list
+ann_list_filename=ann_img_1928.list
 ann_list_filepath=$root_dir/meta/$ann_list_filename
 
 knowledge_dir=/home/tor/xprmnt/knowledge-construction
