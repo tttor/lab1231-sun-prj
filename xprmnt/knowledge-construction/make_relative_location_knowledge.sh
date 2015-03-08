@@ -10,11 +10,16 @@ timestamp="$(date +'%Y%m%d.%H%M%S')"
 #
 chosen_cprime=$1
 dirichlet_noise=False
-img_list_filepath=/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/All_1928.txt
-gt_csv_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv
-img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages
 
-prob_map_out_id=prob-map-dirichlet-off #prob-map.$timestamp
+# img_list_filepath=/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/All_1928.txt
+# gt_csv_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv
+# img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages
+
+img_list_filepath=/home/tor/dataset/msrc/meta/591.list
+gt_csv_dir=/home/tor/dataset/msrc/unmix/GroundTruth-csv
+img_dir=/home/tor/dataset/msrc/unmix/Images
+
+prob_map_out_id=prob-map-dirichlet-off.$timestamp
 prob_map_out_dir=$root_dir/$prob_map_out_id
 
 #
@@ -30,5 +35,5 @@ pdf_map_dir=$prob_map_out_dir/$chosen_cprime
 for f in "$pdf_map_dir"/*.pdf; do
     echo $f.png
     convert $f $f.png
-    convert -crop 340x340+125+45 $f.png $f.png
+    convert -crop 340x340+125+45 $f.png $f.cropped.png 
 done

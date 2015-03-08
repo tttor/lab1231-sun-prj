@@ -57,3 +57,6 @@ class_name_map = {
 class_id2name_map = class_name_map
 
 class_name2id_map = {v: k for k, v in class_name_map.items()}
+
+ori_img_format = '.bmp'
+ignored_class_name_list = ['void','horse','mountain']

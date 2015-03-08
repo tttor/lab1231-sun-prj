@@ -20,7 +20,8 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
-import pascal_voc_2012 as dataset
+# import pascal_voc_2012 as dataset
+import msrc as dataset
 
 def construct(argv):
     '''
