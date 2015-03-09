@@ -20,8 +20,7 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
-# import pascal_voc_2012 as dataset
-import msrc as dataset
+
 
 def construct(argv):
     '''
@@ -284,7 +283,15 @@ def write_prob_map(prob_map, out_dir):
             plt.savefig(mat_img_filepath)
 
 def main(argv):
-    assert len(argv)==7, 'INSUFFICIENT NUMBER OF ARGVs'
+    assert len(argv)==8, 'INSUFFICIENT NUMBER OF ARGVs'
+    dataset_name = argv[7]
+
+    global dataset
+    if dataset_name=='msrc':
+        import msrc as dataset
+    elif dataset_name=='pascal_voc':
+        import pascal_voc_2012 as dataset
+
     construct(argv)
 
 if __name__ == '__main__':

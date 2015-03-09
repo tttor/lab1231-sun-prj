@@ -10,6 +10,7 @@ timestamp="$(date +'%Y%m%d.%H%M%S')"
 #
 chosen_cprime=$1
 dirichlet_noise=False
+dataset_name=msrc
 
 # img_list_filepath=/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/All_1928.txt
 # gt_csv_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv
@@ -28,7 +29,8 @@ exe=/home/tor/lab1231-sun-prj/knowledge-constructor/relative_location_knowledge.
 python  $exe \
 		$chosen_cprime $dirichlet_noise \
 		$img_list_filepath $gt_csv_dir $img_dir \
-		$prob_map_out_dir
+		$prob_map_out_dir \
+		$dataset_name
 
 #
 pdf_map_dir=$prob_map_out_dir/$chosen_cprime
