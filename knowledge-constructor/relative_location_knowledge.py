@@ -56,7 +56,7 @@ def construct(argv):
         img_height = img.shape[0] 
         img_width = img.shape[1]
 
-        segmentation = get_segment(img)
+        segmentation = get_segmentation(img)
         segment_list = get_segment_list(segmentation)
 
         gt_ann_filepath = gt_csv_dir + '/' + img_id + '.csv'
@@ -127,9 +127,10 @@ def init_prob_map(cprime_labels, c_labels, size):
 
     return prob_map
 
-def get_segment(img):
+def get_segmentation(img):
     segmentation = slic(img, n_segments=140, compactness=13, sigma=4, enforce_connectivity=True)
-    segmentation_img = mark_boundaries(img, segmentation)
+    
+    # segmentation_img = mark_boundaries(img, segmentation)
     # io.imsave('slic.jpg', segmentation_img)
 
     return segmentation
