@@ -20,9 +20,6 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
-# import pascal_voc_2012 as dataset
-import msrc as dataset
-
 def construct(argv):
     '''
     the relative location knowledge is represented in the prop_map.
@@ -80,9 +77,13 @@ def construct(argv):
                 continue
 
             for label in c_labels:
-                # Force to only consider one certain object-class as the pair
-                if label['name'] is not 'dog':
-                    continue                
+                # # Force to only consider one certain object-class as the pair
+                # # Warn: May result in different probability map
+                # # Should be commented for most usage
+                # forced_label = 'sky'
+                # if label['name'] is not forced_label:
+                #     print 'WARN: forced_label=', forced_label
+                #     continue                
 
                 pixels = get_pixel_of_label(label, gt_annotation)
                 print ('Processing img_id=%s (%i/%i): segment_id=%i (%i/%i): centroid_label=%s: pair_label=%s (n_pixel=%i)' \
@@ -127,7 +128,7 @@ def init_prob_map(cprime_labels, c_labels, size):
     return prob_map
 
 def get_segment(img):
-    segmentation = slic(img, n_segments=100, compactness=13, sigma=4, enforce_connectivity=True)
+    segmentation = slic(img, n_segments=140, compactness=13, sigma=4, enforce_connectivity=True)
     segmentation_img = mark_boundaries(img, segmentation)
     # io.imsave('slic.jpg', segmentation_img)
 
@@ -284,7 +285,15 @@ def write_prob_map(prob_map, out_dir):
             plt.savefig(mat_img_filepath)
 
 def main(argv):
-    assert len(argv)==7, 'INSUFFICIENT NUMBER OF ARGVs'
+    assert len(argv)==8, 'INSUFFICIENT NUMBER OF ARGVs'
+    dataset_name = argv[7]
+
+    global dataset
+    if dataset_name=='msrc':
+        import msrc as dataset
+    elif dataset_name=='pascal_voc':
+        import pascal_voc_2012 as dataset
+
     construct(argv)
 
 if __name__ == '__main__':

@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 def write_prob_map_collection():
-    knowledge_dir = '/home/tor/xprmnt/knowledge-construction/relative-location-knowledge/prob-map-dirichlet-off'
-    obj_class_list = ['chair', 'dog', 'person', 'sofa', 'tvmonitor']
+    knowledge_dir = '/home/tor/xprmnt/knowledge-construction/relative-location-knowledge/prob-map-dirichlet-off.msrc'
+    obj_class_list = ['building','road']#['chair', 'dog', 'person', 'sofa', 'tvmonitor']
     ext = '.pdf.png'
 
     n_obj_class = len(obj_class_list)
