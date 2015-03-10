@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
     echo "Illegal number of parameters"
     exit 1
 fi
@@ -10,7 +10,7 @@ timestamp="$(date +'%Y%m%d.%H%M%S')"
 #
 chosen_cprime=$1
 dirichlet_noise=False
-dataset_name=msrc
+dataset_name=$2
 
 echo "dataset_name= "$dataset_name
 if [ "$dataset_name" = "msrc" ]
@@ -18,7 +18,7 @@ then
     img_list_filepath=/home/tor/dataset/msrc/meta/591.list
 	gt_csv_dir=/home/tor/dataset/msrc/unmix/GroundTruth-csv
 	img_dir=/home/tor/dataset/msrc/unmix/Images
-elif [ "$dataset_name" = "pascal_voc" ]
+elif [ "$dataset_name" = "voc" ]
 then
 	img_list_filepath=/home/tor/dataset/pascal/VOC2010/meta/split_voc2010_philipp/All_1928.txt
 	gt_csv_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass-csv
