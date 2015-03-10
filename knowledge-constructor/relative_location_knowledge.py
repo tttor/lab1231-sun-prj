@@ -291,7 +291,7 @@ def main(argv):
     global dataset
     if dataset_name=='msrc':
         import msrc as dataset
-    elif dataset_name=='pascal_voc':
+    elif dataset_name=='voc':
         import pascal_voc_2012 as dataset
 
     construct(argv)
