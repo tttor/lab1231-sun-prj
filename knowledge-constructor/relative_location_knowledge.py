@@ -13,6 +13,7 @@ import os
 import shutil
 import random
 import sys
+import cPickle
 
 from skimage.util import img_as_float
 from skimage.segmentation import slic
@@ -30,7 +31,6 @@ def construct(argv):
     img_list_filepath = argv[3]
     gt_csv_dir = argv[4]
     img_dir = argv[5]
-    prob_map_out_dir = argv[6]
 
     #
     relative_location_matrix_shape = (200,200) # following [Gould, 2008]
@@ -113,9 +113,7 @@ def construct(argv):
     sigma = (np.sqrt(variance_factor*img_height),np.sqrt(variance_factor*img_width))
     filtered_norm_prob_map = apply_gaussian_filter(sigma, norm_prob_map, relative_location_matrix_shape)
 
-    #
-    print('write_prob_map()...')
-    write_prob_map(filtered_norm_prob_map, prob_map_out_dir)
+    return filtered_norm_prob_map
 
 def init_prob_map(cprime_labels, c_labels, size):
     prob_map = dict.fromkeys(cprime_labels)
@@ -241,9 +239,6 @@ def normalize_prob_map(prob_map, relative_location_matrix_shape):
 
     for cprime, prob_map_c_given_cprime in prob_map.iteritems():
         for c,relative_location_mat in prob_map_c_given_cprime.iteritems():
-            # if c is not 'grass': # TODO remove me
-            #     continue
-            # print('processing prob_map: c= %s, given cprime= %s' % (c,cprime))
             for row in range(relative_location_matrix_shape[0]):
                 for col in range(relative_location_matrix_shape[1]):
                     val = relative_location_mat[row][col]
@@ -274,9 +269,6 @@ def write_prob_map(prob_map, out_dir):
         os.makedirs(cprime_dir)
 
         for c,relative_location_mat in prob_map_c_given_cprime.iteritems():
-            # if c is not 'grass': # TODO remove me
-            #     continue
-
             mat_filepath = cprime_dir + '/' + c + '_given_' + cprime + '.csv'
             np.savetxt(mat_filepath, relative_location_mat, delimiter=",")
 
@@ -285,6 +277,16 @@ def write_prob_map(prob_map, out_dir):
             plt.axis('off') # clear x- and y-axes
             plt.savefig(mat_img_filepath)
 
+def write(knowledge, filepath):
+    with open(filepath, 'wb') as fid:
+        cPickle.dump(knowledge, fid)
+
+def write_meta(meta, meta_filepath):
+    fo = open(meta_filepath, 'wb')
+    for m in meta:
+        fo.write(m+'\n');
+    fo.close()
+    
 def main(argv):
     assert len(argv)==8, 'INSUFFICIENT NUMBER OF ARGVs'
     dataset_name = argv[7]
@@ -295,7 +297,15 @@ def main(argv):
     elif dataset_name=='voc':
         import pascal_voc_2012 as dataset
 
-    construct(argv)
+    #
+    relative_location = construct(argv);
+
+    print('write relative_location knowledge ...')
+    cprime = argv[1]
+    prob_map_out_dir = argv[6]
+    write_prob_map(relative_location, prob_map_out_dir)
+    write(relative_location, prob_map_out_dir+'/'+cprime+'/relative_location_wrt_'+cprime+'.pickle')
+    write_meta(argv, prob_map_out_dir+'/'+cprime+'/relative_location_wrt_'+cprime+'.meta');
 
 if __name__ == '__main__':
     main(sys.argv)
