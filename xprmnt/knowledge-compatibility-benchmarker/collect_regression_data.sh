@@ -17,6 +17,7 @@ ann_list_filepath=$root_dir/meta/$ann_list_filename
 knowledge_dir=/home/tor/xprmnt/knowledge-construction
 ann_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/result/split_voc2010_philipp_Test_csv
 eval_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/eval
+ori_img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages-ClassSegmented
 
 regression_data_dir=$root_dir/regression-data/philippunarymrf_voc2010
 mkdir -p $regression_data_dir
@@ -30,4 +31,5 @@ python $exe \
 		$knowledge_dir \
 		$ann_dir \
 		$eval_dir \
-		$regression_data_dir
+		$regression_data_dir \
+		$ori_img_dir

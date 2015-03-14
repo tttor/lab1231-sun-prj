@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 import feature_extractor as xtt
 import cooccurrence_knowledge as kc
 import scene_property_knowledge as ks
+import relative_location_knowledge as kr
 
-def get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir):
+def get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir, ori_img_dir):
     '''
     Extract features from the annotation and knowledge
     '''
@@ -22,12 +23,17 @@ def get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir):
     sceneprop_knowledge = ks.read(knowledge_dir+'/scene-property-knowledge/scene_property.xml')
     sceneprop_fea = []
 
+    relloc_knowledge = kr.read(knowledge_dir+'/relative-location-knowledge/relloc-pickle')
+    relloc_fea = []
+
     for i, ann_filepath in enumerate(ann_filepaths):
         print 'Extracting feature:', str(i+1), 'of', str(len(ann_filepaths)), 'id=',sample_id_list[i]
         ann = {}
         ann['ann'] = np.loadtxt(ann_filepath, delimiter=',')
         ann['filename'] = sample_id_list[i]
-                
+        ann['ori_img_dir'] = ori_img_dir
+        ann['ori_img_ext'] = '.jpg'
+
         #
         ith_cooccurrence_fea = xtt.extract_cooccurrence_fea(ann,cooccurrence_knowledge)
         cooccurrence_fea.append(ith_cooccurrence_fea)
@@ -35,12 +41,18 @@ def get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir):
         ith_sceneprop_fea = xtt.extract_sceneprop_fea(ann,sceneprop_knowledge)
         sceneprop_fea.append(ith_sceneprop_fea)
 
+        ith_relloc_fea = xtt.extract_relloc_fea(ann,relloc_knowledge)
+        relloc_fea.append(ith_relloc_fea)
+
     #
     cooccurrence_fea_filepath = regression_data_dir+'/'+'input.cooccurrence_fea.csv'
     np.savetxt(cooccurrence_fea_filepath, cooccurrence_fea, delimiter=",")
 
     sceneprop_fea_filepath = regression_data_dir+'/'+'input.sceneprop_fea.csv'
     np.savetxt(sceneprop_fea_filepath, sceneprop_fea, delimiter=",")
+
+    relloc_fea_filepath = regression_data_dir+'/'+'input.relloc_fea.csv'
+    np.savetxt(relloc_fea_filepath, relloc_fea, delimiter=",")
 
 def get_output(sample_id_list, eval_dir, regression_data_dir):
     '''
@@ -103,19 +115,20 @@ def get_output(sample_id_list, eval_dir, regression_data_dir):
     np.savetxt(regression_output_filepath, regression_output[:,1], delimiter=",")
 
 def main(argv):
-    assert len(argv)==6, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    assert len(argv)==7, 'INSUFFICENT NUMBER OF ARGUMENTS'
     ann_list_filepath = argv[1]
     knowledge_dir = argv[2]
     ann_dir = argv[3]
     eval_dir = argv[4]
     regression_data_dir = argv[5]
+    ori_img_dir = argv[6]
 
     with open(ann_list_filepath) as f:
         sample_id_list = f.readlines()
     sample_id_list = [x.strip('\n') for x in sample_id_list]
 
     #
-    get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir)
+    get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir, ori_img_dir)
     get_output(sample_id_list, eval_dir, regression_data_dir)
     
 if __name__ == '__main__':
