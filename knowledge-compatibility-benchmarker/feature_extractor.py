@@ -4,11 +4,83 @@ import sys
 import numpy as np 
 import json
 import itertools
+import math
 from lxml import etree
 
+from skimage.util import img_as_float
+from skimage.segmentation import slic
+from skimage import io
+from skimage.segmentation import mark_boundaries
+
 import pascal_voc_2012 as voc
+import relative_location_knowledge as rlk
 
 # Extractor functions
+def extract_relloc_fea(ann, knowledge):
+    print 'WARN: does _not_ accomodate diriclet noise in offsets'
+    ori_img_filepath = ann['ori_img_dir']+'/'+ann['filename']+ann['ori_img_ext']
+    img = img_as_float(io.imread(ori_img_filepath))
+
+    segmentation = rlk.get_segmentation(img)
+    segment_list = rlk.get_segment_list(segmentation)
+    class_list = knowledge.keys()
+
+    # compute relative location votes
+    init_vote = dict.fromkeys(range(len(segment_list)), None)
+    for key in init_vote.iterkeys():
+        init_vote[key] = dict.fromkeys(class_list, 0.0)
+
+    vote_other = init_vote
+    vote_self = init_vote
+
+    for i, si in enumerate(segment_list):
+        xi, yi = rlk.get_centroid(si)
+        ci_hat = voc.class_id2name_map[ ann['ann'][xi,yi] ]
+        if ci_hat in voc.ignored_class_name_list:
+            continue
+
+        for c in class_list:
+            if c in voc.ignored_class_name_list:
+                continue
+
+            vote_other[i][c] = 0.0
+            vote_self[i][c] = 0.0
+            for j in range(len(segment_list)):
+                if j == i:
+                    continue
+                sj = segment_list[j]
+                P_cjhat_sj = 1.0 # the probability of a superpixel sj has a class label cjhat
+                alpha_j = P_cjhat_sj * len(sj)
+
+                xj, yj = rlk.get_centroid(sj)
+                cj_hat = voc.class_id2name_map[ ann['ann'][xj,yj] ]
+                if cj_hat in voc.ignored_class_name_list:
+                    continue
+                
+                offset = rlk.get_offset((xi,yi),(xj,yj))
+                norm_offset = rlk.normalize_offset(offset, (200,200), ann['ann'].shape)
+                
+                if ci_hat==cj_hat:
+                    vote_self[i][c]  = vote_self[i][c]  + ( alpha_j*knowledge[c][cj_hat][norm_offset[0],norm_offset[1]] )
+                else:
+                    vote_other[i][c] = vote_other[i][c] + ( alpha_j*knowledge[c][cj_hat][norm_offset[0]][norm_offset[1]] )
+
+    # Compute the relloc features
+    w_other = 1.0
+    w_self = 1.0
+    epsilon = 0.00001
+
+    prob_list = []
+    for s in range(len(segment_list)):
+        for c in class_list:
+            f_relloc = (w_other*math.log(vote_other[s][c]+epsilon)) + (w_self*math.log(vote_self[s][c]+epsilon))
+            # f_relloc = (w_other*vote_other[s][c]) + (w_self*vote_self[s][c])
+            prob_list.append(f_relloc)
+
+    #
+    fea = get_prob_list_representation(prob_list)
+    return fea
+
 def extract_cooccurrence_fea(ann, knowledge):
     numeric_classes = list( set(ann['ann'].flatten()) )    
     classes = [i for i in voc.translate(numeric_classes) if i not in voc.ignored_class_name_list]
