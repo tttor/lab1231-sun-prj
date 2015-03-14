@@ -21,6 +21,20 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
+def read(pickle_dirpath):
+    pickle_filenames = [ f for f in os.listdir(pickle_dirpath) if os.path.isfile(os.path.join(pickle_dirpath,f)) ]
+
+    relloc = {}
+    for p in pickle_filenames:
+        print('reading relloc knowledge of: %s' % (p))
+        local_relloc = None
+        with open(pickle_dirpath+'/'+p, 'rb') as input_file:
+            local_relloc = cPickle.load(input_file)
+    
+        relloc.update(local_relloc)
+
+    return relloc
+
 def construct(argv):
     '''
     the relative location knowledge is represented in the prop_map.
