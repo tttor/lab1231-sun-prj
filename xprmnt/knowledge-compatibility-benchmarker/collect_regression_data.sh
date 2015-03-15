@@ -38,9 +38,12 @@ python $exe \
 		$ori_img_dir
 
 #
+timestamp_end="$(date +'%Y%m%d.%H%M%S')"
 echo $annotator_id > $regression_data_dir/regression_data.meta
 echo $dataset_name >> $regression_data_dir/regression_data.meta
 echo $ann_list_filepath >> $regression_data_dir/regression_data.meta
 echo $eval_dir >> $regression_data_dir/regression_data.meta
 echo $ann_dir >> $regression_data_dir/regression_data.meta
 echo $knowledge_dir >> $regression_data_dir/regression_data.meta
+echo $timestamp >> $regression_data_dir/regression_data.meta 
+echo $timestamp_end >> $regression_data_dir/regression_data.meta 

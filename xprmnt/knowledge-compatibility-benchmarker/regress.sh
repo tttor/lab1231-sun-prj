@@ -18,6 +18,9 @@ python  $exe \
 		$regression_output_dir \
 
 #
+timestamp_end="$(date +'%Y%m%d.%H%M%S')"
 echo $regression_data_dir > $regression_output_dir/regressing.meta
 echo $dataset_name >> $regression_output_dir/regressing.meta 
 echo $annotator_id >> $regression_output_dir/regressing.meta 
+echo $timestamp >> $regression_output_dir/regressing.meta 
+echo $timestamp_end >> $regression_output_dir/regressing.meta 
