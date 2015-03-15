@@ -143,7 +143,10 @@ def main(argv):
     X_sceneprop_fea_filepath = regression_data_dir+'/input.sceneprop_fea.csv'
     X_sceneprop_fea = np.genfromtxt(X_sceneprop_fea_filepath, delimiter=',')
 
-    X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea), axis=1)
+    X_relloc_fea_filepath = regression_data_dir+'/input.relloc_fea.csv'
+    X_relloc_fea = np.genfromtxt(X_relloc_fea_filepath, delimiter=',')
+
+    X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea, X_relloc_fea), axis=1)
 
     y_filepath = regression_data_dir+'/output.ca.csv'
     y = np.genfromtxt(y_filepath, delimiter=',')

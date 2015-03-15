@@ -10,7 +10,10 @@
 
 #
 root_dir=/home/tor/xprmnt/knowledge-compatibility-benchmarker
+timestamp="$(date +'%Y%m%d.%H%M%S')"
 
+annotator_id=philippunarymrf
+dataset_name=voc2010
 ann_list_filename=ann_img_1928.list
 ann_list_filepath=$root_dir/meta/$ann_list_filename
 
@@ -19,7 +22,7 @@ ann_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/result/split_voc2010_philipp_
 eval_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/eval
 ori_img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages-ClassSegmented
 
-regression_data_dir=$root_dir/regression-data/philippunarymrf_voc2010
+regression_data_dir=$root_dir/regression-data/$annotator_id-$dataset_name-$timestamp
 mkdir -p $regression_data_dir
 
 #
@@ -33,3 +36,14 @@ python $exe \
 		$eval_dir \
 		$regression_data_dir \
 		$ori_img_dir
+
+#
+timestamp_end="$(date +'%Y%m%d.%H%M%S')"
+echo $annotator_id > $regression_data_dir/regression_data.meta
+echo $dataset_name >> $regression_data_dir/regression_data.meta
+echo $ann_list_filepath >> $regression_data_dir/regression_data.meta
+echo $eval_dir >> $regression_data_dir/regression_data.meta
+echo $ann_dir >> $regression_data_dir/regression_data.meta
+echo $knowledge_dir >> $regression_data_dir/regression_data.meta
+echo $timestamp >> $regression_data_dir/regression_data.meta 
+echo $timestamp_end >> $regression_data_dir/regression_data.meta 
