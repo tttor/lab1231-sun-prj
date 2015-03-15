@@ -138,20 +138,21 @@ def main(argv):
     meta_filepath = argv[3]
 
     # Load inputs and outputs
-    scaled = '_scaled' #: _scaled', '_scaled_min_max'
+    scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
 
-    X_cooccurrence_fea_filepath = data_dirpath+'/input/cooccurrence_fea'+scaled+'.csv'
+    X_cooccurrence_fea_filepath = data_dirpath+'/input/cooccurrence_fea'+scale_mode+'.csv'
     X_cooccurrence_fea = np.genfromtxt(X_cooccurrence_fea_filepath, delimiter=',')
 
-    X_sceneprop_fea_filepath = data_dirpath+'/input/sceneprop_fea'+scaled+'.csv'
+    X_sceneprop_fea_filepath = data_dirpath+'/input/sceneprop_fea'+scale_mode+'.csv'
     X_sceneprop_fea = np.genfromtxt(X_sceneprop_fea_filepath, delimiter=',')
 
-    X_relloc_fea_filepath = data_dirpath+'/input/relloc_fea'+scaled+'.csv'
+    X_relloc_fea_filepath = data_dirpath+'/input/relloc_fea'+scale_mode+'.csv'
     X_relloc_fea = np.genfromtxt(X_relloc_fea_filepath, delimiter=',')
 
     X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea, X_relloc_fea), axis=1)
 
     y_filepath = data_dirpath+'/output/ca.csv'
+    # y_filepath = data_dirpath+'/output/ca'+scale_mode+'.csv'# have tried, but result in larger mse
     y = np.genfromtxt(y_filepath, delimiter=',')
 
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
@@ -193,7 +194,7 @@ def main(argv):
 
     #
     for scoring, perf in best_perf.iteritems():
-        #
+        # plot y_pred vs y_true
         fig, ax = plt.subplots()
         scatter_plot = ax.scatter(perf['y_true'], perf['y_pred'])
         ax.plot([0.0, 1.0], [0.0, 1.0], '-', linewidth=2, color='red')
@@ -219,7 +220,7 @@ def main(argv):
             f.write(str(perf['estimator']))
 
     with open(meta_filepath,'w') as f:
-        f.write(scaled+'\n')
+        f.write(scale_mode+'\n')
         f.write(str(n_sample)+'\n')
         f.write(str(n_clone)+'\n')
         f.write(str(n_fea)+'\n')
