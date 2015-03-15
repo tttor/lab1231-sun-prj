@@ -12,6 +12,7 @@
 root_dir=/home/tor/xprmnt/knowledge-compatibility-benchmarker
 timestamp="$(date +'%Y%m%d.%H%M%S')"
 
+dataset_name=voc
 ann_list_filename=ann_img_1928.list
 ann_list_filepath=$root_dir/meta/$ann_list_filename
 
@@ -20,7 +21,7 @@ ann_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/result/split_voc2010_philipp_
 eval_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/eval
 ori_img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages-ClassSegmented
 
-regression_data_dir=$root_dir/regression-data/philippunarymrf_voc2010.$timestamp
+regression_data_dir=$root_dir/regression-data/philippunarymrf.$dataset_name.$timestamp
 mkdir -p $regression_data_dir
 
 #
