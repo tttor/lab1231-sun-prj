@@ -137,18 +137,20 @@ def main(argv):
     regression_output_dir = argv[2]
 
     #
-    X_cooccurrence_fea_filepath = regression_data_dir+'/input.cooccurrence_fea.csv'
+    scaled = '_scaled' #: _scaled', '_scaled_min_max'
+
+    X_cooccurrence_fea_filepath = regression_data_dir+'/input/cooccurrence_fea'+scaled+'.csv'
     X_cooccurrence_fea = np.genfromtxt(X_cooccurrence_fea_filepath, delimiter=',')
 
-    X_sceneprop_fea_filepath = regression_data_dir+'/input.sceneprop_fea.csv'
+    X_sceneprop_fea_filepath = regression_data_dir+'/input/sceneprop_fea'+scaled+'.csv'
     X_sceneprop_fea = np.genfromtxt(X_sceneprop_fea_filepath, delimiter=',')
 
-    X_relloc_fea_filepath = regression_data_dir+'/input.relloc_fea.csv'
+    X_relloc_fea_filepath = regression_data_dir+'/input/relloc_fea'+scaled+'.csv'
     X_relloc_fea = np.genfromtxt(X_relloc_fea_filepath, delimiter=',')
 
     X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea, X_relloc_fea), axis=1)
 
-    y_filepath = regression_data_dir+'/output.ca.csv'
+    y_filepath = regression_data_dir+'/output/ca.csv'
     y = np.genfromtxt(y_filepath, delimiter=',')
 
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
