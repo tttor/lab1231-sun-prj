@@ -132,31 +132,32 @@ def get_best_perf(perfs, scoring):
     return perfs[best_idx]
 
 def main(argv):
-    assert len(argv)==3, 'INSUFFICENT NUMBER OF ARGUMENTS'
-    regression_data_dir = argv[1]
-    regression_output_dir = argv[2]
+    assert len(argv)==4, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    data_dirpath = argv[1]
+    result_dirpath = argv[2]
+    meta_filepath = argv[3]
 
-    #
-    scaled = '_scaled' #: _scaled', '_scaled_min_max'
+    # Load inputs and outputs
+    scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
 
-    X_cooccurrence_fea_filepath = regression_data_dir+'/input/cooccurrence_fea'+scaled+'.csv'
+    X_cooccurrence_fea_filepath = data_dirpath+'/input/cooccurrence_fea'+scale_mode+'.csv'
     X_cooccurrence_fea = np.genfromtxt(X_cooccurrence_fea_filepath, delimiter=',')
 
-    X_sceneprop_fea_filepath = regression_data_dir+'/input/sceneprop_fea'+scaled+'.csv'
+    X_sceneprop_fea_filepath = data_dirpath+'/input/sceneprop_fea'+scale_mode+'.csv'
     X_sceneprop_fea = np.genfromtxt(X_sceneprop_fea_filepath, delimiter=',')
 
-    X_relloc_fea_filepath = regression_data_dir+'/input/relloc_fea'+scaled+'.csv'
+    X_relloc_fea_filepath = data_dirpath+'/input/relloc_fea'+scale_mode+'.csv'
     X_relloc_fea = np.genfromtxt(X_relloc_fea_filepath, delimiter=',')
 
     X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea, X_relloc_fea), axis=1)
 
-    y_filepath = regression_data_dir+'/output/ca.csv'
+    y_filepath = data_dirpath+'/output/ca.csv'
+    # y_filepath = data_dirpath+'/output/ca'+scale_mode+'.csv'# have tried, but result in larger mse
     y = np.genfromtxt(y_filepath, delimiter=',')
 
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
-    print 'n_sample=', n_sample
-    print 'n_input_fea=', X.shape[1]
+    n_fea = X.shape[1]
 
     # Shuffle n_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
@@ -178,8 +179,8 @@ def main(argv):
         # title = 'Learning curve'
         # ylim = (0.0, 1.0)
         # fig = plot_learning_curve(regressor, title, X_tr, y_tr, ylim, cv=10, n_jobs=4)
-        # if regression_output_dir!=None:
-        #     with PdfPages(regression_output_dir+'/learning_curve.pdf') as pdf:
+        # if result_dirpath!=None:
+        #     with PdfPages(result_dirpath+'/learning_curve.pdf') as pdf:
         #         pdf.savefig(fig)
 
         #
@@ -193,7 +194,7 @@ def main(argv):
 
     #
     for scoring, perf in best_perf.iteritems():
-        #
+        # plot y_pred vs y_true
         fig, ax = plt.subplots()
         scatter_plot = ax.scatter(perf['y_true'], perf['y_pred'])
         ax.plot([0.0, 1.0], [0.0, 1.0], '-', linewidth=2, color='red')
@@ -208,15 +209,21 @@ def main(argv):
         plt.ylim(ylim)
         ax.grid(True)
 
-        plt.savefig(regression_output_dir + '/best_ypred_vs_ytrue_wrt_'+scoring+'.png')
+        plt.savefig(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+scoring+'.png')
         plt.close
 
-        with PdfPages(regression_output_dir + '/best_ypred_vs_ytrue_wrt_'+scoring+'.pdf') as pdf:
+        with PdfPages(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+scoring+'.pdf') as pdf:
             pdf.savefig(fig)
 
         #
-        with open(regression_output_dir+'/best_regressor_wrt_'+scoring+'.param', 'w') as f:
+        with open(result_dirpath+'/best_regressor_wrt_'+scoring+'.param', 'w') as f:
             f.write(str(perf['estimator']))
+
+    with open(meta_filepath,'w') as f:
+        f.write(scale_mode+'\n')
+        f.write(str(n_sample)+'\n')
+        f.write(str(n_clone)+'\n')
+        f.write(str(n_fea)+'\n')
 
 if __name__ == '__main__':
     main(sys.argv)

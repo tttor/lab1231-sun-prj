@@ -12,15 +12,13 @@ def main(argv):
 
     X_filepath = regression_data_dirpath+'/'+fea_name+'.csv'
     X = np.genfromtxt(X_filepath, delimiter=',')
-    n_sample = X.shape[0]
-    n_cooccurrence_fea = X.shape[1]
 
     # Standardization for standard normally distributed data: Gaussian with zero mean and unit variance.
     X_scaled = preprocessing.scale(X)
     # print X_scaled.mean(axis=0)
     # print X_scaled.std(axis=0)
 
-    X_scaled_filepath = regression_data_dirpath+'/'+fea_name+'_scaled.csv'
+    X_scaled_filepath = regression_data_dirpath+'/'+fea_name+'_scaled_normal.csv'
     np.savetxt(X_scaled_filepath, X_scaled, delimiter=",")
 
     # Min Mix Scaling
@@ -30,7 +28,7 @@ def main(argv):
     np.savetxt(X_scaled_min_max_filepath, X_scaled_min_max, delimiter=",")
 
     # # Plotting
-    # for i in range(n_cooccurrence_fea):
+    # for i in range(n_fea):
     #     plt.clf()        
     #     plt.scatter(range(1,n_sample+1), X_scaled[:,i], edgecolors='none')
     #     plt.grid(True)
