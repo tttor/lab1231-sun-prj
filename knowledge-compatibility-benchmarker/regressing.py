@@ -1,16 +1,24 @@
 #!/usr/bin/python
 
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
-from sklearn.svm import NuSVR
+import collections
+
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from sklearn import cross_validation
 from sklearn.learning_curve import learning_curve
-from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib.pyplot as plt
-import numpy as np
+
+from sklearn.svm import NuSVR
+from sklearn.linear_model import Lasso
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn import gaussian_process
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
@@ -75,9 +83,13 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     return fig
 
-def tune_NuSVR(X_tr, y_tr):
-    print 'tune_nuSVR(X_tr, y_tr)...'
+def tune_GP(X_tr, y_tr):
+    param_space = {}
 
+    regressor = gaussian_process.GaussianProcess()
+    return tune(regressor, param_space, X_tr, y_tr)
+
+def tune_NuSVR(X_tr, y_tr):
     param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
                    'nu': [0.1, 0.3, 0.5, 0.7, 1.0], 
                    'kernel': ['linear', 'rbf', 'poly'], 
@@ -93,11 +105,39 @@ def tune_NuSVR(X_tr, y_tr):
 
     #
     regressor = NuSVR()
+    return tune(regressor, param_space, X_tr, y_tr)
+
+def tune_Lasso(X_tr, y_tr):
+    param_space = {'alpha': [0.1, 0.3, 0.5, 0.7, 1.0],
+                   'max_iter': [1000, 10000, 100000]}
+
+    regressor = Lasso()
+    return tune(regressor, param_space, X_tr, y_tr)
+
+def tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr):
+    param_space = {'n_estimators': [300, 500, 1000],
+                   'learning_rate': [0.5, 1.0],
+                   'loss': ['linear']}
+
+    regressor = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4))
+    return tune(regressor, param_space, X_tr, y_tr)
+
+def tune_GradientBoostingRegressor(X_tr, y_tr):
+    param_space = {'n_estimators': [300, 500, 1000],
+                   'learning_rate': [0.1, 0.5, 1.0],
+                   'max_depth': [1],
+                   'loss': ['ls']}
+
+    regressor = GradientBoostingRegressor()
+    return tune(regressor, param_space, X_tr, y_tr)
+
+def tune(regressor, param_space, X_tr, y_tr):
+    print 'tune estimator ...'
     kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
     grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
     grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
 
-    return grid_search.best_estimator_
+    return grid_search.best_estimator_   
 
 def train(estimator, X_tr, y_tr):
     print 'train estimator ...'
@@ -155,9 +195,17 @@ def main(argv):
     # y_filepath = data_dirpath+'/output/ca'+scale_mode+'.csv'# have tried, but result in larger mse
     y = np.genfromtxt(y_filepath, delimiter=',')
 
+    # # Aim to avoid (when using GaussianProcess):
+    # # Exception: Multiple input features cannot have the same target value.
+    # # but still failed, TODO why?
+    # y, idx = np.unique(y, return_index=True)
+    # X = X[idx,:]
+
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
     n_fea = X.shape[1]
+    print 'n_sample=', n_sample
+    print 'n_fea=', n_fea
 
     # Shuffle n_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
@@ -165,12 +213,31 @@ def main(argv):
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
     # Tune, train and test
+    #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor, GP
+    method = 'GP' 
+    print 'method', method
+
     perf_of_datasets = []
     regressors = []
-    for dataset in datasets:
+    for i, dataset in enumerate(datasets):
+        print 'Running the pipeline on', i+1,'-th clone of',len(datasets)
+
         X_tr, X_te, y_tr, y_te = dataset
 
-        meta_regressor = tune_NuSVR(X_tr, y_tr)
+        meta_regressor = None
+        if method=='NuSVR':
+            meta_regressor = tune_NuSVR(X_tr, y_tr)
+        elif method=='Lasso':            
+            meta_regressor = tune_Lasso(X_tr, y_tr)
+        elif method=='DecisionTreeRegressionwithAdaBoost':
+            meta_regressor = tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)
+        elif method=="GradientBoostingRegressor":
+            meta_regressor = tune_GradientBoostingRegressor(X_tr, y_tr)
+        elif method=="GP":
+            meta_regressor = tune_GP(X_tr, y_tr)
+        else:
+            assert False, 'UNKNOWN regression methods'
+
         regressor = train(meta_regressor, X_tr, y_tr)
         regressors.append(regressor)
 
@@ -201,7 +268,7 @@ def main(argv):
 
         ax.set_ylabel('$y_{pred}$')
         ax.set_xlabel('$y_{true}$')
-        ax.set_title( 'Testing NuSVR: ' + scoring + ' =' + str(perf[scoring]))
+        ax.set_title( 'Testing '+ method +': ' + scoring + ' =' + str(perf[scoring]))
         
         xlim = (-0.2, 1.2)
         ylim = xlim
@@ -221,6 +288,7 @@ def main(argv):
 
     with open(meta_filepath,'w') as f:
         f.write(scale_mode+'\n')
+        f.write(method+'\n')
         f.write(str(n_sample)+'\n')
         f.write(str(n_clone)+'\n')
         f.write(str(n_fea)+'\n')
