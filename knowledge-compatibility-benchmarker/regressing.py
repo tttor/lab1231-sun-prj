@@ -4,6 +4,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import collections
 
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -194,9 +195,17 @@ def main(argv):
     # y_filepath = data_dirpath+'/output/ca'+scale_mode+'.csv'# have tried, but result in larger mse
     y = np.genfromtxt(y_filepath, delimiter=',')
 
+    # # Aim to avoid (when using GaussianProcess):
+    # # Exception: Multiple input features cannot have the same target value.
+    # # but still failed, TODO why?
+    # y, idx = np.unique(y, return_index=True)
+    # X = X[idx,:]
+
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
     n_fea = X.shape[1]
+    print 'n_sample=', n_sample
+    print 'n_fea=', n_fea
 
     # Shuffle n_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
