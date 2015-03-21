@@ -171,13 +171,21 @@ def get_best_perf(perfs, scoring):
 
     return perfs[best_idx]
 
+def unique_rows(a):
+    # http://stackoverflow.com/questions/8560440/...
+    # ...removing-duplicate-columns-and-rows-from-a-numpy-2d-array
+
+    a = np.ascontiguousarray(a)
+    unique_a = np.unique(a.view([('', a.dtype)]*a.shape[1]))
+    return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
+
 def main(argv):
     assert len(argv)==4, 'INSUFFICENT NUMBER OF ARGUMENTS'
     data_dirpath = argv[1]
     result_dirpath = argv[2]
     meta_filepath = argv[3]
 
-    # Load inputs and outputs
+    # Load inputs
     scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
 
     X_cooccurrence_fea_filepath = data_dirpath+'/input/cooccurrence_fea'+scale_mode+'.csv'
@@ -191,16 +199,22 @@ def main(argv):
 
     X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea, X_relloc_fea), axis=1)
 
+    # Load targets
+    # have tried scaling, but result in larger mse
     y_filepath = data_dirpath+'/output/ca.csv'
-    # y_filepath = data_dirpath+'/output/ca'+scale_mode+'.csv'# have tried, but result in larger mse
     y = np.genfromtxt(y_filepath, delimiter=',')
+    y = y.reshape((len(y),1)) #otherwise, we get one-element tuple
 
-    # # Aim to avoid (when using GaussianProcess):
-    # # Exception: Multiple input features cannot have the same target value.
-    # # but still failed, TODO why?
-    # y, idx = np.unique(y, return_index=True)
-    # X = X[idx,:]
+    # when using GaussianProcess, this aims to avoid
+    # Exception: Multiple input features cannot have the same target value.
+    # the idx of a unique row is based on the first occurrence of the row.
+    unique_X = unique_rows(X)
+    unique_X_idx = [X.tolist().index(i) for i in unique_X.tolist()]
 
+    X = unique_X
+    y = y[unique_X_idx] 
+
+    #
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
     n_fea = X.shape[1]
