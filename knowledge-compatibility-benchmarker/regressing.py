@@ -2,14 +2,18 @@
 
 import sys
 
-from sklearn.svm import NuSVR
+
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from sklearn import cross_validation
 from sklearn.learning_curve import learning_curve
+
+from sklearn.svm import NuSVR
 from sklearn.linear_model import Lasso
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import AdaBoostRegressor
 
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
@@ -114,7 +118,21 @@ def tune_Lasso(X_tr, y_tr):
     grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
     grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
 
-    return grid_search.best_estimator_    
+    return grid_search.best_estimator_   
+
+def tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr):
+    print 'tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)...'
+
+    param_space = {'n_estimators': [300, 500, 1000],
+                   'learning_rate': [0.5, 1.0],
+                   'loss': ['linear']}
+    #
+    regressor = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4))
+    kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
+    grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
+    grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
+
+    return grid_search.best_estimator_   
 
 def train(estimator, X_tr, y_tr):
     print 'train estimator ...'
@@ -182,7 +200,7 @@ def main(argv):
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
     # Tune, train and test
-    method = 'Lasso' #: Lasso, NuSVR
+    method = 'DecisionTreeRegressionwithAdaBoost' #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost
 
     perf_of_datasets = []
     regressors = []
@@ -194,6 +212,8 @@ def main(argv):
             meta_regressor = tune_NuSVR(X_tr, y_tr)
         elif method=='Lasso':            
             meta_regressor = tune_Lasso(X_tr, y_tr)
+        elif method=='DecisionTreeRegressionwithAdaBoost':
+            meta_regressor = tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)
         else:
             assert False, 'UNKNOWN regression methods'
 
