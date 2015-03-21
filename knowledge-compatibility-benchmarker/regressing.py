@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
-
 
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -14,10 +16,7 @@ from sklearn.svm import NuSVR
 from sklearn.linear_model import Lasso
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import AdaBoostRegressor
-
-from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib.pyplot as plt
-import numpy as np
+from sklearn.ensemble import GradientBoostingRegressor
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
@@ -134,6 +133,24 @@ def tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr):
 
     return grid_search.best_estimator_   
 
+def tune_GradientBoostingRegressor(X_tr, y_tr):
+    print 'tune_GradientBoostingRegressor(X_tr, y_tr)...'
+
+    param_space = {'n_estimators': [300, 500, 1000],
+                   'learning_rate': [0.1, 0.5, 1.0],
+                   'max_depth': [1],
+                   'loss': ['ls']}
+
+    regressor = GradientBoostingRegressor()
+    return tune(regressor, param_space, X_tr, y_tr)
+
+def tune(regressor, param_space, X_tr, y_tr):
+    kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
+    grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
+    grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
+
+    return grid_search.best_estimator_   
+
 def train(estimator, X_tr, y_tr):
     print 'train estimator ...'
     estimator.fit(X_tr, y_tr)
@@ -200,7 +217,8 @@ def main(argv):
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
     # Tune, train and test
-    method = 'DecisionTreeRegressionwithAdaBoost' #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost
+    #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor
+    method = 'GradientBoostingRegressor' 
 
     perf_of_datasets = []
     regressors = []
@@ -214,6 +232,8 @@ def main(argv):
             meta_regressor = tune_Lasso(X_tr, y_tr)
         elif method=='DecisionTreeRegressionwithAdaBoost':
             meta_regressor = tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)
+        elif method=="GradientBoostingRegressor":
+            meta_regressor = tune_GradientBoostingRegressor(X_tr, y_tr)
         else:
             assert False, 'UNKNOWN regression methods'
 
