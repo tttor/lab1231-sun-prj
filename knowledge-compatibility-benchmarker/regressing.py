@@ -180,10 +180,11 @@ def unique_rows(a):
     return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
 
 def main(argv):
-    assert len(argv)==4, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    assert len(argv)==5, 'INSUFFICENT NUMBER OF ARGUMENTS'
     data_dirpath = argv[1]
     result_dirpath = argv[2]
     meta_filepath = argv[3]
+    method = argv[4]
 
     # Load inputs
     scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
@@ -202,11 +203,11 @@ def main(argv):
     # Load targets
     # have tried scaling, but result in larger mse
     y_filepath = data_dirpath+'/output/ca.csv'
-    y = np.genfromtxt(y_filepath, delimiter=',')
-    y = y.reshape((len(y),1)) #otherwise, we get one-element tuple
+    y = np.genfromtxt(y_filepath, delimiter=',')# note: y.shape is one-element tuple
 
-    # when using GaussianProcess, this aims to avoid
+    # When using GaussianProcess, this aims to avoid
     # Exception: Multiple input features cannot have the same target value.
+    # For other methods, this may improve the regression performance.
     # the idx of a unique row is based on the first occurrence of the row.
     unique_X = unique_rows(X)
     unique_X_idx = [X.tolist().index(i) for i in unique_X.tolist()]
@@ -227,13 +228,12 @@ def main(argv):
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
     # Tune, train and test
-    #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor, GP
-    method = 'GP' 
-    print 'method', method
+    print 'method=', method
 
     perf_of_datasets = []
     regressors = []
     for i, dataset in enumerate(datasets):
+        print '----------'
         print 'Running the pipeline on', i+1,'-th clone of',len(datasets)
 
         X_tr, X_te, y_tr, y_te = dataset
