@@ -82,8 +82,6 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     return fig
 
 def tune_NuSVR(X_tr, y_tr):
-    print 'tune_nuSVR(X_tr, y_tr)...'
-
     param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
                    'nu': [0.1, 0.3, 0.5, 0.7, 1.0], 
                    'kernel': ['linear', 'rbf', 'poly'], 
@@ -99,43 +97,24 @@ def tune_NuSVR(X_tr, y_tr):
 
     #
     regressor = NuSVR()
-    kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
-    grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
-    grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
-
-    return grid_search.best_estimator_
+    return tune(regressor, param_space, X_tr, y_tr)
 
 def tune_Lasso(X_tr, y_tr):
-    print 'tune_Lasso(X_tr, y_tr)...'
-
     param_space = {'alpha': [0.1, 0.3, 0.5, 0.7, 1.0],
                    'max_iter': [1000, 10000, 100000]}
 
-    #
     regressor = Lasso()
-    kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
-    grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
-    grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
-
-    return grid_search.best_estimator_   
+    return tune(regressor, param_space, X_tr, y_tr)
 
 def tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr):
-    print 'tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)...'
-
     param_space = {'n_estimators': [300, 500, 1000],
                    'learning_rate': [0.5, 1.0],
                    'loss': ['linear']}
-    #
-    regressor = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4))
-    kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
-    grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
-    grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
 
-    return grid_search.best_estimator_   
+    regressor = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4))
+    return tune(regressor, param_space, X_tr, y_tr)
 
 def tune_GradientBoostingRegressor(X_tr, y_tr):
-    print 'tune_GradientBoostingRegressor(X_tr, y_tr)...'
-
     param_space = {'n_estimators': [300, 500, 1000],
                    'learning_rate': [0.1, 0.5, 1.0],
                    'max_depth': [1],
@@ -145,6 +124,7 @@ def tune_GradientBoostingRegressor(X_tr, y_tr):
     return tune(regressor, param_space, X_tr, y_tr)
 
 def tune(regressor, param_space, X_tr, y_tr):
+    print 'tune estimator ...'
     kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
     grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
     grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
@@ -218,11 +198,14 @@ def main(argv):
 
     # Tune, train and test
     #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor
-    method = 'GradientBoostingRegressor' 
+    method = 'NuSVR' 
+    print 'method', method
 
     perf_of_datasets = []
     regressors = []
-    for dataset in datasets:
+    for i, dataset in enumerate(datasets):
+        print 'Running the pipeline on', i+1,'-th clone of',len(datasets)
+
         X_tr, X_te, y_tr, y_te = dataset
 
         meta_regressor = None
@@ -287,6 +270,7 @@ def main(argv):
 
     with open(meta_filepath,'w') as f:
         f.write(scale_mode+'\n')
+        f.write(method+'\n')
         f.write(str(n_sample)+'\n')
         f.write(str(n_clone)+'\n')
         f.write(str(n_fea)+'\n')
