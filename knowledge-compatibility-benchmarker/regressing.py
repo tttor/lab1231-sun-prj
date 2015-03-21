@@ -17,6 +17,7 @@ from sklearn.linear_model import Lasso
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn import gaussian_process
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
@@ -80,6 +81,12 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.legend(loc="best")
 
     return fig
+
+def tune_GP(X_tr, y_tr):
+    param_space = {}
+
+    regressor = gaussian_process.GaussianProcess()
+    return tune(regressor, param_space, X_tr, y_tr)
 
 def tune_NuSVR(X_tr, y_tr):
     param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
@@ -197,8 +204,8 @@ def main(argv):
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
     # Tune, train and test
-    #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor
-    method = 'NuSVR' 
+    #: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor, GP
+    method = 'GP' 
     print 'method', method
 
     perf_of_datasets = []
@@ -217,6 +224,8 @@ def main(argv):
             meta_regressor = tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)
         elif method=="GradientBoostingRegressor":
             meta_regressor = tune_GradientBoostingRegressor(X_tr, y_tr)
+        elif method=="GP":
+            meta_regressor = tune_GP(X_tr, y_tr)
         else:
             assert False, 'UNKNOWN regression methods'
 
