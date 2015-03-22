@@ -179,12 +179,13 @@ def unique_rows(a):
     return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
 
 def main(argv):
-    assert len(argv)==6, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    assert len(argv)==7, 'INSUFFICENT NUMBER OF ARGUMENTS'
     data_dirpath = argv[1]
     result_dirpath = argv[2]
     meta_filepath = argv[3]
     method = argv[4]
     hyperparam_filepath = argv [5]
+    n_dataset_clone = int(argv[6])
 
     # Load inputs
     scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
@@ -230,10 +231,10 @@ def main(argv):
     print 'n_sample=', n_sample
     print 'n_fea=', n_fea
 
-    # Shuffle n_clone times
+    # Shuffle n_dataset_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
-    n_clone = 5
-    datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
+    
+    datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_dataset_clone)]
 
     # Tune, train and test on all datasets
     print 'method=', method
@@ -323,7 +324,6 @@ def main(argv):
         f.write(scale_mode+'\n')
         f.write(method+'\n')
         f.write(str(n_sample)+'\n')
-        f.write(str(n_clone)+'\n')
         f.write(str(n_fea)+'\n')
 
 if __name__ == '__main__':
