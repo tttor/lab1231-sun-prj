@@ -6,6 +6,7 @@ import numpy as np
 import sys
 import cPickle
 import json
+import yaml
 
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -84,29 +85,23 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     return fig
 
-def tune_NuSVR(X_tr, y_tr, meta_filepath):
-    param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
-                   'nu': [0.1, 0.3, 0.5, 0.7, 1.0], 
-                   'kernel': ['linear', 'rbf', 'poly'], 
-                   'degree': [3, 5, 7], 
-                   'gamma': [0.0, 0.1, 0.3, 0.5, 0.7]}
-    param_space = {'C': [1.0],
-                   'nu': [0.5], 
-                   'kernel': ['rbf'], 
-                   'degree': [3], 
-                   'gamma': [0.7]}
-    json.dump(param_space, open(meta_filepath,'a'))
+def tune_NuSVR(X_tr, y_tr, hyperparam_filepath, meta_filepath):
+    with open(hyperparam_filepath) as f:  
+        param_space = yaml.load(f)
+
+    with open(meta_filepath,'w') as f:
+        json.dump(param_space, f)  
 
     #
     regressor = NuSVR()
     return tune(regressor, param_space, X_tr, y_tr)
 
-def tune_GradientBoostingRegressor(X_tr, y_tr, meta_filepath):
-    param_space = {'n_estimators': [300, 500, 1000],
-                   'learning_rate': [0.1, 0.5, 1.0],
-                   'max_depth': [1],
-                   'loss': ['ls']}
-    json.dump(param_space, open(meta_filepath,'a'))
+def tune_GradientBoostingRegressor(X_tr, y_tr, hyperparam_filepath, meta_filepath):
+    with open(hyperparam_filepath) as f:  
+        param_space = yaml.load(f)
+
+    with open(meta_filepath,'w') as f:
+        json.dump(param_space, f)  
 
     regressor = GradientBoostingRegressor()
     return tune(regressor, param_space, X_tr, y_tr)
@@ -131,7 +126,7 @@ def tune_GP(X_tr, y_tr):
 
     regressor = gaussian_process.GaussianProcess(theta0=0.1, thetaL=.001, thetaU=1.)
     return tune(regressor, param_space, X_tr, y_tr)
-    
+
 def tune(regressor, param_space, X_tr, y_tr):
     print 'tune estimator ...'
     kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
@@ -184,11 +179,12 @@ def unique_rows(a):
     return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
 
 def main(argv):
-    assert len(argv)==5, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    assert len(argv)==6, 'INSUFFICENT NUMBER OF ARGUMENTS'
     data_dirpath = argv[1]
     result_dirpath = argv[2]
     meta_filepath = argv[3]
     method = argv[4]
+    hyperparam_filepath = argv [5]
 
     # Load inputs
     scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
@@ -253,13 +249,13 @@ def main(argv):
         # Tune
         meta_regressor = None
         if method=='NuSVR':
-            meta_regressor = tune_NuSVR(X_tr, y_tr, meta_filepath)
+            meta_regressor = tune_NuSVR(X_tr, y_tr, hyperparam_filepath, meta_filepath)
+        elif method=="GradientBoostingRegressor":   
+            meta_regressor = tune_GradientBoostingRegressor(X_tr, y_tr, hyperparam_filepath, meta_filepath)
         elif method=='Lasso':            
             meta_regressor = tune_Lasso(X_tr, y_tr)
         elif method=='DecisionTreeRegressionwithAdaBoost':
             meta_regressor = tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)
-        elif method=="GradientBoostingRegressor":
-            meta_regressor = tune_GradientBoostingRegressor(X_tr, y_tr, meta_filepath)
         elif method=="GP":
             meta_regressor = tune_GP(X_tr, y_tr)
         else:

@@ -10,6 +10,8 @@ timestamp="$(date +'%Y%m%d.%H%M%S')"
 #: main: (1) NuSVR and (2) GradientBoostingRegressor, 
 #: secondary: GP (GaussianProcess), Lasso, DecisionTreeRegressionwithAdaBoost,
 method=$1
+hyperparam_filename=v00
+hyperparam_filepath=$root_dir/meta/$method-hyperparam/$hyperparam_filename.json
 
 dataset_name=voc2010
 annotator_id=philippunarymrf
@@ -27,11 +29,13 @@ python  $exe \
 		$data_dirpath \
 		$result_dirpath \
 		$meta_filepath \
-		$method
+		$method \
+		$hyperparam_filepath
 
 #
 echo $data_dirpath >> $meta_filepath
 echo $dataset_name >> $meta_filepath 
-echo $annotator_id >> $meta_filepath 
+echo $annotator_id >> $meta_filepath
+echo $hyperparam_filepath >> $meta_filepath 
 echo $timestamp >> $meta_filepath 
 echo "$(date +'%Y%m%d.%H%M%S')" >> $meta_filepath 
