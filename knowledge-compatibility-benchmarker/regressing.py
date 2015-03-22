@@ -4,7 +4,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-import collections
+import cPickle
 
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -154,22 +154,21 @@ def test(estimator, X_te, y_te):
     perf['r2'] = r2_score(y_true, y_pred)
     perf['y_pred'] = y_pred
     perf['y_true'] = y_true
-    perf['estimator'] = estimator
      
     return perf
 
-def get_best_perf(perfs, scoring):
-    score_list = [perf[scoring] for perf in perfs]
+def get_best_regressor(regressor_list, score_mode):
+    score_list = [regressor['perf'][score_mode] for regressor in regressor_list]
 
     best_idx = None
-    if scoring=='mse':
+    if score_mode=='mse':
         best_idx = score_list.index( min(score_list) )
-    elif scoring=='r2':
+    elif score_mode=='r2':
         best_idx = score_list.index( max(score_list) )
     else:
-        assert False, 'UNKNOWN scoring :('
+        assert False, 'UNKNOWN score_mode :('
 
-    return perfs[best_idx]
+    return regressor_list[best_idx]
 
 def unique_rows(a):
     # http://stackoverflow.com/questions/8560440/...
@@ -205,6 +204,7 @@ def main(argv):
     y_filepath = data_dirpath+'/output/ca.csv'
     y = np.genfromtxt(y_filepath, delimiter=',')# note: y.shape is one-element tuple
 
+    # Preprocess data
     # When using GaussianProcess, this aims to avoid
     # Exception: Multiple input features cannot have the same target value.
     # For other methods, this may improve the regression performance.
@@ -215,7 +215,6 @@ def main(argv):
     X = unique_X
     y = y[unique_X_idx] 
 
-    #
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
     n_fea = X.shape[1]
@@ -227,17 +226,18 @@ def main(argv):
     n_clone = 5
     datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
 
-    # Tune, train and test
+    # Tune, train and test on all datasets
     print 'method=', method
 
-    perf_of_datasets = []
-    regressors = []
+    regressor_list = []
     for i, dataset in enumerate(datasets):
         print '----------'
         print 'Running the pipeline on', i+1,'-th clone of',len(datasets)
 
         X_tr, X_te, y_tr, y_te = dataset
+        regressor_data = {}
 
+        # Tune
         meta_regressor = None
         if method=='NuSVR':
             meta_regressor = tune_NuSVR(X_tr, y_tr)
@@ -252,8 +252,9 @@ def main(argv):
         else:
             assert False, 'UNKNOWN regression methods'
 
+        # Train
         regressor = train(meta_regressor, X_tr, y_tr)
-        regressors.append(regressor)
+        regressor_data['regressor'] = regressor
 
         # #  
         # print 'plot_learning_curve()'
@@ -264,25 +265,32 @@ def main(argv):
         #     with PdfPages(result_dirpath+'/learning_curve.pdf') as pdf:
         #         pdf.savefig(fig)
 
-        #
+        # Test
         perf = test(regressor, X_te, y_te)
-        perf_of_datasets.append(perf)
+        regressor_data['perf'] = perf
+
+        #
+        regressor_list.append(regressor_data)
 
     #
-    best_perf = {}
-    best_perf['mse'] = get_best_perf(perf_of_datasets, 'mse')
-    best_perf['r2'] = get_best_perf(perf_of_datasets, 'r2')
+    best_regressor = {}
+    best_regressor['mse'] = get_best_regressor(regressor_list, 'mse')
+    best_regressor['r2'] = get_best_regressor(regressor_list,'r2')
 
     #
-    for scoring, perf in best_perf.iteritems():
+    for score_mode, regressor in best_regressor.iteritems():
         # plot y_pred vs y_true
+        y_true = regressor['perf']['y_true']
+        y_pred = regressor['perf']['y_pred']
+        score = regressor['perf'][score_mode]
+
         fig, ax = plt.subplots()
-        scatter_plot = ax.scatter(perf['y_true'], perf['y_pred'])
-        ax.plot([0.0, 1.0], [0.0, 1.0], '-', linewidth=2, color='red')
+        scatter_plot = ax.scatter(y_true, y_pred)
+        ax.plot([0.0, 1.0], [0.0, 1.0], '-', linewidth=2, color='red')# the line of y=x 
 
         ax.set_ylabel('$y_{pred}$')
         ax.set_xlabel('$y_{true}$')
-        ax.set_title( 'Testing '+ method +': ' + scoring + ' =' + str(perf[scoring]))
+        ax.set_title( 'Testing '+ method +': ' + score_mode + ' =' + str(score))
         
         xlim = (-0.2, 1.2)
         ylim = xlim
@@ -290,16 +298,17 @@ def main(argv):
         plt.ylim(ylim)
         ax.grid(True)
 
-        plt.savefig(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+scoring+'.png')
+        plt.savefig(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+score_mode+'.png')
         plt.close
 
-        with PdfPages(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+scoring+'.pdf') as pdf:
+        with PdfPages(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+score_mode+'.pdf') as pdf:
             pdf.savefig(fig)
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.param', 'w') as f:
+            f.write(str(regressor['regressor']))
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.pickle', 'wb') as fid:
+            cPickle.dump(regressor['regressor'], fid)
 
-        #
-        with open(result_dirpath+'/best_regressor_wrt_'+scoring+'.param', 'w') as f:
-            f.write(str(perf['estimator']))
-
+    #
     with open(meta_filepath,'w') as f:
         f.write(scale_mode+'\n')
         f.write(method+'\n')
