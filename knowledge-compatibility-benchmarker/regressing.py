@@ -248,6 +248,10 @@ def main(argv):
             cPickle.dump(regressor['regressor'], f)
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.y_pred', 'w') as f:
             np.savetxt(f, np.asarray(y_pred), delimiter=",")
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.r2', 'w') as f:
+            f.write(str(regressor['perf']['r2']))
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.mse', 'w') as f:
+            f.write(str(regressor['perf']['mse']))
 
     #
     with open(meta_filepath,'a') as f:
