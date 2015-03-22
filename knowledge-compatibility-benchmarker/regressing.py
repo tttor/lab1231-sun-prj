@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import cPickle
+import json
+import yaml
 
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -83,28 +85,25 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     return fig
 
-def tune_GP(X_tr, y_tr):
-    param_space = {}
+def tune_NuSVR(X_tr, y_tr, hyperparam_filepath, meta_filepath):
+    with open(hyperparam_filepath) as f:  
+        param_space = yaml.load(f)
 
-    regressor = gaussian_process.GaussianProcess()
-    return tune(regressor, param_space, X_tr, y_tr)
-
-def tune_NuSVR(X_tr, y_tr):
-    param_space = {'C': [0.1, 0.3, 0.5, 0.7, 1.0],
-                   'nu': [0.1, 0.3, 0.5, 0.7, 1.0], 
-                   'kernel': ['linear', 'rbf', 'poly'], 
-                   'degree': [3, 5, 7], 
-                   'gamma': [0.0, 0.1, 0.3, 0.5, 0.7]}
-
-    # dummy
-    param_space = {'C': [1.0],
-                   'nu': [0.5], 
-                   'kernel': ['rbf'], 
-                   'degree': [3], 
-                   'gamma': [0.7]}
+    with open(meta_filepath,'w') as f:
+        json.dump(param_space, f)  
 
     #
     regressor = NuSVR()
+    return tune(regressor, param_space, X_tr, y_tr)
+
+def tune_GradientBoostingRegressor(X_tr, y_tr, hyperparam_filepath, meta_filepath):
+    with open(hyperparam_filepath) as f:  
+        param_space = yaml.load(f)
+
+    with open(meta_filepath,'w') as f:
+        json.dump(param_space, f)  
+
+    regressor = GradientBoostingRegressor()
     return tune(regressor, param_space, X_tr, y_tr)
 
 def tune_Lasso(X_tr, y_tr):
@@ -122,20 +121,21 @@ def tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr):
     regressor = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4))
     return tune(regressor, param_space, X_tr, y_tr)
 
-def tune_GradientBoostingRegressor(X_tr, y_tr):
-    param_space = {'n_estimators': [300, 500, 1000],
-                   'learning_rate': [0.1, 0.5, 1.0],
-                   'max_depth': [1],
-                   'loss': ['ls']}
+def tune_GP(X_tr, y_tr):
+    param_space = {}
 
-    regressor = GradientBoostingRegressor()
+    regressor = gaussian_process.GaussianProcess(theta0=0.1, thetaL=.001, thetaU=1.)
     return tune(regressor, param_space, X_tr, y_tr)
 
 def tune(regressor, param_space, X_tr, y_tr):
     print 'tune estimator ...'
     kf_cv = cross_validation.KFold(n=len(y_tr), n_folds=10)
-    grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)# use r2_score by default for regression
-    grid_search.fit(X_tr,y_tr)# Run fit with all sets of parameters.
+
+    # use r2_score by default for regression
+    grid_search = GridSearchCV(regressor, param_grid=param_space, cv=kf_cv)
+    
+    # Run fit() with all sets of parameters in param_space.
+    grid_search.fit(X_tr,y_tr)
 
     return grid_search.best_estimator_   
 
@@ -179,11 +179,13 @@ def unique_rows(a):
     return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
 
 def main(argv):
-    assert len(argv)==5, 'INSUFFICENT NUMBER OF ARGUMENTS'
+    assert len(argv)==7, 'INSUFFICENT NUMBER OF ARGUMENTS'
     data_dirpath = argv[1]
     result_dirpath = argv[2]
     meta_filepath = argv[3]
     method = argv[4]
+    hyperparam_filepath = argv [5]
+    n_dataset_clone = int(argv[6])
 
     # Load inputs
     scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
@@ -204,7 +206,7 @@ def main(argv):
     y_filepath = data_dirpath+'/output/ca.csv'
     y = np.genfromtxt(y_filepath, delimiter=',')# note: y.shape is one-element tuple
 
-    # Preprocess data
+    # Preprocess data (again, in addition to scaling above)
     # When using GaussianProcess, this aims to avoid
     # Exception: Multiple input features cannot have the same target value.
     # For other methods, this may improve the regression performance.
@@ -215,16 +217,24 @@ def main(argv):
     X = unique_X
     y = y[unique_X_idx] 
 
+    # Sanity checks
+    for i in y.tolist():
+        if np.isnan(i) or np.isinf(i):
+            assert False, 'nan or inf values'
+    for i in X.flatten().tolist():
+        if np.isnan(i) or np.isinf(i):
+            assert False, 'nan or inf values'
+
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
     n_fea = X.shape[1]
     print 'n_sample=', n_sample
     print 'n_fea=', n_fea
 
-    # Shuffle n_clone times
+    # Shuffle n_dataset_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
-    n_clone = 5
-    datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_clone)]
+    
+    datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_dataset_clone)]
 
     # Tune, train and test on all datasets
     print 'method=', method
@@ -240,13 +250,13 @@ def main(argv):
         # Tune
         meta_regressor = None
         if method=='NuSVR':
-            meta_regressor = tune_NuSVR(X_tr, y_tr)
+            meta_regressor = tune_NuSVR(X_tr, y_tr, hyperparam_filepath, meta_filepath)
+        elif method=="GradientBoostingRegressor":   
+            meta_regressor = tune_GradientBoostingRegressor(X_tr, y_tr, hyperparam_filepath, meta_filepath)
         elif method=='Lasso':            
             meta_regressor = tune_Lasso(X_tr, y_tr)
         elif method=='DecisionTreeRegressionwithAdaBoost':
             meta_regressor = tune_DecisionTreeRegressionwithAdaBoost(X_tr, y_tr)
-        elif method=="GradientBoostingRegressor":
-            meta_regressor = tune_GradientBoostingRegressor(X_tr, y_tr)
         elif method=="GP":
             meta_regressor = tune_GP(X_tr, y_tr)
         else:
@@ -305,15 +315,17 @@ def main(argv):
             pdf.savefig(fig)
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.param', 'w') as f:
             f.write(str(regressor['regressor']))
-        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.pickle', 'wb') as fid:
-            cPickle.dump(regressor['regressor'], fid)
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.pickle', 'wb') as f:
+            cPickle.dump(regressor['regressor'], f)
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.y_pred', 'w') as f:
+            np.savetxt(f, np.asarray(y_pred), delimiter=",")
 
     #
-    with open(meta_filepath,'w') as f:
+    with open(meta_filepath,'a') as f:
+        f.write('\n')
         f.write(scale_mode+'\n')
         f.write(method+'\n')
         f.write(str(n_sample)+'\n')
-        f.write(str(n_clone)+'\n')
         f.write(str(n_fea)+'\n')
 
 if __name__ == '__main__':
