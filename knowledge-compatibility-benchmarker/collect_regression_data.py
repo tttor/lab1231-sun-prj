@@ -45,13 +45,13 @@ def get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir, ori_i
         relloc_fea.append(ith_relloc_fea)
 
     #
-    cooccurrence_fea_filepath = regression_data_dir+'/'+'input.cooccurrence_fea.csv'
+    cooccurrence_fea_filepath = regression_data_dir+'/input/cooccurrence_fea.csv'
     np.savetxt(cooccurrence_fea_filepath, cooccurrence_fea, delimiter=",")
 
-    sceneprop_fea_filepath = regression_data_dir+'/'+'input.sceneprop_fea.csv'
+    sceneprop_fea_filepath = regression_data_dir+'/input/sceneprop_fea.csv'
     np.savetxt(sceneprop_fea_filepath, sceneprop_fea, delimiter=",")
 
-    relloc_fea_filepath = regression_data_dir+'/'+'input.relloc_fea.csv'
+    relloc_fea_filepath = regression_data_dir+'/input/relloc_fea.csv'
     np.savetxt(relloc_fea_filepath, relloc_fea, delimiter=",")
 
 def get_output(sample_id_list, eval_dir, regression_data_dir):
@@ -86,7 +86,7 @@ def get_output(sample_id_list, eval_dir, regression_data_dir):
     # plt.legend()
     # plt.grid(True)
 
-    # ca_scatter_plot_filepath = regression_data_dir+'/'+'ca_scatter_plot'
+    # ca_scatter_plot_filepath = regression_data_dir+'/output/ca_scatter_plot'
     # plt.savefig(ca_scatter_plot_filepath+'.pdf')
     # plt.savefig(ca_scatter_plot_filepath+'.png')
     # plt.close()
@@ -95,23 +95,23 @@ def get_output(sample_id_list, eval_dir, regression_data_dir):
     n_bin = 50
 
     plt.hist(regression_output[:,0], n_bin, normed=1, facecolor='red', alpha=0.5)
-    ca_hist_plot_filepath = regression_data_dir+'/'+'ca_hist_plot'
+    ca_hist_plot_filepath = regression_data_dir+'/output/ca_hist_plot'
     plt.savefig(ca_hist_plot_filepath+'.pdf')
     plt.savefig(ca_hist_plot_filepath+'.png')
     plt.close()
 
     
     plt.hist(regression_output[:,1], n_bin, normed=1, facecolor='green', alpha=0.5)
-    ga_hist_plot_filepath = regression_data_dir+'/'+'ga_hist_plot'
+    ga_hist_plot_filepath = regression_data_dir+'/output/ga_hist_plot'
     plt.savefig(ga_hist_plot_filepath+'.pdf')
     plt.savefig(ga_hist_plot_filepath+'.png')
     plt.close()
 
     #
-    regression_output_filepath = regression_data_dir+'/'+'output.ca.csv'
+    regression_output_filepath = regression_data_dir+'/output/ca.csv'
     np.savetxt(regression_output_filepath, regression_output[:,0], delimiter=",")
 
-    regression_output_filepath = regression_data_dir+'/'+'output.ga.csv'
+    regression_output_filepath = regression_data_dir+'/output/ga.csv'
     np.savetxt(regression_output_filepath, regression_output[:,1], delimiter=",")
 
 def main(argv):
