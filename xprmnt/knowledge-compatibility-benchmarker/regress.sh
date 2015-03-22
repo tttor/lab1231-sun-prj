@@ -2,8 +2,8 @@
 root_dir=/home/tor/xprmnt/knowledge-compatibility-benchmarker
 timestamp="$(date +'%Y%m%d.%H%M%S')"
 
-#: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor, GP
-method=GradientBoostingRegressor
+#: Lasso, NuSVR, DecisionTreeRegressionwithAdaBoost, GradientBoostingRegressor, GP (GaussianProcess)
+method=GP
 
 dataset_name=voc2010
 annotator_id=philippunarymrf

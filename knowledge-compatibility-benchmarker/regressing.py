@@ -86,7 +86,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 def tune_GP(X_tr, y_tr):
     param_space = {}
 
-    regressor = gaussian_process.GaussianProcess()
+    regressor = gaussian_process.GaussianProcess(theta0=0.1, thetaL=.001, thetaU=1.)
     return tune(regressor, param_space, X_tr, y_tr)
 
 def tune_NuSVR(X_tr, y_tr):
@@ -214,6 +214,13 @@ def main(argv):
 
     X = unique_X
     y = y[unique_X_idx] 
+
+    for i in y.tolist():
+        if np.isnan(i) or np.isinf(i):
+            assert False, 'nan or inf values'
+    for i in X.flatten().tolist():
+        if np.isnan(i) or np.isinf(i):
+            assert False, 'nan or inf values'
 
     assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
     n_sample = X.shape[0]
