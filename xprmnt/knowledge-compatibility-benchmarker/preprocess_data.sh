@@ -4,7 +4,7 @@ timestamp="$(date +'%Y%m%d.%H%M%S')"
 
 annotator_id=philippunarymrf
 dataset_name=voc2010
-rawdata_timestamp=20150314.224909
+rawdata_timestamp=20150321.221555
 data_dirpath=$root_dir/$annotator_id-$dataset_name-$rawdata_timestamp
 exe=/home/tor/lab1231-sun-prj/knowledge-compatibility-benchmarker/preprocess.py
 
