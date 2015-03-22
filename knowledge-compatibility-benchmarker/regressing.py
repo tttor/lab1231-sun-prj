@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from matplotlib.backends.backend_pdf import PdfPages
+# from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib
 matplotlib.use('Agg')# Force matplotlib to not use any Xwindows backend.
 import matplotlib.pyplot as plt
@@ -240,8 +240,8 @@ def main(argv):
         plt.savefig(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+score_mode+'.png')
         plt.close
 
-        with PdfPages(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+score_mode+'.pdf') as pdf:
-            pdf.savefig(fig)
+        # with PdfPages(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+score_mode+'.pdf') as pdf:
+        #     pdf.savefig(fig)
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.param', 'w') as f:
             f.write(str(regressor['regressor']))
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.pickle', 'wb') as f:
