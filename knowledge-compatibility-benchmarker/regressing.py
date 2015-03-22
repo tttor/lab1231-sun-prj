@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib
+matplotlib.use('Agg')# Force matplotlib to not use any Xwindows backend.
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
