@@ -315,8 +315,10 @@ def main(argv):
             pdf.savefig(fig)
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.param', 'w') as f:
             f.write(str(regressor['regressor']))
-        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.pickle', 'wb') as fid:
-            cPickle.dump(regressor['regressor'], fid)
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.pickle', 'wb') as f:
+            cPickle.dump(regressor['regressor'], f)
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.y_pred', 'w') as f:
+            np.savetxt(f, np.asarray(y_pred), delimiter=",")
 
     #
     with open(meta_filepath,'a') as f:
