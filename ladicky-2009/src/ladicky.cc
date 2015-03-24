@@ -77,7 +77,40 @@ void sun::ladicky::infer(const std::string& method, Energy<double>* energy, Eige
   delete expand;
 }
 
-void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, int n_label, const std::string& prob_img_filepath, Energy<double>* energy) {
+// void sun::ladicky::set_highest_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, 
+//                                      const std::string& prob_img_filepath, 
+//                                      Energy<double>* energy) {
+//   using namespace std;
+
+//   //initialize number of elements in each segment
+//   energy->higherElements[0] = superpixels[0].size();
+
+//   //allocate energy for higher order indexes
+//   energy->AllocateHigherIndexes();
+//   energy->higherIndex[0][0] = superpixels[0][0];
+
+//   // 
+//   // The Robust P n model potentials take the form:
+//   // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
+//   // gamma_c(x_c) = min{gamma_kprime, gamma_max}
+//   // (17)
+//   const size_t perf_ca_max = 1.0;
+  
+//   //initialize truncation ratio Q for each clique
+//   energy->higherTruncation[0] = 0.0;
+
+//   //initialize gamma_k for each clique
+//   for(int k = 0; k < energy->nlabel; k++) 
+//       energy->higherCost[k] = perf_ca_max;
+
+//   //initialize gamma_max for each clique
+//   const size_t higher_cost_idx = energy->nlabel;
+//   energy->higherCost[higher_cost_idx] = get_predicted_perf_ca();
+// }
+
+void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, 
+                                  int n_label, const std::string& prob_img_filepath, 
+                                  Energy<double>* energy) {
   using namespace std;
 
   //initialize number of elements in each segment
