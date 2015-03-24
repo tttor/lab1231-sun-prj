@@ -126,8 +126,8 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img, sun::util::EnergyParam ener
       cv::Point2i p2;   
       p2.x = x+1; p2.y = y;
       
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x, y, img.cols);
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x+1, y, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x, y, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x+1, y, img.cols);
       energy_res = sun::shotton::edge_potential::potential(img.at<cv::Vec3b>(p1), img.at<cv::Vec3b>(p2), beta, theta_phi);
       energy->pairCost[ind_2nd_energy++] =  energy_res;
     } 
@@ -136,8 +136,8 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img, sun::util::EnergyParam ener
       cv::Point2i p2;   
       p2.x = x; p2.y = y+1;
 
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x, y, img.cols);
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x, y+1, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x, y, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x, y+1, img.cols);
       energy_res = sun::shotton::edge_potential::potential(img.at<cv::Vec3b>(p1), img.at<cv::Vec3b>(p2), beta, theta_phi);
       energy->pairCost[ind_2nd_energy++] =  energy_res;
     }
@@ -152,7 +152,7 @@ void sun::ladicky::set_1st_order(const size_t& n_row, const size_t& n_col, const
 
   for (int x = 0; x < n_col; x++) for (int y=0; y<n_row; y++){
     for(int j = 0; j < n_label; j++){
-      int index = sun::util::flat_idx(x, y, n_col);
+      int index = sun::util::flat_idx_xy(x, y, n_col);
       energy->unaryCost[index * energy->nlabel + j] =  -1 * log( prob_img(x,y,j) ); //-1 * prob_img(x,y,j);
     }
   }
