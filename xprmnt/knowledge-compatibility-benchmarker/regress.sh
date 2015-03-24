@@ -18,7 +18,7 @@ regression_input_timestamp=20150321.221555
 
 data_dirpath=$root_dir/regression-data/$annotator_id-$dataset_name-$regression_input_timestamp
 hyperparam_filepath=$root_dir/meta/$method-hyperparam/$hyperparam_filename.json
-result_dirpath=$root_dir/regression-result/$annotator_id-$dataset_name-$timestamp
+result_dirpath=$root_dir/regression-result/$annotator_id-$dataset_name-$method-$timestamp
 meta_filepath=$result_dirpath/regression.meta
 mkdir -p $result_dirpath
 
