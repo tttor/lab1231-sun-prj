@@ -30,21 +30,24 @@ int main(int argc, char* argv[]) {
   }
 
   // Test: Annotate
-  vector<string> test_img_filenames;
-  test_img_filenames = sun::util::read_list(data_param["test_img_list_filepath"]);
+  vector<string> img_filenames;
+  img_filenames = sun::util::read_list(data_param["test_img_list_filepath"]);
   
-  for (size_t i=0; i<test_img_filenames.size(); ++i) {
-    const string img_filename = test_img_filenames.at(i);
-    string superpixel_file_name = string(img_filename.substr(0,img_filename.size()-4)) + "/" + 
-                                  string(img_filename.substr(0,img_filename.size()-4)) + data_param["param_superpixel"] + ".sup";
+  for (size_t i=0; i<img_filenames.size(); ++i) {
+    const string img_filename = img_filenames.at(i);
 
-    cout << "ANNOTATING: " << img_filename << " (" << i+1 << "/" << test_img_filenames.size() << ")" << endl;
+    string superpixel_file_name = string(img_filename) + 
+                                  "/" + string(img_filename) + 
+                                  data_param["param_superpixel"] + ".sup";
+                                  
+    cout << "ANNOTATING: " << img_filename 
+                           << " (" << i+1 << "/" << img_filenames.size() << ")" << endl;
 
     Eigen::MatrixXi ann;
     ann = sun::ladicky::annotate(img_filename, superpixel_file_name, data_param, energy_param);
 
-    const string ann_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".ann");
-    const string ann_img_filepath = string(data_param["result_dir"]+img_filename.substr(0,img_filename.size()-4)+".bmp");
+    const string ann_filepath = string(data_param["result_dir"]+img_filename+".ann");
+    const string ann_img_filepath = string(data_param["result_dir"]+img_filename+".bmp");
     sun::util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
     cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
   }

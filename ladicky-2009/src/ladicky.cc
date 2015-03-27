@@ -77,7 +77,40 @@ void sun::ladicky::infer(const std::string& method, Energy<double>* energy, Eige
   delete expand;
 }
 
-void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, int n_label, const std::string& prob_img_filepath, Energy<double>* energy) {
+// void sun::ladicky::set_highest_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, 
+//                                      const std::string& prob_img_filepath, 
+//                                      Energy<double>* energy) {
+//   using namespace std;
+
+//   //initialize number of elements in each segment
+//   energy->higherElements[0] = superpixels[0].size();
+
+//   //allocate energy for higher order indexes
+//   energy->AllocateHigherIndexes();
+//   energy->higherIndex[0][0] = superpixels[0][0];
+
+//   // 
+//   // The Robust P n model potentials take the form:
+//   // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
+//   // gamma_c(x_c) = min{gamma_kprime, gamma_max}
+//   // (17)
+//   const size_t perf_ca_max = 1.0;
+  
+//   //initialize truncation ratio Q for each clique
+//   energy->higherTruncation[0] = 0.0;
+
+//   //initialize gamma_k for each clique
+//   for(int k = 0; k < energy->nlabel; k++) 
+//       energy->higherCost[k] = perf_ca_max;
+
+//   //initialize gamma_max for each clique
+//   const size_t higher_cost_idx = energy->nlabel;
+//   energy->higherCost[higher_cost_idx] = get_predicted_perf_ca();
+// }
+
+void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, 
+                                  int n_label, const std::string& prob_img_filepath, 
+                                  Energy<double>* energy) {
   using namespace std;
 
   //initialize number of elements in each segment
@@ -126,8 +159,8 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img, sun::util::EnergyParam ener
       cv::Point2i p2;   
       p2.x = x+1; p2.y = y;
       
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x, y, img.cols);
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x+1, y, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x, y, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x+1, y, img.cols);
       energy_res = sun::shotton::edge_potential::potential(img.at<cv::Vec3b>(p1), img.at<cv::Vec3b>(p2), beta, theta_phi);
       energy->pairCost[ind_2nd_energy++] =  energy_res;
     } 
@@ -136,8 +169,8 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img, sun::util::EnergyParam ener
       cv::Point2i p2;   
       p2.x = x; p2.y = y+1;
 
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x, y, img.cols);
-      energy->pairIndex[ind_2nd++] = sun::util::flat_idx(x, y+1, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x, y, img.cols);
+      energy->pairIndex[ind_2nd++] = sun::util::flat_idx_xy(x, y+1, img.cols);
       energy_res = sun::shotton::edge_potential::potential(img.at<cv::Vec3b>(p1), img.at<cv::Vec3b>(p2), beta, theta_phi);
       energy->pairCost[ind_2nd_energy++] =  energy_res;
     }
@@ -152,7 +185,7 @@ void sun::ladicky::set_1st_order(const size_t& n_row, const size_t& n_col, const
 
   for (int x = 0; x < n_col; x++) for (int y=0; y<n_row; y++){
     for(int j = 0; j < n_label; j++){
-      int index = sun::util::flat_idx(x, y, n_col);
+      int index = sun::util::flat_idx_xy(x, y, n_col);
       energy->unaryCost[index * energy->nlabel + j] =  -1 * log( prob_img(x,y,j) ); //-1 * prob_img(x,y,j);
     }
   }
