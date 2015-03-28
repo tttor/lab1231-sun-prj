@@ -60,11 +60,11 @@ std::vector<std::string> sun::util::read_list(const std::string& list_path) {
   return test_img_filenames;
 }
 
-std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string& list_path){
+std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string& path){
   using namespace std;
 
   vector<Superpixel> vec_sup;
-  ifstream superpixel_file(list_path.c_str());
+  ifstream superpixel_file(path.c_str());
 
   if (superpixel_file.is_open()) {
     string line;
@@ -82,7 +82,10 @@ std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string&
     }
     superpixel_file.close();
   }
-  cout << "load_superpixel" <<  vec_sup.size() << endl;
+  else {
+    assert(false && "FATAL: file not found.");
+  }
+
   return vec_sup;
 }
 
