@@ -40,10 +40,10 @@ int main(int argc, char* argv[]) {
     Eigen::MatrixXi ann;
     ann = sun::ladicky::annotate(img_id, data_param, energy_param);
 
-    // const string ann_filepath = string(data_param["result_dir"]+img_id+".ann");
-    // const string ann_img_filepath = string(data_param["result_dir"]+img_id+".bmp");
-    // sun::util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
-    // cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
+    const string ann_filepath = string(data_param["result_dir"]+"/"+img_id+".csv");
+    const string ann_img_filepath = string(data_param["result_dir"]+"/"+img_id+data_param["img_extension"]);
+    sun::util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
+    cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
   }
 
   return 0;
