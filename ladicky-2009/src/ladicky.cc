@@ -2,7 +2,10 @@
 
 namespace sun = lab1231_sun_prj;
 
-Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, const std::string& superpixel_filename, sun::util::DataParam data_param, sun::util::EnergyParam energy_param) {
+Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, 
+                                       const std::string& superpixel_filename, 
+                                       sun::util::DataParam data_param, 
+                                       sun::util::EnergyParam energy_param) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
   cout << "annotate(): BEGIN\n";
@@ -15,7 +18,8 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, const st
   const string img_path = string(data_param["ori_img_dir"]+img_filename);
   cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
 
-  const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]+img_filename.substr(0,img_filename.size()-4)+".c_unary" );// -4 for ".bmp"
+  const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]
+                                        +img_filename+".c_unary" );
 
   // Segmentation for hi-order energy
   vector<sun::util::Superpixel> superpixels;
@@ -58,7 +62,8 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, const st
   return ann;
 }
 
-void sun::ladicky::infer(const std::string& method, Energy<double>* energy, Eigen::MatrixXi* ann) {
+void sun::ladicky::infer(const std::string& method, 
+                         Energy<double>* energy, Eigen::MatrixXi* ann) {
   const size_t n_var = ann->rows() * ann->cols();
 
   //initialize solution
@@ -77,7 +82,8 @@ void sun::ladicky::infer(const std::string& method, Energy<double>* energy, Eige
   delete expand;
 }
 
-// void sun::ladicky::set_highest_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, 
+// void sun::ladicky::set_highest_order(const cv::Mat& img, 
+//                                      std::vector<sun::util::Superpixel> superpixels, 
 //                                      const std::string& prob_img_filepath, 
 //                                      Energy<double>* energy) {
 //   using namespace std;
@@ -108,7 +114,8 @@ void sun::ladicky::infer(const std::string& method, Energy<double>* energy, Eige
 //   energy->higherCost[higher_cost_idx] = get_predicted_perf_ca();
 // }
 
-void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Superpixel> superpixels, 
+void sun::ladicky::set_high_order(const cv::Mat& img, 
+                                  std::vector<sun::util::Superpixel> superpixels, 
                                   int n_label, const std::string& prob_img_filepath, 
                                   Energy<double>* energy) {
   using namespace std;
@@ -142,7 +149,9 @@ void sun::ladicky::set_high_order(const cv::Mat& img, std::vector<sun::util::Sup
   }
 }
 
-void sun::ladicky::set_2nd_order(const cv::Mat& img, sun::util::EnergyParam energy_param, Energy<double>* energy) {
+void sun::ladicky::set_2nd_order(const cv::Mat& img, 
+                                 sun::util::EnergyParam energy_param, 
+                                 Energy<double>* energy) {
   int ind_2nd = 0, ind_2nd_energy = 0;
   double energy_res = 0.0;
   double beta = sun::shotton::edge_potential::get_beta(img);
@@ -177,8 +186,11 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img, sun::util::EnergyParam ener
   }   
 }
 
-void sun::ladicky::set_1st_order(const size_t& n_row, const size_t& n_col, const size_t& n_label, const std::string& img_filename, sun::util::DataParam data_param, Energy<double>* energy) {
-  const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]+img_filename.substr(0,img_filename.size()-4)+".c_unary" );// -4 for ".bmp"
+void sun::ladicky::set_1st_order(const size_t& n_row, const size_t& n_col, 
+                                 const size_t& n_label, const std::string& img_filename, 
+                                 sun::util::DataParam data_param, Energy<double>* energy) {
+  const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]
+                                        +img_filename+".c_unary" );
 
   ProbImage prob_img;
   prob_img.decompress(prob_img_filepath.c_str());
