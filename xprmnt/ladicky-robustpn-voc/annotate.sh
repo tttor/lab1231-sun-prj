@@ -8,8 +8,8 @@ home=/home/tor
 root_dir=$home/xprmnt/ladicky-robustpn-voc
 timestamp="$(date +'%Y%m%d.%H%M%S')"
 
-img_id_list_filepath=$root_dir/meta/list01
-out_dir=$root_dir/ann/ladicky-robustpn-voc.$timestamp
+img_id_list_filepath=$root_dir/meta/list02
+out_dir=$root_dir/annotation/ladicky-robustpn-voc.$timestamp
 mkdir -p $out_dir
 
 dataset=VOC2010
@@ -18,8 +18,8 @@ img_dir=$home/dataset/pascal/$dataset/VOCdevkit/$dataset/JPEGImages
 img_extension=.jpg
 unary_philipp_dir=$home/dataset/pascal/$dataset/unary-philipp/voc2010_compressed
 
-superpixel_dir=$home/xprmnt/superpixel-generation/one-superpixel
-param_superpixel=-onesuperpixel
+superpixel_dir=$home/xprmnt/superpixel-generation/voc2010/fifty-paramset
+param_superpixel=-slic-10-15-1
 
 # Annotate
 exe=$home/lab1231-sun-prj/ladicky-2009/build/main 
