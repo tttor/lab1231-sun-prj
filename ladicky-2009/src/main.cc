@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
   for (size_t i=0; i<img_filenames.size(); ++i) {
     const string img_filename = img_filenames.at(i);
 
-    string superpixel_file_name = string(img_filename) + 
+    string superpixel_filename = string(img_filename) + 
                                   "/" + string(img_filename) + 
                                   data_param["param_superpixel"] + ".sup";
                                   
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
                            << " (" << i+1 << "/" << img_filenames.size() << ")" << endl;
 
     Eigen::MatrixXi ann;
-    ann = sun::ladicky::annotate(img_filename, superpixel_file_name, data_param, energy_param);
+    ann = sun::ladicky::annotate(img_filename, superpixel_filename, data_param, energy_param);
 
     const string ann_filepath = string(data_param["result_dir"]+img_filename+".ann");
     const string ann_img_filepath = string(data_param["result_dir"]+img_filename+".bmp");

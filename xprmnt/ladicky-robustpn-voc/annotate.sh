@@ -17,8 +17,8 @@ n_label=21
 ori_img_dir=$home/dataset/pascal/$dataset/VOCdevkit/$dataset/JPEGImages
 unary_philipp_dir=$home/dataset/pascal/$dataset/unary-philipp/voc2010_compressed
 
-superpixel_dir=
-param_superpixel=
+superpixel_dir=$home/xprmnt/superpixel-generation/one-superpixel
+param_superpixel=onesuperpixel
 
 # Annotate
 exe=$home/lab1231-sun-prj/ladicky-2009/build/main 
