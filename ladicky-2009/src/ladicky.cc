@@ -25,14 +25,16 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   const size_t n_label = boost::lexical_cast<size_t>(data_param["n_label"]);
   const size_t n_segment = superpixels.size();
   const size_t n_pairwise = sun::util::n_pairwise(img.rows, img.cols,"N4");
+  const std::string unary_philipp_filepath = std::string(data_param["unary_philipp_dir"]+"/"
+                                                         +img_id+".c_unary");
 
   Energy<double>* energy;
   energy = new Energy<double>(n_label, n_var, n_pairwise, n_segment);
 
   //
-  sun::ladicky::set_1st_order(img.rows, img.cols, n_label, img_id, data_param, energy);
+  sun::ladicky::set_1st_order(img, n_label, unary_philipp_filepath, energy);
   sun::ladicky::set_2nd_order(img, energy_param, energy);
-  sun::ladicky::set_high_order(img, img_id, superpixels, data_param, energy);
+  sun::ladicky::set_high_order(img, superpixels, unary_philipp_filepath, n_label, energy);
 
   //
   Eigen::MatrixXi ann(img.rows, img.cols);
@@ -108,9 +110,10 @@ void sun::ladicky::infer(const std::string& method,
 //   energy->higherCost[higher_cost_idx] = get_predicted_perf_ca();
 // }
 
-void sun::ladicky::set_high_order(const cv::Mat& img, const std::string& img_id,
+void sun::ladicky::set_high_order(const cv::Mat& img,
                                   const std::vector<sun::util::Superpixel>& superpixels,
-                                  sun::util::DataParam data_param,
+                                  const std::string& unary_philipp_filepath,
+                                  const size_t& n_label,
                                   Energy<double>* energy) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
@@ -144,11 +147,8 @@ void sun::ladicky::set_high_order(const cv::Mat& img, const std::string& img_id,
       energy->higherCost[i * (energy->nlabel + 1) + k] = 0;//get_gamma_k(superpixels[i], k);
 
     //gamma_max
-    const std::string prob_img_filepath = std::string(data_param["unary_philipp_dir"]+"/"
-                                                      +img_id+".c_unary");
-    const size_t n_label = boost::lexical_cast<size_t>(data_param["n_label"]);
     // energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = sun::ladicky::robustpn::gamma(img, superpixels[i], 0.8, 0.2, 0.5, 12.0);
-    energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = 100 * sun::ladicky::robustpn::gamma_unary(prob_img_filepath, img, n_label, superpixels[i], 0.8, 0.2, 0.5, 12.0);
+    energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = 100 * sun::ladicky::robustpn::gamma_unary(unary_philipp_filepath, img, n_label, superpixels[i], 0.8, 0.2, 0.5, 12.0);
   }
 
   #ifdef DEBUG_LEVEL_1
@@ -202,20 +202,23 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img,
   #endif
 }
 
-void sun::ladicky::set_1st_order(const size_t& n_row, const size_t& n_col, 
-                                 const size_t& n_label, const std::string& img_id, 
-                                 sun::util::DataParam data_param, Energy<double>* energy) {
+void sun::ladicky::set_1st_order(const cv::Mat& img, 
+                                 const size_t& n_label, 
+                                 const std::string& unary_philipp_filepath, 
+                                 Energy<double>* energy) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
   cout << "set_1st_order(): BEGIN\n";
   #endif
 
-  const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]
-                                        +"/"+img_id+".c_unary" );
-
   ProbImage prob_img;
-  prob_img.decompress(prob_img_filepath.c_str());
+  prob_img.decompress(unary_philipp_filepath.c_str());
+  assert(prob_img.width()==img.cols && "prob_img.width()!=img.cols");
+  assert(prob_img.height()==img.rows && "prob_img.height()!=img.rows");
+  assert(prob_img.depth()==n_label && "prob_img.depth()!=n_label");
 
+  const size_t n_col = img.cols;
+  const size_t n_row = img.rows;
   for (int x = 0; x < n_col; x++) for (int y=0; y<n_row; y++){
     for(int j = 0; j < n_label; j++){
       int index = sun::util::flat_idx_xy(x, y, n_col);

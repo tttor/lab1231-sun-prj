@@ -24,18 +24,28 @@ namespace ladicky {
 /*!
  * @brief Annotate an image with given data_param, energy_param
  */
-Eigen::MatrixXi annotate(const std::string& img_filename, util::DataParam data_param, util::EnergyParam energy_param);
+Eigen::MatrixXi annotate(const std::string& img_filename, 
+                         util::DataParam data_param, 
+                         util::EnergyParam energy_param);
 
-void set_1st_order(const size_t& n_row, const size_t& n_col, const size_t& n_label, const std::string& img_filename, util::DataParam data_param, Energy<double>* energy);
+void set_1st_order(const cv::Mat& img, 
+                   const size_t& n_label, 
+                   const std::string& unary_philipp_filepath, 
+                   Energy<double>* energy);
 
-void set_2nd_order(const cv::Mat& img, util::EnergyParam energy_param, Energy<double>* energy);
+void set_2nd_order(const cv::Mat& img, 
+                   util::EnergyParam energy_param, 
+                   Energy<double>* energy);
 
-void set_high_order(const cv::Mat& img, const std::string& img_id,
+void set_high_order(const cv::Mat& img,
                     const std::vector<util::Superpixel>& superpixels,
-                    util::DataParam data_param, 
+                    const std::string& unary_philipp_filepath,
+                    const size_t& n_label,
                     Energy<double>* energy);
 
-void infer(const std::string& method, Energy<double>* energy, Eigen::MatrixXi* ann);
+void infer(const std::string& method, 
+           Energy<double>* energy, 
+           Eigen::MatrixXi* ann);
 
 }// namespace ladicky
 }// namespace lab1231_sun_prj
