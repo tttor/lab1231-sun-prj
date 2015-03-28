@@ -13,11 +13,11 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   const string img_filepath = string(data_param["img_dir"]+"/"+img_id+data_param["img_extension"]);
   cv::Mat img = cv::imread(img_filepath, CV_LOAD_IMAGE_COLOR);
 
-
   // Segmentation for hi-order energy
   vector<sun::util::Superpixel> superpixels;
   const string segmentation_filepath = string(data_param["segmentation_dir"]+"/"+img_id+"/"
                                               +img_id+data_param["segmentation_param"]+".sup");
+  cout << "segmentation_filepath= " << segmentation_filepath << endl;
   superpixels = sun::util::load_superpixel(segmentation_filepath);
 
   //inititialize energy 
@@ -34,7 +34,10 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   //
   sun::ladicky::set_1st_order(img, n_label, unary_philipp_filepath, energy);
   sun::ladicky::set_2nd_order(img, energy_param, energy);
-  sun::ladicky::set_high_order(img, superpixels, unary_philipp_filepath, n_label, energy);
+  if (data_param["segmentation_param"]=="-onesuperpixel") 
+    sun::ladicky::set_highest_order(img_id, superpixels, energy);
+  else
+    sun::ladicky::set_high_order(img, superpixels, unary_philipp_filepath, n_label, energy);
 
   //
   Eigen::MatrixXi ann(img.rows, img.cols);
@@ -78,37 +81,47 @@ void sun::ladicky::infer(const std::string& method,
   #endif
 }
 
-// void sun::ladicky::set_highest_order(const cv::Mat& img, 
-//                                      std::vector<sun::util::Superpixel> superpixels, 
-//                                      const std::string& prob_img_filepath, 
-//                                      Energy<double>* energy) {
-//   using namespace std;
+double sun::ladicky::get_predicted_perf_ca(const std::string& img_id) {
+  return 1.0;
+}
 
-//   //initialize number of elements in each segment
-//   energy->higherElements[0] = superpixels[0].size();
+void sun::ladicky::set_highest_order(const std::string& img_id, 
+                                     std::vector<sun::util::Superpixel> superpixels, 
+                                     Energy<double>* energy) {
+  using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_highest_order(): BEGIN\n";
+  #endif
 
-//   //allocate energy for higher order indexes
-//   energy->AllocateHigherIndexes();
-//   energy->higherIndex[0][0] = superpixels[0][0];
+  //initialize number of elements in each segment
+  cout << "superpixels.size()= " << superpixels.size() << endl;
+  energy->higherElements[0] = superpixels[0].size();
 
-//   // 
-//   // The Robust P n model potentials take the form:
-//   // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
-//   // gamma_c(x_c) = min{gamma_kprime, gamma_max}
-//   // (17)
-//   const size_t perf_ca_max = 1.0;
+  //allocate energy for higher order indexes
+  energy->AllocateHigherIndexes();
+  energy->higherIndex[0][0] = superpixels[0][0];
+
+  // The Robust P n model potentials take the form:
+  // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
+  // gamma_c(x_c) = min{gamma_kprime, gamma_max}
+  // (17)
+  const size_t perf_ca_max = 1.0;
   
-//   //initialize truncation ratio Q for each clique
-//   energy->higherTruncation[0] = 0.0;
+  //initialize truncation ratio Q for each clique
+  energy->higherTruncation[0] = 0.0;
 
-//   //initialize gamma_k for each clique
-//   for(int k = 0; k < energy->nlabel; k++) 
-//       energy->higherCost[k] = perf_ca_max;
+  //initialize gamma_k for each clique
+  for(int k = 0; k < energy->nlabel; k++) 
+      energy->higherCost[k] = perf_ca_max;
 
-//   //initialize gamma_max for each clique
-//   const size_t higher_cost_idx = energy->nlabel;
-//   energy->higherCost[higher_cost_idx] = get_predicted_perf_ca();
-// }
+  //initialize gamma_max for each clique
+  const size_t higher_cost_idx = energy->nlabel;
+  energy->higherCost[higher_cost_idx] = get_predicted_perf_ca(img_id);
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_highest_order(): END\n";
+  #endif
+}
 
 void sun::ladicky::set_high_order(const cv::Mat& img,
                                   const std::vector<sun::util::Superpixel>& superpixels,
@@ -120,10 +133,10 @@ void sun::ladicky::set_high_order(const cv::Mat& img,
   cout << "set_high_order(): BEGIN\n";
   #endif
 
-
   //initialize number of elements in each segment
-  // cout << "superpixels.size()= " << superpixels.size() << endl;
+  cout << "superpixels.size()= " << superpixels.size() << endl;
   for (int i = 0; i < superpixels.size(); i++) {
+    cout << "superpixels[i].size()= " << superpixels[i].size() << endl;
     energy->higherElements[i] = superpixels[i].size();
   }
 
