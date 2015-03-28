@@ -38,7 +38,7 @@ add_library(segmenter
 )
 
 # 
-add_definitions(-DDEBUG_OFF)
+add_definitions(-DDEBUG_LEVEL_1)
 add_executable(main src/main.cc )
 
 target_link_libraries( main 

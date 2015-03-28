@@ -24,7 +24,7 @@ namespace ladicky {
 /*!
  * @brief Annotate an image with given data_param, energy_param
  */
-Eigen::MatrixXi annotate(const std::string& img_filename, const std::string& superpixel_filename, util::DataParam data_param, util::EnergyParam energy_param);
+Eigen::MatrixXi annotate(const std::string& img_filename, util::DataParam data_param, util::EnergyParam energy_param);
 
 void set_1st_order(const size_t& n_row, const size_t& n_col, const size_t& n_label, const std::string& img_filename, util::DataParam data_param, Energy<double>* energy);
 

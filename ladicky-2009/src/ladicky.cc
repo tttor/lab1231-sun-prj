@@ -2,8 +2,7 @@
 
 namespace sun = lab1231_sun_prj;
 
-Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename, 
-                                       const std::string& superpixel_filename, 
+Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id, 
                                        sun::util::DataParam data_param, 
                                        sun::util::EnergyParam energy_param) {
   using namespace std;
@@ -15,24 +14,27 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename,
   long mtime, seconds, useconds;
 
   //
-  const string img_path = string(data_param["ori_img_dir"]+img_filename);
-  cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_COLOR);
+  const string img_filepath = string(data_param["img_dir"]+"/"+img_id+data_param["img_extension"]);
+  cv::Mat img = cv::imread(img_filepath, CV_LOAD_IMAGE_COLOR);
 
   const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]
-                                        +img_filename+".c_unary" );
+                                        +img_id+".c_unary" );
 
   // Segmentation for hi-order energy
   vector<sun::util::Superpixel> superpixels;
 
   gettimeofday(&start, NULL);
-  superpixels = sun::util::load_superpixel(data_param["superpixel_dir"]+superpixel_filename);
+  const string segmentation_filepath = string(data_param["segmentation_dir"]+"/"+img_id+"/"
+                                            +img_id+data_param["segmentation_param"]+".sup");
+  cout << "segmentation_filepath= " << segmentation_filepath << endl;
+  superpixels = sun::util::load_superpixel(segmentation_filepath);
   gettimeofday(&end, NULL);
 
   seconds  = end.tv_sec  - start.tv_sec;
   useconds = end.tv_usec - start.tv_usec;
   mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
 
-  cout << "Elapsed time load " << superpixel_filename << " : " << mtime <<" milliseconds\n";
+  cout << "Elapsed time load " << segmentation_filepath << " : " << mtime <<" milliseconds\n";
 
   //inititialize energy 
   const size_t n_var = img.rows * img.cols;
@@ -45,7 +47,7 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename,
   energy = new Energy<double>(n_label, n_var, n_pairwise, n_segment);
 
   //
-  sun::ladicky::set_1st_order(img.rows, img.cols, n_label, img_filename, data_param, energy);
+  sun::ladicky::set_1st_order(img.rows, img.cols, n_label, img_id, data_param, energy);
   sun::ladicky::set_2nd_order(img, energy_param, energy);
   sun::ladicky::set_high_order(img, superpixels, n_label, prob_img_filepath, energy);
 
@@ -64,6 +66,11 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_filename,
 
 void sun::ladicky::infer(const std::string& method, 
                          Energy<double>* energy, Eigen::MatrixXi* ann) {
+  using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "infer(): BEGIN\n";
+  #endif
+
   const size_t n_var = ann->rows() * ann->cols();
 
   //initialize solution
@@ -80,6 +87,10 @@ void sun::ladicky::infer(const std::string& method,
   //
   *ann = sun::util::arr2mat(ann_arr, ann->rows(), ann->cols());
   delete expand;
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "infer(): END\n";
+  #endif
 }
 
 // void sun::ladicky::set_highest_order(const cv::Mat& img, 
@@ -119,6 +130,9 @@ void sun::ladicky::set_high_order(const cv::Mat& img,
                                   int n_label, const std::string& prob_img_filepath, 
                                   Energy<double>* energy) {
   using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_high_order(): BEGIN\n";
+  #endif
 
   //initialize number of elements in each segment
   for (int i = 0; i < superpixels.size(); i++) {
@@ -147,11 +161,20 @@ void sun::ladicky::set_high_order(const cv::Mat& img,
     // energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = sun::ladicky::robustpn::gamma(img, superpixels[i], 0.8, 0.2, 0.5, 12.0);
     energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = 100 * sun::ladicky::robustpn::gamma_unary(prob_img_filepath, img, n_label, superpixels[i], 0.8, 0.2, 0.5, 12.0);
   }
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_high_order(): END\n";
+  #endif
 }
 
 void sun::ladicky::set_2nd_order(const cv::Mat& img, 
                                  sun::util::EnergyParam energy_param, 
                                  Energy<double>* energy) {
+  using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_2nd_order(): BEGIN\n";
+  #endif
+
   int ind_2nd = 0, ind_2nd_energy = 0;
   double energy_res = 0.0;
   double beta = sun::shotton::edge_potential::get_beta(img);
@@ -184,13 +207,22 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img,
       energy->pairCost[ind_2nd_energy++] =  energy_res;
     }
   }   
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_2nd_order(): END\n";
+  #endif
 }
 
 void sun::ladicky::set_1st_order(const size_t& n_row, const size_t& n_col, 
-                                 const size_t& n_label, const std::string& img_filename, 
+                                 const size_t& n_label, const std::string& img_id, 
                                  sun::util::DataParam data_param, Energy<double>* energy) {
+  using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_1st_order(): BEGIN\n";
+  #endif
+
   const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]
-                                        +img_filename+".c_unary" );
+                                        +"/"+img_id+".c_unary" );
 
   ProbImage prob_img;
   prob_img.decompress(prob_img_filepath.c_str());
@@ -201,4 +233,8 @@ void sun::ladicky::set_1st_order(const size_t& n_row, const size_t& n_col,
       energy->unaryCost[index * energy->nlabel + j] =  -1 * log( prob_img(x,y,j) ); //-1 * prob_img(x,y,j);
     }
   }
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_1st_order(): END\n";
+  #endif
 }
