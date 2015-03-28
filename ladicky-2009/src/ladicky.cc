@@ -10,31 +10,15 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   cout << "annotate(): BEGIN\n";
   #endif
 
-  struct timeval start, end;
-  long mtime, seconds, useconds;
-
-  //
   const string img_filepath = string(data_param["img_dir"]+"/"+img_id+data_param["img_extension"]);
   cv::Mat img = cv::imread(img_filepath, CV_LOAD_IMAGE_COLOR);
 
-  const std::string prob_img_filepath = std::string( data_param["unary_philipp_dir"]
-                                        +img_id+".c_unary" );
 
   // Segmentation for hi-order energy
   vector<sun::util::Superpixel> superpixels;
-
-  gettimeofday(&start, NULL);
   const string segmentation_filepath = string(data_param["segmentation_dir"]+"/"+img_id+"/"
-                                            +img_id+data_param["segmentation_param"]+".sup");
-  cout << "segmentation_filepath= " << segmentation_filepath << endl;
+                                              +img_id+data_param["segmentation_param"]+".sup");
   superpixels = sun::util::load_superpixel(segmentation_filepath);
-  gettimeofday(&end, NULL);
-
-  seconds  = end.tv_sec  - start.tv_sec;
-  useconds = end.tv_usec - start.tv_usec;
-  mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
-
-  cout << "Elapsed time load " << segmentation_filepath << " : " << mtime <<" milliseconds\n";
 
   //inititialize energy 
   const size_t n_var = img.rows * img.cols;
@@ -43,13 +27,12 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   const size_t n_pairwise = sun::util::n_pairwise(img.rows, img.cols,"N4");
 
   Energy<double>* energy;
-  // energy = new Energy<double>(n_label, n_var, n_pairwise, 0);
   energy = new Energy<double>(n_label, n_var, n_pairwise, n_segment);
 
   //
   sun::ladicky::set_1st_order(img.rows, img.cols, n_label, img_id, data_param, energy);
   sun::ladicky::set_2nd_order(img, energy_param, energy);
-  sun::ladicky::set_high_order(img, superpixels, n_label, prob_img_filepath, energy);
+  sun::ladicky::set_high_order(img, img_id, superpixels, data_param, energy);
 
   //
   Eigen::MatrixXi ann(img.rows, img.cols);
@@ -125,39 +108,45 @@ void sun::ladicky::infer(const std::string& method,
 //   energy->higherCost[higher_cost_idx] = get_predicted_perf_ca();
 // }
 
-void sun::ladicky::set_high_order(const cv::Mat& img, 
-                                  std::vector<sun::util::Superpixel> superpixels, 
-                                  int n_label, const std::string& prob_img_filepath, 
+void sun::ladicky::set_high_order(const cv::Mat& img, const std::string& img_id,
+                                  const std::vector<sun::util::Superpixel>& superpixels,
+                                  sun::util::DataParam data_param,
                                   Energy<double>* energy) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
   cout << "set_high_order(): BEGIN\n";
   #endif
 
+
   //initialize number of elements in each segment
+  // cout << "superpixels.size()= " << superpixels.size() << endl;
   for (int i = 0; i < superpixels.size(); i++) {
     energy->higherElements[i] = superpixels[i].size();
   }
 
   //allocate energy for higher order indexes
   energy->AllocateHigherIndexes();
-
   for (int i = 0; i < superpixels.size(); i++) for(int j = 0; j < superpixels[i].size(); j++){
     energy->higherIndex[i][j] = superpixels[i][j];
   }
 
   //initialize truncation ratio Q, gamma_k and gamma_max for each clique
+  // cout << "energy->nhigher=" << energy->nhigher << endl;
   for(int i = 0; i < energy->nhigher; i++)
   {
     //truncation ratio 30%
     energy->higherTruncation[i] = 0.3 * (energy->higherElements[i]);
     // cout << "n_segment" << (energy->higherElements[i]) << endl;
     // cout << "higher truncation" << energy->higherTruncation[i] << endl;
+
     //gamma_k
     for(int k = 0; k < energy->nlabel; k++) 
       energy->higherCost[i * (energy->nlabel + 1) + k] = 0;//get_gamma_k(superpixels[i], k);
 
     //gamma_max
+    const std::string prob_img_filepath = std::string(data_param["unary_philipp_dir"]+"/"
+                                                      +img_id+".c_unary");
+    const size_t n_label = boost::lexical_cast<size_t>(data_param["n_label"]);
     // energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = sun::ladicky::robustpn::gamma(img, superpixels[i], 0.8, 0.2, 0.5, 12.0);
     energy->higherCost[i * (energy->nlabel + 1) + energy->nlabel] = 100 * sun::ladicky::robustpn::gamma_unary(prob_img_filepath, img, n_label, superpixels[i], 0.8, 0.2, 0.5, 12.0);
   }
