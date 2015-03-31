@@ -19,7 +19,7 @@ def main(argv):
 
     # 
     for i, img_id in enumerate(img_ids):
-        print 'Segmenting ith=', i, 'of', len(img_ids)
+        print 'Segmenting ith=', i+1, 'of', len(img_ids)
 
         img_filepath = img_dir+'/'+img_id+img_extension
         img = img_as_float(io.imread(img_filepath))
@@ -34,6 +34,13 @@ def main(argv):
 
         segmentation_filepath = segmentation_dir+'/'+img_id+'-onesuperpixel'+'.sup'
         np.savetxt(segmentation_filepath, segmentation, delimiter=",")
+
+        #
+        n_pixel = img.shape[0]*img.shape[1]
+        segmentation_onesegmentperrow = np.asarray(range(n_pixel))
+        segmentation_onesegmentperrow = segmentation_onesegmentperrow.reshape((1,n_pixel))
+        segmentation_filepath_2 = segmentation_dir+'/'+img_id+'-onesuperpixel'+'.sup2'
+        np.savetxt(segmentation_filepath_2, segmentation_onesegmentperrow, delimiter=",")
 
 if __name__ == '__main__':
     main(sys.argv)
