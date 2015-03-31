@@ -16,7 +16,7 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   // Segmentation for hi-order energy
   vector<sun::util::Superpixel> superpixels;
   const string segmentation_filepath = string(data_param["segmentation_dir"]+"/"+img_id+"/"
-                                              +img_id+data_param["segmentation_param"]+".sup");
+                                              +img_id+data_param["segmentation_param"]+".sup2");
   cout << "segmentation_filepath= " << segmentation_filepath << endl;
   superpixels = sun::util::load_superpixel(segmentation_filepath);
 
