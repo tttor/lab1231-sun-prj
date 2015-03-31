@@ -153,9 +153,9 @@ MatType csv_read(const std::string& csv_path) {
  Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
 
 /*!
- * @brief
+ * @brief: each row in .sup files corresponds to one superpixel
  */
-std::vector<Superpixel> load_superpixel(const std::string& list_path);
+std::vector<Superpixel> load_superpixel(const std::string& path);
 
 /*!
  * @brief
