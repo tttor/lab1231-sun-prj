@@ -62,14 +62,17 @@ void sun::ladicky::infer(const std::string& method,
   const size_t n_var = ann->rows() * ann->cols();
 
   //initialize solution
+  cout << "initialize solution\n";
   int *ann_arr = new int[n_var];
   memset(ann_arr, 0, n_var * sizeof(int));
 
   //initialize alpha expansion
+  cout << "initialize alpha expansion\n";
   const size_t max_iter = 10;
   AExpand *expand = new AExpand(energy, max_iter);
 
   //solve CRF
+  cout << "solve CRF\n";
   expand->minimize(ann_arr);
 
   //
@@ -95,28 +98,36 @@ void sun::ladicky::set_highest_order(const std::string& img_id,
 
   //initialize number of elements in each segment
   cout << "superpixels.size()= " << superpixels.size() << endl;
-  energy->higherElements[0] = superpixels[0].size();
+  for (int i = 0; i < superpixels.size(); i++) {
+    cout << "superpixels[" << i << "].size()= " << superpixels[i].size() << endl;
+    energy->higherElements[i] = superpixels[i].size();
+  }
 
   //allocate energy for higher order indexes
   energy->AllocateHigherIndexes();
-  energy->higherIndex[0][0] = superpixels[0][0];
+  for (int i = 0; i < superpixels.size(); i++) for(int j = 0; j < superpixels[i].size(); j++){
+    energy->higherIndex[i][j] = superpixels[i][j];
+  }
 
   // The Robust P n model potentials take the form:
   // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
   // gamma_c(x_c) = min{gamma_kprime, gamma_max}
   // (17)
   const size_t perf_ca_max = 1.0;
-  
-  //initialize truncation ratio Q for each clique
-  energy->higherTruncation[0] = 0.0;
 
-  //initialize gamma_k for each clique
-  for(int k = 0; k < energy->nlabel; k++) 
-      energy->higherCost[k] = perf_ca_max;
+  cout << "energy->nhigher= " << energy->nhigher << endl;
+  for(int i = 0; i < energy->nhigher; i++) {
+    //initialize truncation ratio Q for each clique
+    energy->higherTruncation[i] = 0.0 * (energy->higherElements[i]);
 
-  //initialize gamma_max for each clique
-  const size_t higher_cost_idx = energy->nlabel;
-  energy->higherCost[higher_cost_idx] = get_predicted_perf_ca(img_id);
+    //initialize gamma_k for each clique
+    for(int k = 0; k < energy->nlabel; k++) 
+        energy->higherCost[i * (energy->nlabel + 1) + k] = perf_ca_max;
+
+    //initialize gamma_max for each clique
+    const size_t higher_cost_idx = i * (energy->nlabel + 1) + energy->nlabel;
+    energy->higherCost[higher_cost_idx] = get_predicted_perf_ca(img_id);
+  }
 
   #ifdef DEBUG_LEVEL_1
   cout << "set_highest_order(): END\n";
