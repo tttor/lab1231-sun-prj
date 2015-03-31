@@ -61,7 +61,7 @@ MatType csv_read(const std::string& csv_path) {
   using namespace std;
   using namespace boost;
   
-  ifstream csv(csv_path);
+  ifstream csv(csv_path.c_str());
   BOOST_ASSERT_MSG(csv.is_open(), string("ERROR: Cannot find: " + csv_path).c_str());
   
   typedef tokenizer< escaped_list_separator<char> > Tokenizer;
