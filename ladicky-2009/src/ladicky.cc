@@ -18,7 +18,7 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   const string segmentation_filepath = string(data_param["segmentation_dir"]+"/"+img_id+"/"
                                               +img_id+data_param["segmentation_param"]+".sup2");
   cout << "segmentation_filepath= " << segmentation_filepath << endl;
-  superpixels = sun::util::load_superpixel(segmentation_filepath);
+  superpixels = sun::util::load_sup2(segmentation_filepath);
 
   //inititialize energy 
   const size_t n_var = img.rows * img.cols;

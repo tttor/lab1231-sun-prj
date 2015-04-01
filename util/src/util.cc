@@ -60,7 +60,7 @@ std::vector<std::string> sun::util::read_list(const std::string& list_path) {
   return test_img_filenames;
 }
 
-std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string& path){
+std::vector<sun::util::Superpixel> sun::util::load_sup2(const std::string& path){
   using namespace std;
 
   vector<Superpixel> segment_list;
