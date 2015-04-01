@@ -27,13 +27,13 @@ def ensure_path(path):
   if not os.path.exists(directory):
     os.makedirs(directory)
 
-def segmentsToCsv(path_output, segments):
+def write_sup(path_output, segments):
   ensure_path(path_output)
   with open(path_output, 'w') as the_file:
     writer = csv.writer(the_file)
     writer.writerows(segments)
 
-def segmentsToFile(path_output, segments):
+def write_sup2(path_output, segments):
   map_segment = {}
   for i in range(np.max(segments)+1):
     map_segment.setdefault(i, [])
@@ -68,8 +68,8 @@ def main():
         segments_res = doSegment(param, img=image)
         seg_img = mark_boundaries(image, segments_res)
         # io.imsave(sys.argv[4] + '/image/' + filename+'-'+'-'.join(param)+'.bmp', seg_img)
-        segmentsToFile(path_output, segments_res)    
-        # segmentsToCsv(path_output, segments_res)
+        write_sup2(path_output, segments_res)    
+        # write_sup(path_output, segments_res)
 
 if __name__ == "__main__":
   main();
