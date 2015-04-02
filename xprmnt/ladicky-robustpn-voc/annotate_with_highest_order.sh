@@ -18,8 +18,8 @@ img_dir=$home/dataset/pascal/$dataset/VOCdevkit/$dataset/JPEGImages
 img_extension=.jpg
 unary_philipp_dir=$home/dataset/pascal/$dataset/unary-philipp/voc2010_compressed
 
-superpixel_dir=$home/xprmnt/superpixel-generation/voc2010/fifty-paramset
-param_superpixel=-slic-10-15-1
+superpixel_dir=$home/xprmnt/superpixel-generation/voc2010/one-superpixel
+param_superpixel=-onesuperpixel
 
 # Annotate
 exe=$home/lab1231-sun-prj/ladicky-2009/build/main 

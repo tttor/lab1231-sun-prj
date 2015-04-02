@@ -60,12 +60,12 @@ std::vector<std::string> sun::util::read_list(const std::string& list_path) {
   return test_img_filenames;
 }
 
-std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string& list_path){
+std::vector<sun::util::Superpixel> sun::util::load_sup2(const std::string& path){
   using namespace std;
 
-  vector<Superpixel> vec_sup;
-  ifstream superpixel_file(list_path.c_str());
+  vector<Superpixel> segment_list;
 
+  ifstream superpixel_file(path.c_str());
   if (superpixel_file.is_open()) {
     string line;
     while ( getline(superpixel_file,line) ) {
@@ -78,12 +78,15 @@ std::vector<sun::util::Superpixel> sun::util::load_superpixel(const std::string&
           if (ss.peek() == ',') ss.ignore();
       }
       if (v_temp.size() > 0)
-        vec_sup.push_back(v_temp);
+        segment_list.push_back(v_temp);
     }
     superpixel_file.close();
   }
-  cout << "load_superpixel" <<  vec_sup.size() << endl;
-  return vec_sup;
+  else {
+    assert(false && "FATAL: file not found.");
+  }
+
+  return segment_list;
 }
 
 Eigen::MatrixXi sun::util::arr2mat(int* arr, const size_t& n_row, const size_t& n_col) {

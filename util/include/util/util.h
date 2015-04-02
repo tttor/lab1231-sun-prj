@@ -61,7 +61,7 @@ MatType csv_read(const std::string& csv_path) {
   using namespace std;
   using namespace boost;
   
-  ifstream csv(csv_path);
+  ifstream csv(csv_path.c_str());
   BOOST_ASSERT_MSG(csv.is_open(), string("ERROR: Cannot find: " + csv_path).c_str());
   
   typedef tokenizer< escaped_list_separator<char> > Tokenizer;
@@ -153,9 +153,9 @@ MatType csv_read(const std::string& csv_path) {
  Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
 
 /*!
- * @brief
+ * @brief: each row in .sup2 files corresponds to one superpixel
  */
-std::vector<Superpixel> load_superpixel(const std::string& list_path);
+std::vector<Superpixel> load_sup2(const std::string& path);
 
 /*!
  * @brief

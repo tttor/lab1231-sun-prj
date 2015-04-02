@@ -19,21 +19,37 @@ def main(argv):
 
     # 
     for i, img_id in enumerate(img_ids):
-        print 'Segmenting ith=', i, 'of', len(img_ids)
+        print 'Segmenting ith=', i+1, 'of', len(img_ids)
 
         img_filepath = img_dir+'/'+img_id+img_extension
         img = img_as_float(io.imread(img_filepath))
-
-        #
-        shape = (img.shape[0], img.shape[1])
-        segmentation = np.zeros(shape)
 
         segmentation_dir = out_dir+'/'+img_id
         if not os.path.exists(segmentation_dir):
             os.makedirs(segmentation_dir)
 
-        segmentation_filepath = segmentation_dir+'/'+img_id+'-onesuperpixel'+'.sup'
-        np.savetxt(segmentation_filepath, segmentation, delimiter=",")
+        # #
+        # shape = (img.shape[0], img.shape[1])
+        # segmentation = np.zeros(shape)
+
+        # segmentation_filepath = segmentation_dir+'/'+img_id+'-onesuperpixel'+'.sup'
+        # np.savetxt(segmentation_filepath, segmentation, delimiter=",")
+
+        #
+        n_pixel = img.shape[0]*img.shape[1]
+        # segmentation_onesegmentperrow = np.asarray(range(n_pixel))
+        # segmentation_onesegmentperrow = segmentation_onesegmentperrow.reshape((1,n_pixel))
+        segmentation_filepath_2 = segmentation_dir+'/'+img_id+'-onesuperpixel'+'.sup2'
+        # np.savetxt(segmentation_filepath_2, segmentation_onesegmentperrow, delimiter=",")
+
+        str_buf = ''
+        for p in range(n_pixel):
+            str_buf += str(p)
+            if p < n_pixel-1:
+                str_buf += ','
+
+        with open(segmentation_filepath_2, 'w') as f:
+            f.write(str_buf)
 
 if __name__ == '__main__':
     main(sys.argv)

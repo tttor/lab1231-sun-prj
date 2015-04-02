@@ -11,16 +11,16 @@ int main(int argc, char* argv[]) {
   sun::util::DataParam data_param;
   sun::util::EnergyParam energy_param;
 
-  if (argc == 9) {
-    //
+  if (argc == 10) {
     data_param["dataset_name"] = argv[1];
     data_param["n_label"] = argv[2];
-    data_param["ori_img_dir"] = argv[3];
-    data_param["test_img_list_filepath"] = argv[4];
-    data_param["result_dir"] = argv[5];
+    data_param["img_dir"] = argv[3];
+    data_param["img_extension"] = argv[4];
+    data_param["img_id_list_filepath"] = argv[5];
     data_param["unary_philipp_dir"] = argv[6];
-    data_param["superpixel_dir"] = argv[7];
-    data_param["param_superpixel"] = argv[8];
+    data_param["segmentation_dir"] = argv[7];
+    data_param["segmentation_param"] = argv[8];
+    data_param["result_dir"] = argv[9];
 
     energy_param["theta_phi_1"] = 4.5;
     energy_param["theta_phi_2"] = 1;
@@ -30,24 +30,18 @@ int main(int argc, char* argv[]) {
   }
 
   // Test: Annotate
-  vector<string> img_filenames;
-  img_filenames = sun::util::read_list(data_param["test_img_list_filepath"]);
+  vector<string> img_id_list;
+  img_id_list = sun::util::read_list(data_param["img_id_list_filepath"]);
   
-  for (size_t i=0; i<img_filenames.size(); ++i) {
-    const string img_filename = img_filenames.at(i);
-
-    string superpixel_filename = string(img_filename) + 
-                                  "/" + string(img_filename) + 
-                                  data_param["param_superpixel"] + ".sup";
-                                  
-    cout << "ANNOTATING: " << img_filename 
-                           << " (" << i+1 << "/" << img_filenames.size() << ")" << endl;
+  for (size_t i=0; i<img_id_list.size(); ++i) {
+    const string img_id = img_id_list.at(i);
+    cout << "ANNOTATING: " << img_id << " (" << i+1 << "/" << img_id_list.size() << ")" << endl;
 
     Eigen::MatrixXi ann;
-    ann = sun::ladicky::annotate(img_filename, superpixel_filename, data_param, energy_param);
+    ann = sun::ladicky::annotate(img_id, data_param, energy_param);
 
-    const string ann_filepath = string(data_param["result_dir"]+img_filename+".ann");
-    const string ann_img_filepath = string(data_param["result_dir"]+img_filename+".bmp");
+    const string ann_filepath = string(data_param["result_dir"]+"/"+img_id+".csv");
+    const string ann_img_filepath = string(data_param["result_dir"]+"/"+img_id+data_param["img_extension"]);
     sun::util::csv_write<Eigen::MatrixXi>(ann, ann_filepath);
     cv::imwrite(ann_img_filepath, sun::util::ann2img(ann, data_param["dataset_name"]));
   }
