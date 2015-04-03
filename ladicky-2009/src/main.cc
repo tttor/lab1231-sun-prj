@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
   sun::util::DataParam data_param;
   sun::util::EnergyParam energy_param;
 
-  if (argc == 10) {
+  if (argc == 11) {
     data_param["dataset_name"] = argv[1];
     data_param["n_label"] = argv[2];
     data_param["img_dir"] = argv[3];
@@ -20,7 +20,8 @@ int main(int argc, char* argv[]) {
     data_param["unary_philipp_dir"] = argv[6];
     data_param["segmentation_dir"] = argv[7];
     data_param["segmentation_param"] = argv[8];
-    data_param["result_dir"] = argv[9];
+    data_param["with_perf_prediction"] = argv[9];
+    data_param["result_dir"] = argv[10];
 
     energy_param["theta_phi_1"] = 4.5;
     energy_param["theta_phi_2"] = 1;

@@ -34,8 +34,9 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   //
   sun::ladicky::set_1st_order(img, n_label, unary_philipp_filepath, energy);
   sun::ladicky::set_2nd_order(img, energy_param, energy);
-  if (data_param["segmentation_param"]=="-onesuperpixel") 
-    sun::ladicky::set_highest_order(img_id, superpixels, energy);
+  if (data_param["with_perf_prediction"]=="True") 
+    // sun::ladicky::set_highest_order(img_id, superpixels, energy);
+    sun::ladicky::set_high_order_with_perf_pred(img_id, superpixels, energy);
   else
     sun::ladicky::set_high_order(img, superpixels, unary_philipp_filepath, n_label, energy);
 
@@ -110,8 +111,8 @@ void sun::ladicky::set_highest_order(const std::string& img_id,
   }
 
   // The Robust P n model potentials take the form:
-  // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
   // gamma_c(x_c) = min{gamma_kprime, gamma_max}
+  // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
   // (17)
   const size_t perf_ca_max = 1.0;
 
@@ -134,6 +135,63 @@ void sun::ladicky::set_highest_order(const std::string& img_id,
   #endif
 }
 
+void sun::ladicky::set_high_order_with_perf_pred(const std::string& img_id, 
+                                                 std::vector<sun::util::Superpixel> superpixels, 
+                                                 Energy<double>* energy) {
+using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_high_order_with_perf_pred(): BEGIN\n";
+  #endif
+
+  //initialize number of elements in each segment
+  cout << "superpixels.size()= " << superpixels.size() << endl;
+  for (int i = 0; i < superpixels.size(); i++) {
+    cout << "superpixels[" << i << "].size()= " << superpixels[i].size() << endl;
+    energy->higherElements[i] = superpixels[i].size();
+  }
+
+  //allocate energy for higher order indexes
+  energy->AllocateHigherIndexes();
+  for (int i = 0; i < superpixels.size(); i++) for(int j = 0; j < superpixels[i].size(); j++){
+    energy->higherIndex[i][j] = superpixels[i][j];
+  }
+
+  // initialize truncation ratio Q, gamma_k and gamma_max for each clique c
+  // The Robust P n model potentials take the form:
+  // gamma_c(x_c) = min{gamma_kprime, gamma_max}
+  // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
+  // (17)
+  const size_t perf_ca_max = 1.0;
+  
+  for(int i = 0; i < energy->nhigher; i++)
+  {
+    //truncation ratio 
+    const double truncation_ratio = 0.5;
+    energy->higherTruncation[i] = truncation_ratio * (energy->higherElements[i]);
+
+    //gamma_k
+    std::vector<double> gamma_k_list(energy->nlabel);
+    for(int k = 0; k < energy->nlabel; k++){
+      const size_t gamma_k_idx = i * (energy->nlabel + 1) + k;
+      const double gamma_k = 0.0;// perf_ca_max;
+
+      energy->higherCost[gamma_k_idx] = gamma_k;
+      gamma_k_list.at(i) = gamma_k;
+    }
+
+    //gamma_max
+    const size_t gamma_max_idx = i * (energy->nlabel + 1) + energy->nlabel;
+    const double gamma_max = get_predicted_perf_ca(img_id) / (double)superpixels.size();
+    energy->higherCost[gamma_max_idx] = gamma_max;
+
+    // calculate_gamma_c(gamma_max, gamma_k_list, superpixels.at[i]);
+  }
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_high_order_with_perf_pred(): END\n";
+  #endif
+}
+
 void sun::ladicky::set_high_order(const cv::Mat& img,
                                   const std::vector<sun::util::Superpixel>& superpixels,
                                   const std::string& unary_philipp_filepath,
@@ -147,7 +205,7 @@ void sun::ladicky::set_high_order(const cv::Mat& img,
   //initialize number of elements in each segment
   cout << "superpixels.size()= " << superpixels.size() << endl;
   for (int i = 0; i < superpixels.size(); i++) {
-    cout << "superpixels[i].size()= " << superpixels[i].size() << endl;
+    cout << "superpixels[" << i << "].size()= " << superpixels[i].size() << endl;
     energy->higherElements[i] = superpixels[i].size();
   }
 
