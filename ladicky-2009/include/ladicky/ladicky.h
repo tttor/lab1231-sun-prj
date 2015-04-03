@@ -43,6 +43,10 @@ void set_high_order(const cv::Mat& img,
                     const size_t& n_label,
                     Energy<double>* energy);
 
+void set_high_order_with_perf_pred(const std::string& img_id, 
+                                   std::vector<util::Superpixel> superpixels, 
+                                   Energy<double>* energy);
+
 void set_highest_order(const std::string& img_id, 
                        std::vector<util::Superpixel> superpixels, 
                        Energy<double>* energy);

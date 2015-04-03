@@ -134,6 +134,48 @@ void sun::ladicky::set_highest_order(const std::string& img_id,
   #endif
 }
 
+void sun::ladicky::set_high_order_with_perf_pred(const std::string& img_id, 
+                                                 std::vector<sun::util::Superpixel> superpixels, 
+                                                 Energy<double>* energy) {
+using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_high_order_for_kcbenchmarker(): BEGIN\n";
+  #endif
+
+  //initialize number of elements in each segment
+  cout << "superpixels.size()= " << superpixels.size() << endl;
+  for (int i = 0; i < superpixels.size(); i++) {
+    cout << "superpixels[" << i << "].size()= " << superpixels[i].size() << endl;
+    energy->higherElements[i] = superpixels[i].size();
+  }
+
+  //allocate energy for higher order indexes
+  energy->AllocateHigherIndexes();
+  for (int i = 0; i < superpixels.size(); i++) for(int j = 0; j < superpixels[i].size(); j++){
+    energy->higherIndex[i][j] = superpixels[i][j];
+  }
+
+  //initialize truncation ratio Q, gamma_k and gamma_max for each clique
+  const size_t perf_ca_max = 1.0;
+  for(int i = 0; i < energy->nhigher; i++)
+  {
+    //truncation ratio 
+    energy->higherTruncation[i] = 0.0 * (energy->higherElements[i]);
+
+    //gamma_k
+    for(int k = 0; k < energy->nlabel; k++) 
+      energy->higherCost[i * (energy->nlabel + 1) + k] = perf_ca_max;
+
+    //gamma_max
+    const size_t higher_cost_idx = i * (energy->nlabel + 1) + energy->nlabel;
+    energy->higherCost[higher_cost_idx] = get_predicted_perf_ca(img_id) / superpixels.size();
+  }
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "set_high_order_for_kcbenchmarker(): END\n";
+  #endif
+}
+
 void sun::ladicky::set_high_order(const cv::Mat& img,
                                   const std::vector<sun::util::Superpixel>& superpixels,
                                   const std::string& unary_philipp_filepath,
@@ -147,7 +189,7 @@ void sun::ladicky::set_high_order(const cv::Mat& img,
   //initialize number of elements in each segment
   cout << "superpixels.size()= " << superpixels.size() << endl;
   for (int i = 0; i < superpixels.size(); i++) {
-    cout << "superpixels[i].size()= " << superpixels[i].size() << endl;
+    cout << "superpixels[" << i << "].size()= " << superpixels[i].size() << endl;
     energy->higherElements[i] = superpixels[i].size();
   }
 
