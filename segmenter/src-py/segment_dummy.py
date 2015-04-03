@@ -10,7 +10,8 @@ def main(argv):
     img_dir = argv[1]
     img_list_filepath = argv[2]
     img_extension = argv[3]
-    out_dir = argv[4]
+    n_segment = int(argv[4])
+    out_dir = argv[5]
 
     # read the list
     with open(img_list_filepath) as f:
@@ -37,17 +38,21 @@ def main(argv):
 
         #
         n_pixel = img.shape[0]*img.shape[1]
+        n_min_pixel_per_segment = n_pixel / n_segment
         # segmentation_onesegmentperrow = np.asarray(range(n_pixel))
         # segmentation_onesegmentperrow = segmentation_onesegmentperrow.reshape((1,n_pixel))
-        segmentation_filepath_2 = segmentation_dir+'/'+img_id+'-onesuperpixel'+'.sup2'
-        # np.savetxt(segmentation_filepath_2, segmentation_onesegmentperrow, delimiter=",")
 
         str_buf = ''
         for p in range(n_pixel):
             str_buf += str(p)
-            if p < n_pixel-1:
+            if p%n_min_pixel_per_segment == 0:
+                str_buf += '\n'
+            else:
                 str_buf += ','
 
+        segmentation_filepath_2 = segmentation_dir+'/'+img_id \
+                                  + '-' + str(n_segment) + 'dummyseg'+'.sup2'
+        # np.savetxt(segmentation_filepath_2, segmentation_onesegmentperrow, delimiter=",")
         with open(segmentation_filepath_2, 'w') as f:
             f.write(str_buf)
 
