@@ -38,14 +38,16 @@ def main(argv):
 
         #
         n_pixel = img.shape[0]*img.shape[1]
-        n_min_pixel_per_segment = n_pixel / n_segment
+        n_max_pixel_per_segment = n_pixel / n_segment
         # segmentation_onesegmentperrow = np.asarray(range(n_pixel))
         # segmentation_onesegmentperrow = segmentation_onesegmentperrow.reshape((1,n_pixel))
 
+        # Notice that the _actual_ number of segments (lines in sup2) 
+        # is either n_segment or (n_segment+1)
         str_buf = ''
         for p in range(n_pixel):
             str_buf += str(p)
-            if p%n_min_pixel_per_segment == 0:
+            if (p+1)%n_max_pixel_per_segment == 0:
                 str_buf += '\n'
             else:
                 str_buf += ','
