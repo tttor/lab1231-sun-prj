@@ -43,19 +43,9 @@ void set_high_order(const cv::Mat& img,
                     const size_t& n_label,
                     Energy<double>* energy);
 
-void set_high_order_with_perf_pred(const std::string& img_id, 
-                                   std::vector<util::Superpixel> superpixels, 
-                                   Energy<double>* energy);
-
-void set_highest_order(const std::string& img_id, 
-                       std::vector<util::Superpixel> superpixels, 
-                       Energy<double>* energy);
-
 void infer(const std::string& method, 
            Energy<double>* energy, 
            Eigen::MatrixXi* ann);
-
-double get_predicted_perf_ca(const std::string& img_id);
 
 }// namespace ladicky
 }// namespace lab1231_sun_prj
