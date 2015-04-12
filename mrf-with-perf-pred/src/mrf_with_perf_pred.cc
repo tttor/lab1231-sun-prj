@@ -1,10 +1,10 @@
-#include <ladicky/ladicky.h>
+#include <mrf_with_perf_pred/mrf_with_perf_pred.h>
 
 namespace sun = lab1231_sun_prj;
 
-Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id, 
-                                       sun::util::DataParam data_param, 
-                                       sun::util::EnergyParam energy_param) {
+Eigen::MatrixXi sun::mrf_with_perf_pred::annotate( const std::string& img_id, 
+                                                   sun::util::DataParam data_param, 
+                                                   sun::util::EnergyParam energy_param) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
   cout << "annotate(): BEGIN\n";
@@ -32,15 +32,14 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   energy = new Energy<double>(n_label, n_var, n_pairwise, n_segment);
 
   //
-  sun::ladicky::set_1st_order(img, n_label, unary_philipp_filepath, energy);
-  sun::ladicky::set_2nd_order(img, energy_param, energy);
-  sun::ladicky::set_high_order(img, superpixels, unary_philipp_filepath, n_label, energy);
+  sun::mrf_with_perf_pred::set_1st_order(img, n_label, unary_philipp_filepath, energy);
+  sun::mrf_with_perf_pred::set_2nd_order(img, energy_param, energy);
+  sun::mrf_with_perf_pred::set_highest_order(img_id, superpixels, energy);
 
   //
   Eigen::MatrixXi ann(img.rows, img.cols);
   const string method = "AlphaExpansion";
-  sun::ladicky::infer(method, energy, &ann);
-
+  sun::mrf_with_perf_pred::infer(method, energy, &ann);
   delete energy;  
 
   #ifdef DEBUG_LEVEL_1
@@ -49,98 +48,55 @@ Eigen::MatrixXi sun::ladicky::annotate(const std::string& img_id,
   return ann;
 }
 
-void sun::ladicky::infer(const std::string& method, 
-                         Energy<double>* energy, Eigen::MatrixXi* ann) {
-  using namespace std;
+void sun::mrf_with_perf_pred::set_highest_order( const std::string& img_id, 
+                                                 std::vector<sun::util::Superpixel> superpixels, 
+                                                 Energy<double>* energy) {
+using namespace std;
   #ifdef DEBUG_LEVEL_1
-  cout << "infer(): BEGIN\n";
+  cout << "set_highest_order(): BEGIN\n";
   #endif
 
-  const size_t n_var = ann->rows() * ann->cols();
-
-  //initialize solution
-  cout << "initialize solution\n";
-  int *ann_arr = new int[n_var];
-  memset(ann_arr, 0, n_var * sizeof(int));
-
-  //initialize alpha expansion
-  cout << "initialize alpha expansion\n";
-  const size_t max_iter = 10;
-  AExpand *expand = new AExpand(energy, max_iter);
-
-  //solve CRF
-  cout << "solve CRF\n";
-  expand->minimize(ann_arr);
-
-  //
-  *ann = sun::util::arr2mat(ann_arr, ann->rows(), ann->cols());
-  delete expand;
-
-  #ifdef DEBUG_LEVEL_1
-  cout << "infer(): END\n";
-  #endif
-}
-
-void sun::ladicky::set_high_order(const cv::Mat& img,
-                                  const std::vector<sun::util::Superpixel>& superpixels,
-                                  const std::string& unary_philipp_filepath,
-                                  const size_t& n_label,
-                                  Energy<double>* energy) {
-  using namespace std;
-  #ifdef DEBUG_LEVEL_1
-  cout << "set_high_order(): BEGIN\n";
-  #endif
+  assert (superpixels.size()==1 && "FATAL: superpixels.size()!=1");
 
   //initialize number of elements in each segment
-  cout << "superpixels.size()= " << superpixels.size() << endl;
-  for (int i = 0; i < superpixels.size(); i++) {
-    cout << "superpixels[" << i << "].size()= " << superpixels[i].size() << endl;
-    energy->higherElements[i] = superpixels[i].size();
-  }
+  energy->higherElements[0] = superpixels[0].size();
 
   //allocate energy for higher order indexes
   energy->AllocateHigherIndexes();
-  for (int i = 0; i < superpixels.size(); i++) for(int j = 0; j < superpixels[i].size(); j++){
-    energy->higherIndex[i][j] = superpixels[i][j];
+  for(int j = 0; j < superpixels[0].size(); j++){
+    energy->higherIndex[0][j] = superpixels[0][j];
   }
 
-  // initialize truncation ratio Q, gamma_k and gamma_max for each clique c
-  // The Robust P n model potentials take the form:
-  // gamma_c(x_c) = min{gamma_kprime, gamma_max}
-  // gamma_kprime = min{ (|c|-n_k(x_c))*theta_k +gamma_k }
-  // (17)
-  
-  // cout << "energy->nhigher=" << energy->nhigher << endl;
-  for(int i = 0; i < energy->nhigher; i++)
-  {
-    //truncation ratio 
-    const double truncation_ratio = 0.3;
-    energy->higherTruncation[i] = truncation_ratio * (energy->higherElements[i]);
+  // initialize highest order energy
+  // Note that we adopt the robust-pn higher order energy data-structure,
+  // where there are gamma_k and gamma_max and truncation_ratio
+  // here (in the ladicky-mrf (for mrf with perf pred)), we void _all_ of them, 
+  // but initialized here for completeness
+  size_t i = 0;// idx of the highest-order clique
 
-    //gamma_k
-    for(int k = 0; k < energy->nlabel; k++){
-      const size_t gamma_k_idx = i * (energy->nlabel + 1) + k;
-      const double gamma_k = 0.0;//get_gamma_k(superpixels[i], k);
+  //truncation ratio 
+  const double truncation_ratio = 1.0;
+  energy->higherTruncation[i] = truncation_ratio * (energy->higherElements[i]);
 
+  //gamma_k
+  for(int k = 0; k < energy->nlabel; k++){
+    const size_t gamma_k_idx = i * (energy->nlabel + 1) + k;
+    const double gamma_k = 0.0;
 
-      energy->higherCost[gamma_k_idx] = gamma_k;
-    }
-
-    //gamma_max
-    const size_t gamma_max_idx = i * (energy->nlabel + 1) + energy->nlabel;
-    // const double gamma_max = sun::ladicky::robustpn::gamma(img, superpixels[i], 0.8, 0.2, 0.5, 12.0);
-    const double gamma_max = 100 * sun::ladicky::robustpn::gamma_unary(unary_philipp_filepath, img, 
-                                                                       n_label, superpixels[i], 
-                                                                       0.8, 0.2, 0.5, 12.0);
-    energy->higherCost[gamma_max_idx] = gamma_max;
+    energy->higherCost[gamma_k_idx] = gamma_k;
   }
+
+  //gamma_max
+  const size_t gamma_max_idx = i * (energy->nlabel + 1) + energy->nlabel;
+  const double gamma_max = 0.0;
+  energy->higherCost[gamma_max_idx] = gamma_max;
 
   #ifdef DEBUG_LEVEL_1
-  cout << "set_high_order(): END\n";
+  cout << "set_highest_order(): END\n";
   #endif
 }
 
-void sun::ladicky::set_2nd_order(const cv::Mat& img, 
+void sun::mrf_with_perf_pred::set_2nd_order(const cv::Mat& img, 
                                  sun::util::EnergyParam energy_param, 
                                  Energy<double>* energy) {
   using namespace std;
@@ -186,7 +142,7 @@ void sun::ladicky::set_2nd_order(const cv::Mat& img,
   #endif
 }
 
-void sun::ladicky::set_1st_order(const cv::Mat& img, 
+void sun::mrf_with_perf_pred::set_1st_order(const cv::Mat& img, 
                                  const size_t& n_label, 
                                  const std::string& unary_philipp_filepath, 
                                  Energy<double>* energy) {
@@ -212,5 +168,37 @@ void sun::ladicky::set_1st_order(const cv::Mat& img,
 
   #ifdef DEBUG_LEVEL_1
   cout << "set_1st_order(): END\n";
+  #endif
+}
+
+void sun::mrf_with_perf_pred::infer(const std::string& method, 
+                         Energy<double>* energy, Eigen::MatrixXi* ann) {
+  using namespace std;
+  #ifdef DEBUG_LEVEL_1
+  cout << "infer(): BEGIN\n";
+  #endif
+
+  const size_t n_var = ann->rows() * ann->cols();
+
+  //initialize solution
+  cout << "initialize solution\n";
+  int *ann_arr = new int[n_var];
+  memset(ann_arr, 0, n_var * sizeof(int));
+
+  //initialize alpha expansion
+  cout << "initialize alpha expansion\n";
+  const size_t max_iter = 10;
+  AExpand *expand = new AExpand(energy, max_iter);
+
+  //solve CRF
+  cout << "solve CRF\n";
+  expand->minimize(ann_arr);
+
+  //
+  *ann = sun::util::arr2mat(ann_arr, ann->rows(), ann->cols());
+  delete expand;
+
+  #ifdef DEBUG_LEVEL_1
+  cout << "infer(): END\n";
   #endif
 }

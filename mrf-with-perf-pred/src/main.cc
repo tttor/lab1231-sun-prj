@@ -1,8 +1,9 @@
 #include <iostream>
 #include <boost/lexical_cast.hpp>
-#include <util/util.h>
-#include <ladicky/ladicky.h>
 #include <opencv2/opencv.hpp>
+
+#include <util/util.h>
+#include <mrf_with_perf_pred/mrf_with_perf_pred.h>
 
 int main(int argc, char* argv[]) {
   using namespace std;
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
     cout << "ANNOTATING: " << img_id << " (" << i+1 << "/" << img_id_list.size() << ")" << endl;
 
     Eigen::MatrixXi ann;
-    ann = sun::ladicky::annotate(img_id, data_param, energy_param);
+    ann = sun::mrf_with_perf_pred::annotate(img_id, data_param, energy_param);
 
     const string ann_filepath = string(data_param["result_dir"]+"/"+img_id+".csv");
     const string ann_img_filepath = string(data_param["result_dir"]+"/"+img_id+data_param["img_extension"]);
