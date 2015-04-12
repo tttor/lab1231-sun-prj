@@ -5,6 +5,10 @@
 #include "graph.h"
 #include "energy.h"
 
+#include <boost/python.hpp> //boost libraries
+#include <Python.h> //python libraries
+namespace bp = boost::python;
+
 // Alpha expansion class
 // By Pushmeet Kohli, Lubor Ladicky, Phil Torr
 
@@ -236,6 +240,17 @@ class AExpand
 			termType highestCost;
 			highestCost = 0.0; //get_predicted_performance();//TODO @tttor: call the prediction pipeline
 			std::cout << "compute_energy()::highestCost= " << highestCost << std::endl;
+
+			try {
+				Py_Initialize();
+
+				bp::object mExtractor = bp::import("feature_extractor");
+				mExtractor.attr("extract")();
+			}
+				catch (bp::error_already_set const&) {
+				PyErr_Print();
+			}
+
 			
 			tempE += highestCost;
 
