@@ -89,7 +89,7 @@ std::vector<sun::util::Superpixel> sun::util::load_sup2(const std::string& path)
   return segment_list;
 }
 
-Eigen::MatrixXi sun::util::arr2mat(int* arr, const size_t& n_row, const size_t& n_col) {
+Eigen::MatrixXi sun::util::arr2mat(const int* arr, const size_t& n_row, const size_t& n_col) {
   Eigen::MatrixXi mat(n_row, n_col);
 
   size_t idx = 0;
