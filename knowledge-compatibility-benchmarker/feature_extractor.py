@@ -15,6 +15,10 @@ from skimage.segmentation import mark_boundaries
 import pascal_voc_2012 as voc
 import relative_location_knowledge as rlk
 
+# Interface function to alpha-exp method (written in cpp)
+def extract():
+    print 'extract ...'
+
 # Extractor functions
 def extract_relloc_fea(ann, knowledge):
     print 'WARN: does _not_ accomodate diriclet noise in offsets'

@@ -5,6 +5,9 @@
 #include "graph.h"
 #include "energy.h"
 
+#include <mrf_with_perf_pred/perf_predictor.h>
+namespace sun = lab1231_sun_prj;
+
 // Alpha expansion class
 // By Pushmeet Kohli, Lubor Ladicky, Phil Torr
 
@@ -234,9 +237,9 @@ class AExpand
 
 			// Highest-order cost
 			termType highestCost;
-			highestCost = 0.0; //get_predicted_performance();//TODO @tttor: call the prediction pipeline
+			highestCost = sun::mrf_with_perf_pred::PerformancePredictor::predict();
 			std::cout << "compute_energy()::highestCost= " << highestCost << std::endl;
-			
+
 			tempE += highestCost;
 
 			//
