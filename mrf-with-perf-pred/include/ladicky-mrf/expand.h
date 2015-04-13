@@ -5,9 +5,8 @@
 #include "graph.h"
 #include "energy.h"
 
-#include <boost/python.hpp> //boost libraries
-#include <Python.h> //python libraries
-namespace bp = boost::python;
+#include <mrf_with_perf_pred/perf_predictor.h>
+namespace sun = lab1231_sun_prj;
 
 // Alpha expansion class
 // By Pushmeet Kohli, Lubor Ladicky, Phil Torr
@@ -238,20 +237,9 @@ class AExpand
 
 			// Highest-order cost
 			termType highestCost;
-			highestCost = 0.0; //get_predicted_performance();//TODO @tttor: call the prediction pipeline
+			highestCost = sun::mrf_with_perf_pred::PerformancePredictor::predict();
 			std::cout << "compute_energy()::highestCost= " << highestCost << std::endl;
 
-			try {
-				Py_Initialize();
-
-				bp::object mExtractor = bp::import("feature_extractor");
-				mExtractor.attr("extract")();
-			}
-				catch (bp::error_already_set const&) {
-				PyErr_Print();
-			}
-
-			
 			tempE += highestCost;
 
 			//

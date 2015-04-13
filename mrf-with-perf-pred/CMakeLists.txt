@@ -26,7 +26,8 @@ add_library(util
 add_library(mrf_with_perf_pred
   ../shotton-2009/src/edge_potential.cc
   ${PROBIMAGE_DIR}/probimage.cpp
-  src/mrf_with_perf_pred
+  src/mrf_with_perf_pred.cc
+  src/perf_predictor.cc
 )
 
 # 
