@@ -21,6 +21,23 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
+from pandas import read_hdf
+
+def read_hdf5(filepath):
+    obj_class = read_hdf(filepath, 'obj_class')
+
+    relloc = dict.fromkeys(obj_class, None)
+    for key in relloc.iterkeys():
+        print 'reading', key
+        relloc[key] = dict.fromkeys(obj_class, None)
+        for key2 in obj_class:
+            relloc_id = key+'/'+key2
+            # print 'reading', relloc_id
+            prob_map = read_hdf(filepath, relloc_id) 
+            relloc[key][key2] = prob_map
+
+    return relloc
+
 def read(pickle_dirpath):
     pickle_filenames = [ f for f in os.listdir(pickle_dirpath) if os.path.isfile(os.path.join(pickle_dirpath,f)) ]
 
