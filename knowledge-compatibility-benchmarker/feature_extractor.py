@@ -15,10 +15,6 @@ from skimage.segmentation import mark_boundaries
 import pascal_voc_2012 as voc
 import relative_location_knowledge as rlk
 
-# Interface function to alpha-exp method (written in cpp)
-def extract():
-    print 'extract ...'
-
 # Extractor functions
 def extract_relloc_fea(ann, knowledge):
     print 'WARN: does _not_ accomodate diriclet noise in offsets'
@@ -63,11 +59,14 @@ def extract_relloc_fea(ann, knowledge):
                 
                 offset = rlk.get_offset((xi,yi),(xj,yj))
                 norm_offset = rlk.normalize_offset(offset, (200,200), ann['ann'].shape)
-                
+
+                prob_map = knowledge[c][cj_hat]
+                idx_x, idx_y = rlk.get_prob_map_idx(norm_offset, prob_map.shape)
+
                 if ci_hat==cj_hat:
-                    vote_self[i][c]  = vote_self[i][c]  + ( alpha_j*knowledge[c][cj_hat][norm_offset[0],norm_offset[1]] )
+                    vote_self[i][c]  = vote_self[i][c]  + (alpha_j*prob_map[idx_x][idx_y])
                 else:
-                    vote_other[i][c] = vote_other[i][c] + ( alpha_j*knowledge[c][cj_hat][norm_offset[0]][norm_offset[1]] )
+                    vote_other[i][c] = vote_other[i][c] + (alpha_j*prob_map[idx_x][idx_y])
 
     # Compute the relloc features
     w_other = 1.0

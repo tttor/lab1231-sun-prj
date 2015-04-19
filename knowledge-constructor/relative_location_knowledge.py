@@ -129,13 +129,11 @@ def construct(argv):
                     norm_offset = normalize_offset(offset, relative_location_matrix_shape, gt_annotation.shape)
 
                     #
-                    idx = get_prob_map_idx(norm_offset)
-                    count = prob_map[centroid_label['name']][label['name']][idx[0]][idx[1]]
+                    idx = get_prob_map_idx(norm_offset,relative_location_matrix_shape)
+                    count = prob_map[centroid_label['name']][label['name']] [idx]
                     count = count + centroid_weight
-                    # print 'count=', count
-                    # print ('local_prob_map[%i][%i] has count= %i' % (idx[0],idx[1],count))
 
-                    prob_map[centroid_label['name']][label['name']][idx[0]][idx[1]] = count
+                    prob_map[centroid_label['name']][label['name']] [idx] = count
 
     #
     print('normalize_prob_map()...')
@@ -153,12 +151,11 @@ def get_prob_map_idx(offset, prob_map_shape):
     Convert the offset (in frame (O, x+, x-, y+, y-) with O is at the centroid) to
     a _positive_ integer index of the 2D prob_map matrix with frame (O, x+, y+) with O is at the top-left corner.
     The centroid of offset is positioned in the center of the prob_map, so that O is at prob_map_shape/2.
-    '''
-    origin_idx = (prob_map_shape/2,prob_map_shape/2)
-    idx = origin_idx
 
-    idx[0] = idx[0] + int(offset[0])
-    idx[1] = idx[1] + int(offset[1])
+    The idx is of the form (ith-row, jth-col).
+    '''
+    origin_idx = (prob_map_shape[0]/2,prob_map_shape[1]/2)
+    idx = (  origin_idx[0]+int(offset[0]), origin_idx[1]+int(offset[1])  )
 
     assert (idx[0] >= 0) and (idx[1] >= 0), 'FATAL: negative idx' 
     return idx
