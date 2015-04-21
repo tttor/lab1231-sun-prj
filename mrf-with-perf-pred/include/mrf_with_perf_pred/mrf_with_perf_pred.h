@@ -36,7 +36,7 @@ void set_2nd_order(const cv::Mat& img,
                    util::EnergyParam energy_param, 
                    Energy<double>* energy);
 
-void set_highest_order(const std::string& img_id, 
+void set_highest_order(const cv::Mat& img, const std::string& img_id, 
                        std::vector<util::Superpixel> superpixels, 
                        Energy<double>* energy);
 

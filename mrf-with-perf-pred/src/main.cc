@@ -29,9 +29,12 @@ int main(int argc, char* argv[]) {
     energy_param["theta_phi_1"] = 4.5;
     energy_param["theta_phi_2"] = 1;
 
-    sun_mrf::PerformancePredictor::hot_ann_dir = string(data_param["result_dir"]+"/tmp");
+    sun_mrf::PerformancePredictor::tmp_dir = string(data_param["result_dir"]+"/tmp");
+    sun_mrf::PerformancePredictor::ypred_filepath = string(data_param["result_dir"]+"/tmp/y_pred.tmp");
     sun_mrf::PerformancePredictor::knowledge_dir = data_param["knowledge_dir"];
     sun_mrf::PerformancePredictor::trained_estimator_filepath = data_param["trained_estimator_filepath"];
+    sun_mrf::PerformancePredictor::ori_img_dir = data_param["img_dir"];
+    sun_mrf::PerformancePredictor::ori_img_extension = data_param["img_extension"];
   }
   else {
     assert(false && "UNSUFFICIENT ARGUMENTS!");
@@ -40,7 +43,7 @@ int main(int argc, char* argv[]) {
   // Test: Annotate
   vector<string> img_id_list;
   img_id_list = sun::util::read_list(data_param["img_id_list_filepath"]);
-  
+
   for (size_t i=0; i<img_id_list.size(); ++i) {
     const string img_id = img_id_list.at(i);
     cout << "ANNOTATING: " << img_id << " (" << i+1 << "/" << img_id_list.size() << ")" << endl;

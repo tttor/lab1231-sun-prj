@@ -21,6 +21,23 @@ from skimage import io
 from skimage.segmentation import mark_boundaries
 from skimage.filter import gaussian_filter
 
+from pandas import read_hdf
+
+def read_hdf5(filepath):
+    obj_class = read_hdf(filepath, 'obj_class')
+
+    relloc = dict.fromkeys(obj_class, None)
+    for key in relloc.iterkeys():
+        # print 'reading', key
+        relloc[key] = dict.fromkeys(obj_class, None)
+        for key2 in obj_class:
+            relloc_id = key+'/'+key2
+            # print 'reading', relloc_id
+            prob_map = read_hdf(filepath, relloc_id) 
+            relloc[key][key2] = prob_map
+
+    return relloc
+
 def read(pickle_dirpath):
     pickle_filenames = [ f for f in os.listdir(pickle_dirpath) if os.path.isfile(os.path.join(pickle_dirpath,f)) ]
 
@@ -37,7 +54,8 @@ def read(pickle_dirpath):
 
 def construct(argv):
     '''
-    the relative location knowledge is represented in the prop_map.
+    the relative location knowledge is represented in a prop_map for each object class pair, 
+    e.g. one prob_map for a car with respect to a road
     '''
     #
     chosen_cprime = argv[1]
@@ -111,12 +129,11 @@ def construct(argv):
                     norm_offset = normalize_offset(offset, relative_location_matrix_shape, gt_annotation.shape)
 
                     #
-                    count = prob_map[centroid_label['name']][label['name']][norm_offset[0]][norm_offset[1]]
+                    idx = get_prob_map_idx(norm_offset,relative_location_matrix_shape)
+                    count = prob_map[centroid_label['name']][label['name']] [idx]
                     count = count + centroid_weight
-                    # print 'count=', count
-                    # print ('local_prob_map[%i][%i] has count= %i' % (norm_offset[0],norm_offset[1],count))
 
-                    prob_map[centroid_label['name']][label['name']][norm_offset[0]][norm_offset[1]] = count
+                    prob_map[centroid_label['name']][label['name']] [idx] = count
 
     #
     print('normalize_prob_map()...')
@@ -128,6 +145,20 @@ def construct(argv):
     filtered_norm_prob_map = apply_gaussian_filter(sigma, norm_prob_map, relative_location_matrix_shape)
 
     return filtered_norm_prob_map
+
+def get_prob_map_idx(offset, prob_map_shape):
+    '''
+    Convert the offset (in frame (O, x+, x-, y+, y-) with O is at the centroid) to
+    a _positive_ integer index of the 2D prob_map matrix with frame (O, x+, y+) with O is at the top-left corner.
+    The centroid of offset is positioned in the center of the prob_map, so that O is at prob_map_shape/2.
+
+    The idx is of the form (ith-row, jth-col).
+    '''
+    origin_idx = (prob_map_shape[0]/2,prob_map_shape[1]/2)
+    idx = (  origin_idx[0]+int(offset[0]), origin_idx[1]+int(offset[1])  )
+
+    assert (idx[0] >= 0) and (idx[1] >= 0), 'FATAL: negative idx' 
+    return idx
 
 def init_prob_map(cprime_labels, c_labels, size):
     prob_map = dict.fromkeys(cprime_labels)
@@ -178,15 +209,20 @@ def get_pixel_of_label(label, annotation):
 
     return pixels
 
-def get_offset(pixel_1, pixel_2):
+def get_offset(centroid, pixel):
     '''
-    Notice the used coordinate system:
-    x+
-    y+
-    Origin
+    A pixel (and centroid pixel) is represented in a tuple of (ith-row, jth-col).
+    Notice the used coordinate system for this pixel representation:
+    Origin: at top-left corner of an image
+    x+: from the Origin to the right, associated with cols
+    y+: from the Origin to the bottom (downward), associated with rows
     '''
-    drow = -1.0 * (pixel_2[0] - pixel_1[0])
-    dcol = pixel_2[1] - pixel_1[1]
+    # this factor is used to convert the (O,x+,y+) frame above to 
+    # a standard (O, x+, x-, y+, y-) frame where the O is at the centroid
+    converting_factor = -1.0
+
+    drow = (pixel[0] - centroid[0]) * converting_factor
+    dcol = pixel[1] - centroid[1]
 
     return (drow,dcol)
 
@@ -207,8 +243,9 @@ def normalize_offset(offset, relative_location_matrix_shape, img_shape):
     we normalize the offsets by the image img_width and img_height.
     the prob map is defined over the range [-1, 1] in normalized image coordinates
     the x axis is horizontal axis, associated with columns
-    the y axis is horizontal axis, associated with rows
-    divided by 2, because the segment centroid, from which the offset is calculated, is always positioned in the center of prob map
+    the y axis is vertical axis, associated with rows
+    divided by 2, because the segment centroid, from which the offset is calculated, 
+    is always positioned in the center of prob map
     '''
     normalizer_x = 1.0
     normalizer_y = normalizer_x
@@ -217,7 +254,7 @@ def normalize_offset(offset, relative_location_matrix_shape, img_shape):
     norm_drow = float(offset[0])/img_shape[0] * normalizer_y * (relative_location_matrix_shape[0]/2)
     norm_dcol = float(offset[1])/img_shape[1] * normalizer_x * (relative_location_matrix_shape[1]/2)
 
-    return ( int(norm_drow),int(norm_dcol) )
+    return (norm_drow,norm_dcol)
 
 def get_weight(segment):
     '''

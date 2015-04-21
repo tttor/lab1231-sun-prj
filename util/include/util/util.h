@@ -109,9 +109,6 @@ MatType csv_read(const std::string& csv_path) {
   return xmat;
 }
 
-
-
-
 /*!
  * @brief
  */
@@ -150,7 +147,7 @@ MatType csv_read(const std::string& csv_path) {
 /*!
  * @brief
  */
- Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
+ Eigen::MatrixXi arr2mat(const int* arr, const size_t& n_row, const size_t& n_col);
 
 /*!
  * @brief: each row in .sup2 files corresponds to one superpixel
@@ -160,17 +157,12 @@ std::vector<Superpixel> load_sup2(const std::string& path);
 /*!
  * @brief
  */
-Eigen::MatrixXi arr2mat(int* arr, const size_t& n_row, const size_t& n_col);
+ cv::Mat ann2img(const Eigen::MatrixXi& ann, const std::string& dataset);
 
 /*!
  * @brief
  */
- cv::Mat ann2img(const Eigen::MatrixXi& ann, const std::string& dataset);
-
-
  double energy_probability(double probability);
-
-
 
 }// namespace util
 } // namespace lab1231_sun_prj

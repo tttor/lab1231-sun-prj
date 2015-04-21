@@ -8,7 +8,7 @@ home=/home/tor
 root_dir=$home/xprmnt/mrf-with-perf-pred-xprmnt-data
 timestamp="$(date +'%Y%m%d.%H%M%S')"
 
-img_id_list_filepath=$root_dir/meta/list01
+img_id_list_filepath=$root_dir/meta/list03
 
 dataset=voc2010
 n_label=21
@@ -25,7 +25,7 @@ param_superpixel=-1dummyseg
 
 knowledge_dir=$home/xprmnt/knowledge-construction
 regression_dir=$home/xprmnt/knowledge-compatibility-benchmarker/regression-result
-trained_estimator_filepath=$regression_dir/philippunarymrf-voc2010-NuSVR-20150324.104327/best_regressor_wrt_mse.pickle
+trained_estimator_filepath=$regression_dir/philippunarymrf-voc2010-NuSVR-20150324.104327/best_regressor_wrt_r2.pickle
 
 # Annotate
 exe=$home/lab1231-sun-prj/mrf-with-perf-pred/build/main

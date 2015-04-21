@@ -237,10 +237,10 @@ class AExpand
 
 			// Highest-order cost
 			termType highestCost;
-			highestCost = sun::mrf_with_perf_pred::PerformancePredictor::predict();
-			std::cout << "compute_energy()::highestCost= " << highestCost << std::endl;
-
-			tempE += highestCost;
+			highestCost = sun::mrf_with_perf_pred::PerformancePredictor::predict(label_map);
+			// TODO: scale the highestCost so it optimally influences Alpha-expansion
+			// std::cout << "compute_energy()::highestCost= " << highestCost << std::endl;
+			// tempE += highestCost;
 
 			//
 			// std::cout << "compute_energy()::total= " << tempE << std::endl;

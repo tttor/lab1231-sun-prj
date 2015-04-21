@@ -1,6 +1,7 @@
 #include <mrf_with_perf_pred/mrf_with_perf_pred.h>
 
 namespace sun = lab1231_sun_prj;
+namespace sun_mrf = lab1231_sun_prj::mrf_with_perf_pred;
 
 Eigen::MatrixXi sun::mrf_with_perf_pred::annotate( const std::string& img_id, 
                                                    sun::util::DataParam data_param, 
@@ -34,7 +35,7 @@ Eigen::MatrixXi sun::mrf_with_perf_pred::annotate( const std::string& img_id,
   //
   sun::mrf_with_perf_pred::set_1st_order(img, n_label, unary_philipp_filepath, energy);
   sun::mrf_with_perf_pred::set_2nd_order(img, energy_param, energy);
-  sun::mrf_with_perf_pred::set_highest_order(img_id, superpixels, energy);
+  sun::mrf_with_perf_pred::set_highest_order(img, img_id, superpixels, energy);
 
   //
   Eigen::MatrixXi ann(img.rows, img.cols);
@@ -48,7 +49,7 @@ Eigen::MatrixXi sun::mrf_with_perf_pred::annotate( const std::string& img_id,
   return ann;
 }
 
-void sun::mrf_with_perf_pred::set_highest_order( const std::string& img_id, 
+void sun::mrf_with_perf_pred::set_highest_order( const cv::Mat& img, const std::string& img_id, 
                                                  std::vector<sun::util::Superpixel> superpixels, 
                                                  Energy<double>* energy) {
 using namespace std;
@@ -57,6 +58,11 @@ using namespace std;
   #endif
 
   assert (superpixels.size()==1 && "FATAL: superpixels.size()!=1");
+
+  // for the need of performance predictor
+  sun_mrf::PerformancePredictor::current_img_id = img_id;
+  sun_mrf::PerformancePredictor::current_img_nrow = img.rows;
+  sun_mrf::PerformancePredictor::current_img_ncol = img.cols;
 
   //initialize number of elements in each segment
   energy->higherElements[0] = superpixels[0].size();
@@ -96,9 +102,9 @@ using namespace std;
   #endif
 }
 
-void sun::mrf_with_perf_pred::set_2nd_order(const cv::Mat& img, 
-                                 sun::util::EnergyParam energy_param, 
-                                 Energy<double>* energy) {
+void sun::mrf_with_perf_pred::set_2nd_order( const cv::Mat& img, 
+                                             sun::util::EnergyParam energy_param, 
+                                             Energy<double>* energy) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
   cout << "set_2nd_order(): BEGIN\n";
@@ -142,10 +148,10 @@ void sun::mrf_with_perf_pred::set_2nd_order(const cv::Mat& img,
   #endif
 }
 
-void sun::mrf_with_perf_pred::set_1st_order(const cv::Mat& img, 
-                                 const size_t& n_label, 
-                                 const std::string& unary_philipp_filepath, 
-                                 Energy<double>* energy) {
+void sun::mrf_with_perf_pred::set_1st_order( const cv::Mat& img, 
+                                             const size_t& n_label, 
+                                             const std::string& unary_philipp_filepath, 
+                                             Energy<double>* energy) {
   using namespace std;
   #ifdef DEBUG_LEVEL_1
   cout << "set_1st_order(): BEGIN\n";
