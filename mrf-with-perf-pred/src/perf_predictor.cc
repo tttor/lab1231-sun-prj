@@ -4,15 +4,12 @@
 namespace sun = lab1231_sun_prj;
 namespace sun_mrf = lab1231_sun_prj::mrf_with_perf_pred;
 
-std::string sun_mrf::PerformancePredictor::tmp_dir = "";
-std::string sun_mrf::PerformancePredictor::knowledge_dir = "";
-std::string sun_mrf::PerformancePredictor::trained_estimator_filepath = "";
-std::string sun_mrf::PerformancePredictor::ori_img_dir = "";
-std::string sun_mrf::PerformancePredictor::ori_img_extension = "";
-std::string sun_mrf::PerformancePredictor::ypred_filepath = "";
 std::string sun_mrf::PerformancePredictor::current_img_id = "";
 size_t sun_mrf::PerformancePredictor::current_img_nrow = 0;
 size_t sun_mrf::PerformancePredictor::current_img_ncol = 0;
+
+std::string sun_mrf::PerformancePredictor::tmp_dir = "";
+std::string sun_mrf::PerformancePredictor::predictor_addr = "";
 
 double sun_mrf::PerformancePredictor::read_perf_txt(const std::string& filepath) {
   using namespace std;
@@ -52,11 +49,9 @@ double sun_mrf::PerformancePredictor::predict(const int* ann_flat) {
   try {
     Py_Initialize();
 
-    bp::object predictor = bp::import("perf_predictor");
-    predictor.attr("predict")(current_img_id, ann_filepath, 
-                              knowledge_dir, trained_estimator_filepath,
-                              ori_img_dir, ori_img_extension, 
-                              ypred_filepath, tmp_dir);
+    bp::object predictor_client = bp::import("perf_predictor_client");
+    predictor_client.attr("predict")(current_img_id, ann_filepath, 
+                                                 tmp_dir, predictor_addr);
   }
   catch (bp::error_already_set const&) {
     succeed = false;
@@ -66,6 +61,8 @@ double sun_mrf::PerformancePredictor::predict(const int* ann_flat) {
 
   //
   double perf_hat = 0.0;
+
+  const string ypred_filepath = string(tmp_dir+"/ypred.csv");
   if (succeed) {
     perf_hat = read_perf_txt(ypred_filepath);
   }
