@@ -189,6 +189,7 @@ def main(argv):
         print('preprocess...')
         scale_mode = 'StandardScaler()'
         scaler = preprocessing.StandardScaler().fit(X_tr)
+        regressor_data['scaler'] = scaler
 
         X_tr = scaler.transform(X_tr) 
         X_te = scaler.transform(X_te)
@@ -219,12 +220,12 @@ def main(argv):
         #
         regressor_list.append(regressor_data)
 
-    #
+    # Get the best regressor over all dataset clones
     best_regressor = {}
     best_regressor['mse'] = get_best_regressor(regressor_list, 'mse')
     best_regressor['r2'] = get_best_regressor(regressor_list,'r2')
 
-    #
+    # Log the best regressor
     for score_mode, regressor in best_regressor.iteritems():
         # plot y_pred vs y_true
         y_true = regressor['perf']['y_true']
@@ -254,6 +255,8 @@ def main(argv):
             f.write(str(regressor['regressor']))
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.pickle', 'wb') as f:
             cPickle.dump(regressor['regressor'], f)
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.scaler.pickle', 'wb') as f:
+            cPickle.dump(regressor['scaler'], f)
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.y_pred', 'w') as f:
             np.savetxt(f, np.asarray(y_pred), delimiter=",")
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.r2', 'w') as f:
