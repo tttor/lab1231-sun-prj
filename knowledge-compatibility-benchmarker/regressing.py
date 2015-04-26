@@ -15,6 +15,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from sklearn import cross_validation
+from sklearn import preprocessing
 
 from sklearn.svm import NuSVR
 from sklearn.linear_model import Lasso
@@ -126,25 +127,22 @@ def main(argv):
     n_dataset_clone = int(argv[6])
 
     # Load inputs
-    scale_mode = '_scaled_normal' #: _scaled_normal', '_scaled_min_max'
-
-    X_cooccurrence_fea_filepath = data_dirpath+'/input/cooccurrence_fea'+scale_mode+'.csv'
+    X_cooccurrence_fea_filepath = data_dirpath+'/input/cooccurrence_fea.csv'
     X_cooccurrence_fea = np.genfromtxt(X_cooccurrence_fea_filepath, delimiter=',')
 
-    X_sceneprop_fea_filepath = data_dirpath+'/input/sceneprop_fea'+scale_mode+'.csv'
+    X_sceneprop_fea_filepath = data_dirpath+'/input/sceneprop_fea.csv'
     X_sceneprop_fea = np.genfromtxt(X_sceneprop_fea_filepath, delimiter=',')
 
-    X_relloc_fea_filepath = data_dirpath+'/input/relloc_fea'+scale_mode+'.csv'
+    X_relloc_fea_filepath = data_dirpath+'/input/relloc_fea.csv'
     X_relloc_fea = np.genfromtxt(X_relloc_fea_filepath, delimiter=',')
 
     X = np.concatenate((X_cooccurrence_fea, X_sceneprop_fea, X_relloc_fea), axis=1)
 
     # Load targets
-    # have tried scaling, but result in larger mse
     y_filepath = data_dirpath+'/output/ca.csv'
     y = np.genfromtxt(y_filepath, delimiter=',')# note: y.shape is one-element tuple
 
-    # Preprocess data (again, in addition to scaling above)
+    # Preprocess data: clean up
     # When using GaussianProcess, this aims to avoid
     # Exception: Multiple input features cannot have the same target value.
     # For other methods, this may improve the regression performance.
@@ -184,6 +182,16 @@ def main(argv):
 
         X_tr, X_te, y_tr, y_te = dataset
         regressor_data = {}
+
+        # Preprocess
+        # have tried scaling y, but result in larger mse
+        # '_scaled_min_max' on X results in worse mse, compared to using 'StandardScaler()'
+        print('preprocess...')
+        scale_mode = 'StandardScaler()'
+        scaler = preprocessing.StandardScaler().fit(X_tr)
+
+        X_tr = scaler.transform(X_tr) 
+        X_te = scaler.transform(X_te)
 
         # Tune
         meta_regressor = None
