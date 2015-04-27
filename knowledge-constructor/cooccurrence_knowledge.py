@@ -38,12 +38,11 @@ def construct(ann_ids, obj_names, ann_dir):
         ann = np.genfromtxt(ann_filepath, delimiter=',')
 
         obj_ids = list(set( ann.flatten().tolist() ))
-        obj_ids = [i for i in obj_ids if i!=255 and i!=0]
         objs = voc.translate(obj_ids)
+        objs = [i for i in objs if i not in voc.ignored_class_name_list]
 
         for i in objs:
-            cooccurrence[i][i] = cooccurrence[i][i] + 1# Cooccurrence at [i,i] indicates the occurrence of obj i in images in the image set
-
+            cooccurrence[i][i] = cooccurrence[i][i] + 1
             for j in objs:            
                 if i is not j:
                     cooccurrence[i][j] = cooccurrence[i][j] + 1
