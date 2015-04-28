@@ -31,10 +31,10 @@ def construct(ann_ids, obj_names, ann_dir):
     for key in cooccurrence.iterkeys():
         cooccurrence[key] = dict.fromkeys(obj_names, 0)
 
-    for i,id in enumerate(ann_ids):
-        print 'Processing',i+1,'of',len(ann_ids),'id=',id
+    for i,ann_id in enumerate(ann_ids):
+        print 'Processing',i+1,'of',len(ann_ids),'ann_id=',ann_id
 
-        ann_filepath = ann_dir+'/'+id+'.csv'
+        ann_filepath = ann_dir+'/'+ann_id+'.csv'
         ann = np.genfromtxt(ann_filepath, delimiter=',')
 
         obj_ids = list(set( ann.flatten().tolist() ))
