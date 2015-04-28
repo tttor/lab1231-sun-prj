@@ -23,18 +23,12 @@ from skimage.filter import gaussian_filter
 
 from pandas import read_hdf
 
-def construct(argv):
-    '''
-    the relative location knowledge is represented in a prop_map for each object class pair, 
-    e.g. one prob_map for a car with respect to a road
-    '''
-    #
-    chosen_cprime = argv[1]
-    dirichlet_noise = argv[2]
-    img_list_filepath = argv[3]
-    gt_csv_dir = argv[4]
-    img_dir = argv[5]
-
+'''
+@construct()
+the relative location knowledge is represented in a prop_map for each object class pair, 
+e.g. one prob_map for a car with respect to a road
+'''
+def construct(chosen_cprime, dirichlet_noise, img_list_filepath, gt_csv_dir, img_dir):
     #
     relative_location_matrix_shape = (200,200) # following [Gould, 2008]
     variance_factor = 0.10 # following [Gould, 2008]
@@ -80,14 +74,6 @@ def construct(argv):
                 continue
 
             for label in c_labels:
-                # # Force to only consider one certain object-class as the pair
-                # # Warn: May result in different probability map
-                # # Should be commented for most usage
-                # forced_label = 'sky'
-                # if label['name'] is not forced_label:
-                #     print 'WARN: forced_label=', forced_label
-                #     continue                
-
                 pixels = get_pixel_of_label(label, gt_annotation)
                 print ('Processing img_id=%s (%i/%i): segment_id=%i (%i/%i): centroid_label=%s: pair_label=%s (n_pixel=%i)' \
                 % (img_id,i+1,len(img_ids),j,j+1,len(segment_list),centroid_label['name'], label['name'],len(pixels)))
@@ -349,7 +335,14 @@ def main(argv):
         import pascal_voc_2012 as dataset
 
     #
-    relative_location = construct(argv);
+    chosen_cprime = argv[1]
+    dirichlet_noise = argv[2]
+    img_list_filepath = argv[3]
+    gt_csv_dir = argv[4]
+    img_dir = argv[5]
+
+    relative_location = construct(chosen_cprime, dirichlet_noise, img_list_filepath, \
+                                  gt_csv_dir, img_dir);
 
     print('write relative_location knowledge ...')
     cprime = argv[1]
