@@ -14,7 +14,8 @@ def construct(img_ids, scepe_prop_ann_dir):
         root = etree.parse(ann_filepath).getroot()
         for place_sub in root.findall('place'):
             place = place_sub.get('name').lower()
-            objs = [obj_sub.get('name').lower() for obj_sub in place_sub.findall('object')]
+            objs = [obj_sub.get('name').lower() for obj_sub \
+                                                in place_sub.findall('object')]
             
             if place in scene_prop.keys():
                 obj_count_dict = scene_prop[place]
