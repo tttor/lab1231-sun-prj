@@ -23,35 +23,6 @@ from skimage.filter import gaussian_filter
 
 from pandas import read_hdf
 
-def read_hdf5(filepath):
-    obj_class = read_hdf(filepath, 'obj_class')
-
-    relloc = dict.fromkeys(obj_class, None)
-    for key in relloc.iterkeys():
-        # print 'reading', key
-        relloc[key] = dict.fromkeys(obj_class, None)
-        for key2 in obj_class:
-            relloc_id = key+'/'+key2
-            # print 'reading', relloc_id
-            prob_map = read_hdf(filepath, relloc_id) 
-            relloc[key][key2] = prob_map
-
-    return relloc
-
-def read(pickle_dirpath):
-    pickle_filenames = [ f for f in os.listdir(pickle_dirpath) if os.path.isfile(os.path.join(pickle_dirpath,f)) ]
-
-    relloc = {}
-    for p in pickle_filenames:
-        print('reading relloc knowledge of: %s' % (p))
-        local_relloc = None
-        with open(pickle_dirpath+'/'+p, 'rb') as input_file:
-            local_relloc = cPickle.load(input_file)
-    
-        relloc.update(local_relloc)
-
-    return relloc
-
 def construct(argv):
     '''
     the relative location knowledge is represented in a prop_map for each object class pair, 
@@ -337,6 +308,35 @@ def write_meta(meta, meta_filepath):
     for m in meta:
         fo.write(m+'\n');
     fo.close()
+
+def read_hdf5(filepath):
+    obj_class = read_hdf(filepath, 'obj_class')
+
+    relloc = dict.fromkeys(obj_class, None)
+    for key in relloc.iterkeys():
+        # print 'reading', key
+        relloc[key] = dict.fromkeys(obj_class, None)
+        for key2 in obj_class:
+            relloc_id = key+'/'+key2
+            # print 'reading', relloc_id
+            prob_map = read_hdf(filepath, relloc_id) 
+            relloc[key][key2] = prob_map
+
+    return relloc
+
+def read(pickle_dirpath):
+    pickle_filenames = [ f for f in os.listdir(pickle_dirpath) if os.path.isfile(os.path.join(pickle_dirpath,f)) ]
+
+    relloc = {}
+    for p in pickle_filenames:
+        print('reading relloc knowledge of: %s' % (p))
+        local_relloc = None
+        with open(pickle_dirpath+'/'+p, 'rb') as input_file:
+            local_relloc = cPickle.load(input_file)
+    
+        relloc.update(local_relloc)
+
+    return relloc
     
 def main(argv):
     assert len(argv)==8, 'INSUFFICIENT NUMBER OF ARGVs'
