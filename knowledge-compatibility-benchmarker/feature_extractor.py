@@ -51,8 +51,12 @@ def extract_sceneprop_fea(ann, knowledge):
     fea = fxu.get_prob_list_representation(prob_list)
     return fea
 
+'''
+@extract_relloc_fea(ann, knowledge)
+'WARN: does _not_ accomodate diriclet noise in offsets'
+'''
 def extract_relloc_fea(ann, knowledge):
-    print 'WARN: does _not_ accomodate diriclet noise in offsets'
+    # do (standard) segmentation
     ori_img_filepath = ann['ori_img_dir']+'/'+ann['filename']+ann['ori_img_ext']
     img = img_as_float(io.imread(ori_img_filepath))
 
@@ -65,9 +69,7 @@ def extract_relloc_fea(ann, knowledge):
     for key in init_vote.iterkeys():
         init_vote[key] = dict.fromkeys(class_list, 0.0)
 
-    vote_other = init_vote
-    vote_self = init_vote
-
+    vote_other =  vote_self = init_vote
     for i, si in enumerate(segment_list):
         xi, yi = rlk.get_centroid(si)
         ci_hat = voc.class_id2name_map[ ann['ann'][xi,yi] ]
@@ -78,8 +80,7 @@ def extract_relloc_fea(ann, knowledge):
             if c in voc.ignored_class_name_list:
                 continue
 
-            vote_other[i][c] = 0.0
-            vote_self[i][c] = 0.0
+            vote_other[i][c] = vote_self[i][c] = 0.0
             for j in range(len(segment_list)):
                 if j == i:
                     continue
@@ -93,29 +94,30 @@ def extract_relloc_fea(ann, knowledge):
                     continue
                 
                 offset = rlk.get_offset((xi,yi),(xj,yj))
-                norm_offset = rlk.normalize_offset(offset, (200,200), ann['ann'].shape)
+                norm_offset = rlk.normalize_offset(offset, (200,200), \
+                                                   ann['ann'].shape)
 
                 prob_map = knowledge[c][cj_hat]
                 idx_x, idx_y = rlk.get_prob_map_idx(norm_offset, prob_map.shape)
 
                 if ci_hat==cj_hat:
-                    vote_self[i][c]  = vote_self[i][c]  + (alpha_j*prob_map[idx_x][idx_y])
+                    vote_self[i][c]  = vote_self[i][c] \
+                                       + (alpha_j*prob_map[idx_x][idx_y])
                 else:
-                    vote_other[i][c] = vote_other[i][c] + (alpha_j*prob_map[idx_x][idx_y])
+                    vote_other[i][c] = vote_other[i][c] \
+                                       + (alpha_j*prob_map[idx_x][idx_y])
 
     # Compute the relloc features
-    w_other = 1.0
-    w_self = 1.0
-    epsilon = 0.00001
+    w_other = 1.0; w_self = 1.0; epsilon = 0.00001
 
     prob_list = []
     for s in range(len(segment_list)):
         for c in class_list:
-            f_relloc = (w_other*math.log(vote_other[s][c]+epsilon)) + (w_self*math.log(vote_self[s][c]+epsilon))
-            # f_relloc = (w_other*vote_other[s][c]) + (w_self*vote_self[s][c])
+            f_relloc = (w_other*math.log(vote_other[s][c]+epsilon)) \
+                       + (w_self*math.log(vote_self[s][c]+epsilon))
             prob_list.append(f_relloc)
 
-    #
+    # Get the representation of pseudo prob map
     fea = fxu.get_prob_list_representation(prob_list)
     return fea
 
