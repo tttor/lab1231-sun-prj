@@ -29,19 +29,24 @@ def extract_cooccurrence_fea(ann, knowledge):
     fea = fxu.get_prob_list_representation(prob_list)
     return fea
 
+
+'''
+@extract_sceneprop_fea(ann, knowledge)
+Calculate the probabibility of each present object given the scene class.
+For now, the scene class is given by an Oracle
+'''
 def extract_sceneprop_fea(ann, knowledge):
-    '''
-    Calculate the probabibility of each present object given the scene class.
-    For now, the scene class is given by an Oracle
-    '''
     scene_class = fxu.get_scene_class(ann['filename']).lower()
 
     numeric_classes = list( set(ann['ann'].flatten()) )    
-    classes = [i for i in voc.translate(numeric_classes) if i not in voc.ignored_class_name_list]
+    classes = [i for i in voc.translate(numeric_classes) \
+               if i not in voc.ignored_class_name_list]
 
     prob_list = [0.0]
     if len(classes) > 1:
-        prob_list = [knowledge[scene_class][obj] if (obj in knowledge[scene_class].keys()) else 0.0 for obj in classes]
+        prob_list = [knowledge[scene_class][obj] \
+                     if (obj in knowledge[scene_class].keys()) \
+                     else 0.0 for obj in classes]
     
     fea = fxu.get_prob_list_representation(prob_list)
     return fea
