@@ -10,40 +10,39 @@ from lxml import etree
 
 import pascal_voc_2012 as voc
 
+'''
+@construct()
+Based on pixel-wise annotations, this construct a cooccurrence knowledge.
+
+The knowledge can be represented by a n-by-n matrix C, 
+where n is the number of the prespecified object classes in a dataset.
+The element C[i,i] indicates the number of occurrence of i in the dataset.
+The element C[i,j] indicates the number of cooccurrence of i and j in the 
+dataset and is equal to C[j,i].
+
+Notice that 
+> we do not care whether an object class is from two or more
+separate objects, meaning that there is no information about the cooccurrence
+of an object with itself.
+> the data stucture for the cooccurrence knowledge is a dictionary.
+'''
 def construct(ann_ids, obj_names, ann_dir):
-    '''
-    Based on pixel-wise annotations, this construct a cooccurrence knowledge.
-
-    The knowledge can be represented by a n-by-n matrix C, 
-    where n is the number of the prespecified object classes in a dataset.
-    The element C[i,i] indicates the number of occurrence of i in the dataset.
-    The element C[i,j] indicates the number of cooccurrence of i and j in the 
-    dataset and is equal to C[j,i].
-
-    Notice that 
-    > we do not care whether an object class is from two or more
-    separate objects, meaning that there is no information about the cooccurrence
-    of an object with itself.
-    > the data stucture for the cooccurrence knowledge is a dictionary.
-    '''
-    # cooccurrence = dict.fromkeys(obj_names, dict.fromkeys(obj_names, 0))# this does _not_ work, TODO why?
     cooccurrence = dict.fromkeys(obj_names, None)
     for key in cooccurrence.iterkeys():
         cooccurrence[key] = dict.fromkeys(obj_names, 0)
 
-    for i,id in enumerate(ann_ids):
-        print 'Processing',i+1,'of',len(ann_ids),'id=',id
+    for i,ann_id in enumerate(ann_ids):
+        print 'Processing',i+1,'of',len(ann_ids),'ann_id=',ann_id
 
-        ann_filepath = ann_dir+'/'+id+'.csv'
+        ann_filepath = ann_dir+'/'+ann_id+'.csv'
         ann = np.genfromtxt(ann_filepath, delimiter=',')
 
         obj_ids = list(set( ann.flatten().tolist() ))
-        obj_ids = [i for i in obj_ids if i!=255 and i!=0]
         objs = voc.translate(obj_ids)
+        objs = [i for i in objs if i not in voc.ignored_class_name_list]
 
         for i in objs:
-            cooccurrence[i][i] = cooccurrence[i][i] + 1# Cooccurrence at [i,i] indicates the occurrence of obj i in images in the image set
-
+            cooccurrence[i][i] = cooccurrence[i][i] + 1
             for j in objs:            
                 if i is not j:
                     cooccurrence[i][j] = cooccurrence[i][j] + 1
