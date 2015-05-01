@@ -141,7 +141,19 @@ def main(argv):
     # Load targets
     y_filepath = data_dirpath+'/output/ca.csv'
     y = np.genfromtxt(y_filepath, delimiter=',')# note: y.shape is one-element tuple
+    y = y.reshape((len(y),1))
 
+    # Load img id
+    imgid_list_filepath = data_dirpath+'/ann_img_1928.list'
+    imgid_list = None
+    with open(imgid_list_filepath) as f:
+        imgid_list = f.readlines()
+
+    imgidx = np.asarray(range(len(imgid_list)))
+    imgidx = imgidx.reshape( (len(imgid_list),1) )
+
+    y_with_imgidx = np.concatenate((y, imgidx), axis=1)
+    
     # Preprocess data: clean up
     # When using GaussianProcess, this aims to avoid
     # Exception: Multiple input features cannot have the same target value.
@@ -151,7 +163,7 @@ def main(argv):
     unique_X_idx = [X.tolist().index(i) for i in unique_X.tolist()]
 
     X = unique_X
-    y = y[unique_X_idx] 
+    y_with_imgidx = y_with_imgidx[unique_X_idx]
 
     # Sanity checks
     for i in y.tolist():
@@ -161,7 +173,7 @@ def main(argv):
         if np.isnan(i) or np.isinf(i):
             assert False, 'nan or inf values'
 
-    assert X.shape[0]==y.shape[0], 'X.shape[0]!=y.shape[0]'
+    assert X.shape[0]==y_with_imgidx.shape[0], 'X.shape[0]!=y_with_imgidx.shape[0]'
     n_sample = X.shape[0]
     n_fea = X.shape[1]
     print 'n_sample=', n_sample
@@ -170,7 +182,7 @@ def main(argv):
     # Shuffle n_dataset_clone times
     # NOTE: a single dataset is a list of [X_tr, X_te, y_tr, y_te]
     
-    datasets = [train_test_split(X, y, test_size=0.3, random_state=i) for i in range(n_dataset_clone)]
+    datasets = [train_test_split(X, y_with_imgidx, test_size=0.3, random_state=i) for i in range(n_dataset_clone)]
 
     # Tune, train and test on all datasets
     print 'method=', method
@@ -180,9 +192,14 @@ def main(argv):
         print '----------'
         print 'Running the pipeline on', i+1,'-th clone of',len(datasets)
 
-        X_tr, X_te, y_tr, y_te = dataset
         regressor_data = {}
-
+        
+        X_tr, X_te, y_tr_with_imgidx, y_te_with_imgidx = dataset
+        y_tr = y_tr_with_imgidx[:,0]
+        y_te = y_te_with_imgidx[:,0]
+        regressor_data['imgid_tr'] = [imgid_list[int(i)] for i in y_tr_with_imgidx[:,1]]
+        regressor_data['imgid_te'] = [imgid_list[int(i)] for i in y_te_with_imgidx[:,1]]
+        
         # Preprocess
         # have tried scaling y, but result in larger mse
         # '_scaled_min_max' on X results in worse mse, compared to using 'StandardScaler()'
@@ -225,13 +242,23 @@ def main(argv):
     best_regressor['mse'] = get_best_regressor(regressor_list, 'mse')
     best_regressor['r2'] = get_best_regressor(regressor_list,'r2')
 
-    # Log the best regressor
+    # Log only the best regressor
     for score_mode, regressor in best_regressor.iteritems():
-        # plot y_pred vs y_true
         y_true = regressor['perf']['y_true']
         y_pred = regressor['perf']['y_pred']
         score = regressor['perf'][score_mode]
 
+        # write delta(y_true, y_pred) on testing
+        delta_dict = {}
+        for i in range(len(y_true)):
+            d = abs(y_pred[i]-y_true[i])
+            imgid = regressor['imgid_te'][i]
+            delta_dict[imgid] = d
+
+        with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.delta','w') as f:
+            json.dump(delta_dict, f) 
+
+        # plot y_pred vs y_true
         fig, ax = plt.subplots()
         scatter_plot = ax.scatter(y_true, y_pred)
         ax.plot([0.0, 1.0], [0.0, 1.0], '-', linewidth=2, color='red')# the line of y=x 
@@ -246,7 +273,7 @@ def main(argv):
         plt.ylim(ylim)
         ax.grid(True)
 
-        plt.savefig(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+score_mode+'.png')
+        plt.savefig(result_dirpath+'/best_ypred_vs_ytrue_wrt_'+score_mode+'.png',bbox_inches = 'tight')
         plt.close
 
         # with PdfPages(result_dirpath + '/best_ypred_vs_ytrue_wrt_'+score_mode+'.pdf') as pdf:
