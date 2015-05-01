@@ -264,9 +264,9 @@ def main(argv):
         scatter_plot = ax.scatter(y_true, y_pred)
         ax.plot([0.0, 1.0], [0.0, 1.0], '-', linewidth=2, color='red')# the line of y=x 
 
-        ax.set_ylabel('$y_{pred}$')
-        ax.set_xlabel('$y_{true}$')
-        ax.set_title( 'Testing '+ method +': ' + score_mode + ' =' + str(score))
+        ax.set_ylabel('$\hat{y}$: predicted averaged-CA',fontsize=20)
+        ax.set_xlabel('$y$: true averaged-CA',fontsize=20)
+        ax.set_title( 'Testing '+ method +': ' + score_mode + '= ' + str(round(score,4)),fontsize=20)
         
         xlim = (-0.2, 1.2)
         ylim = xlim
