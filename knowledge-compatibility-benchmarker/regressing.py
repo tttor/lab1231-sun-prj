@@ -88,11 +88,16 @@ def test(estimator, X_te, y_te):
     y_pred = estimator.predict(X_te)
     y_true = y_te
 
+    n_pesimistic = sum([1 if y_true[i]>y_pred[i] else 0 for i in range(len(y_true))])
+    n_optimistic = sum([1 if y_true[i]<y_pred[i] else 0 for i in range(len(y_true))])
+
     perf = {}
     perf['mse'] = mean_squared_error(y_true, y_pred) 
     perf['r2'] = r2_score(y_true, y_pred)
     perf['y_pred'] = y_pred
     perf['y_true'] = y_true
+    perf['n_optimistic'] = n_optimistic
+    perf['n_pesimistic'] = n_pesimistic
      
     return perf
 
@@ -238,12 +243,24 @@ def main(argv):
         #
         regressor_list.append(regressor_data)
 
-    # Get the best regressor over all dataset clones
+    # Log regression perf of all data clones
+    mse_list = [i['perf']['mse'] for i in regressor_list]
+    np.savetxt(result_dirpath+'/mse.all', np.asarray(mse_list), delimiter=',')
+
+    r2_list = [i['perf']['r2'] for i in regressor_list]
+    np.savetxt(result_dirpath+'/r2.all', np.asarray(r2_list), delimiter=',')
+
+    n_pesimistic_list = [i['perf']['n_pesimistic'] for i in regressor_list]
+    np.savetxt(result_dirpath+'/n_pesimistic.all', np.asarray(n_pesimistic_list), delimiter=',')
+
+    n_optimistic_list = [i['perf']['n_optimistic'] for i in regressor_list]
+    np.savetxt(result_dirpath+'/n_optimistic.all', np.asarray(n_optimistic_list), delimiter=',')
+
+    # Log only the best regressor
     best_regressor = {}
     best_regressor['mse'] = get_best_regressor(regressor_list, 'mse')
     best_regressor['r2'] = get_best_regressor(regressor_list,'r2')
 
-    # Log only the best regressor
     for score_mode, regressor in best_regressor.iteritems():
         y_true = regressor['perf']['y_true']
         y_pred = regressor['perf']['y_pred']
@@ -266,7 +283,7 @@ def main(argv):
 
         ax.set_ylabel('$\hat{y}$: predicted averaged-CA',fontsize=20)
         ax.set_xlabel('$y$: true averaged-CA',fontsize=20)
-        ax.set_title( 'Testing '+ method +': ' + score_mode + '= ' + str(round(score,4)),fontsize=20)
+        ax.set_title( 'Testing '+ method +': ' + score_mode + '= ' + str(round(score,3)),fontsize=15)
         
         xlim = (-0.2, 1.2)
         ylim = xlim
