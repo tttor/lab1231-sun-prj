@@ -148,6 +148,7 @@ def main(argv):
     imgid_list = None
     with open(imgid_list_filepath) as f:
         imgid_list = f.readlines()
+    imgid_list = [i.strip('\n') for i in imgid_list]
 
     imgidx = np.asarray(range(len(imgid_list)))
     imgidx = imgidx.reshape( (len(imgid_list),1) )
