@@ -254,7 +254,7 @@ def main(argv):
         for i in range(len(y_true)):
             d = abs(y_pred[i]-y_true[i])
             imgid = regressor['imgid_te'][i]
-            delta_dict[imgid] = d
+            delta_dict[imgid] = (y_true[i],y_pred[i],d)
 
         with open(result_dirpath+'/best_regressor_wrt_'+score_mode+'.delta','w') as f:
             json.dump(delta_dict, f) 
