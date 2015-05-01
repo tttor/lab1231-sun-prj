@@ -3,7 +3,7 @@ import pygraphviz as pgv # visualisasi graf, butuh pygraphviz or pydot untuk nx.
 import cPickle
 
 scene_prop_filepath = '/home/tor/xprmnt/knowledge-construction/scene-property-knowledge/scene_property.pickle'
-out_dir = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/scene-prop'
+out_dir = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/knowledge/scene-prop'
 edge_val_th = 0.1
 
 G = nx.DiGraph()
@@ -29,6 +29,6 @@ for key,val in relloc.iteritems():
 		
 	A = nx.to_agraph(G)
 	A.layout(prog='dot')
-	namefile= out_dir+'/'+'gambar_'+key+'.svg'
+	namefile= out_dir+'/'+key+'.svg'
 	A.draw(namefile)	
 	G.clear()
