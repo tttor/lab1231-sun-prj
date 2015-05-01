@@ -10,8 +10,8 @@ timestamp="$(date +'%Y%m%d.%H%M%S')"
 #: main: (1) NuSVR and (2) GradientBoostingRegressor, 
 #: secondary: GP (GaussianProcess), Lasso, DecisionTreeRegressionwithAdaBoost,
 method=$1
-hyperparam_filename=v00
-n_dataset_clone=1
+hyperparam_filename=v11
+n_dataset_clone=100
 dataset_name=voc2010
 annotator_id=philippunarymrf
 regression_input_timestamp=20150321.221555
