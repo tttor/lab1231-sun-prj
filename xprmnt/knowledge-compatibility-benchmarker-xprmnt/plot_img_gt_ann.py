@@ -8,7 +8,8 @@ ori_dir = '/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages-ClassSe
 gt_dir = '/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/SegmentationClass'
 ann_dir = '/home/tor/xprmnt/philipp-unary-mrf-voc2010/result/split_voc2010_philipp_Test_cls'
 out_dir = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/regression/qual-result'
-data_dict_filepath = '/home/tor/xprmnt/knowledge-compatibility-benchmarker/regression-result/philippunarymrf-voc2010-GradientBoostingRegressor-20150501.164425/best_regressor_wrt_r2.delta'
+
+data_dict_filepath = '/home/tor/xprmnt/knowledge-compatibility-benchmarker/regression-result/philippunarymrf-voc2010-GradientBoostingRegressor-20150501.201503.s/best_regressor_wrt_r2.delta'
 
 def main():
     data_dict = None
@@ -20,7 +21,7 @@ def main():
         y_pred = data[1]
         delta = data[2]
 
-        if is_ok_4(delta):
+        if is_ok_5(delta):
             print 'plotting delta=', delta, 'of', imgid
             plot_ori_gt_ann(imgid)
 
