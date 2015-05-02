@@ -94,17 +94,21 @@ def get_output(sample_id_list, eval_dir, regression_data_dir):
     #
     n_bin = 50
 
-    plt.hist(regression_output[:,0], n_bin, normed=1, facecolor='red', alpha=0.5)
+    plt.hist(regression_output[:,0], n_bin, normed=0, facecolor='red', alpha=1.0)
+    plt.xlabel('true averaged-CA values', fontsize=18)
+    plt.ylabel('frequency: #samples', fontsize=18)
     ca_hist_plot_filepath = regression_data_dir+'/output/ca_hist_plot'
-    plt.savefig(ca_hist_plot_filepath+'.pdf')
-    plt.savefig(ca_hist_plot_filepath+'.png')
+    plt.savefig(ca_hist_plot_filepath+'.pdf',bbox_inches = 'tight')
+    plt.savefig(ca_hist_plot_filepath+'.png',bbox_inches = 'tight')
     plt.close()
 
     
-    plt.hist(regression_output[:,1], n_bin, normed=1, facecolor='green', alpha=0.5)
+    plt.hist(regression_output[:,1], n_bin, normed=0, facecolor='green', alpha=1.0)
     ga_hist_plot_filepath = regression_data_dir+'/output/ga_hist_plot'
-    plt.savefig(ga_hist_plot_filepath+'.pdf')
-    plt.savefig(ga_hist_plot_filepath+'.png')
+    plt.xlabel('Global accuracy values', fontsize=18)
+    plt.ylabel('frequency: #samples', fontsize=18)
+    plt.savefig(ga_hist_plot_filepath+'.pdf',bbox_inches = 'tight')
+    plt.savefig(ga_hist_plot_filepath+'.png',bbox_inches = 'tight')
     plt.close()
 
     #
@@ -128,7 +132,7 @@ def main(argv):
     sample_id_list = [x.strip('\n') for x in sample_id_list]
 
     #
-    get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir, ori_img_dir)
+    # get_input(sample_id_list, ann_dir, knowledge_dir, regression_data_dir, ori_img_dir)
     get_output(sample_id_list, eval_dir, regression_data_dir)
     
 if __name__ == '__main__':

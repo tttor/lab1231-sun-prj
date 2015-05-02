@@ -23,7 +23,8 @@ eval_dir=/home/tor/xprmnt/philipp-unary-mrf-voc2010/eval
 ori_img_dir=/home/tor/dataset/pascal/VOC2010/VOCdevkit/VOC2010/JPEGImages-ClassSegmented
 
 regression_data_dir=$root_dir/regression-data/$annotator_id-$dataset_name-$timestamp
-mkdir -p $regression_data_dir
+mkdir -p $regression_data_dir/input
+mkdir -p $regression_data_dir/output
 
 #
 export PYTHONPATH=$PYTHONPATH:/home/tor/lab1231-sun-prj/util/src-py
