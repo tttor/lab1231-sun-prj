@@ -28,7 +28,81 @@ from pandas import read_hdf
 the relative location knowledge is represented in a prop_map for each object class pair, 
 e.g. one prob_map for a car with respect to a road
 '''
-def construct(chosen_cprime, dirichlet_noise, img_list_filepath, gt_csv_dir, img_dir):
+def construct(chosen_cprime, img_list_filepath, gt_csv_dir, img_dir):
+    #
+    relative_location_matrix_shape = (200,200) # following [Gould, 2008]
+    variance_factor = 0.10 # following [Gould, 2008]
+    dirichlet_noise = False
+    dirichlet_noise_alpha = (5.0,5.0) # following [Gould, 2008]
+
+    #
+    c_labels = [{'id':key, 'name':val} for key,val \
+                in dataset.class_id2name_map.iteritems() \
+                if val not in dataset.ignored_class_name_list]
+    cprime_labels = c_labels
+    if chosen_cprime is not 'all':
+        cprime_labels = [{'id':key, 'name':val} for key,val \
+                         in dataset.class_id2name_map.iteritems() \
+                         if val==chosen_cprime]
+
+    prob_map = init_prob_map([i['name'] for i in cprime_labels], [i['name'] \
+                             for i in c_labels], relative_location_matrix_shape)
+    with open(img_list_filepath) as f:
+        img_ids = f.readlines()
+    img_ids = [x.strip('\n') for x in img_ids]
+
+    for i, img_id in enumerate(img_ids):
+        img_filepath = img_dir + '/' + img_id + dataset.ori_img_format
+        img = img_as_float(io.imread(img_filepath))
+        img_height, img_width = img.shape
+
+        segmentation = get_segmentation(img)
+        segment_list = get_segment_list(segmentation)
+
+        gt_ann_filepath = gt_csv_dir + '/' + img_id + '.csv'
+        gt_annotation = np.genfromtxt(gt_ann_filepath, delimiter=',')
+
+        for j, segment in enumerate(segment_list):
+            centroid = get_centroid(segment)
+            centroid_label = get_label(centroid, gt_annotation)
+            centroid_weight = get_weight(segment)
+
+            if centroid_label['name'] in dataset.ignored_class_name_list:
+                continue
+
+            if centroid_label['name'] not in prob_map.keys():
+                continue
+
+            for label in c_labels:
+                pixels = get_pixel_of_label(label, gt_annotation)
+                for pixel in pixels:
+                    offset = get_offset(centroid,pixel)
+                    if dirichlet_noise=='True':
+                        offset = add_dirichlet_noise(offset,dirichlet_noise_alpha,\
+                                                     relative_location_matrix_shape)
+                    norm_offset = normalize_offset(offset, \
+                                                   relative_location_matrix_shape,\
+                                                   gt_annotation.shape)
+
+                    idx=get_prob_map_idx(norm_offset,relative_location_matrix_shape)
+                    count = prob_map[centroid_label['name']][label['name']] [idx]
+                    count = count + centroid_weight
+
+                    prob_map[centroid_label['name']][label['name']] [idx] = count
+
+    norm_prob_map = normalize_prob_map(prob_map, relative_location_matrix_shape)
+    sigma = (np.sqrt(variance_factor*img_height),\
+             np.sqrt(variance_factor*img_width))
+    filtered_norm_prob_map = apply_gaussian_filter(sigma, norm_prob_map, \
+                                                   relative_location_matrix_shape)
+    return filtered_norm_prob_map
+
+'''
+@construct_2()
+the relative location knowledge is represented in a prop_map for each object class pair, 
+e.g. one prob_map for a car with respect to a road
+'''
+def construct_2(chosen_cprime, dirichlet_noise, img_list_filepath, gt_csv_dir, img_dir):
     #
     relative_location_matrix_shape = (200,200) # following [Gould, 2008]
     variance_factor = 0.10 # following [Gould, 2008]
@@ -341,8 +415,8 @@ def main(argv):
     gt_csv_dir = argv[4]
     img_dir = argv[5]
 
-    relative_location = construct(chosen_cprime, dirichlet_noise, img_list_filepath, \
-                                  gt_csv_dir, img_dir);
+    relative_location = construct_2(chosen_cprime, dirichlet_noise, img_list_filepath, \
+                                    gt_csv_dir, img_dir);
 
     print('write relative_location knowledge ...')
     cprime = argv[1]
