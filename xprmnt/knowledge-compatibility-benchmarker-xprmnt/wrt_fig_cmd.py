@@ -1,10 +1,8 @@
 #!/usr/bin/python
 
 # list_filepath = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/regression/qual-result/oneobjgt.list'
-
-# list_filepath = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/regression/qual-result/twoobjgt.list'
-
-list_filepath = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/regression/qual-result/threeobjgt.list'
+list_filepath = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/regression/qual-result/twoobjgt.list'
+# list_filepath = '/home/tor/Dropbox/robotics/prj/011/wrt/tor/kc-benchmarker/s2is-usings2is/fig/regression/qual-result/threeobjgt.list'
 
 #read list
 img_filepath_list = []
